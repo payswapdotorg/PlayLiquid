@@ -1,0 +1,16 @@
+{
+  "name": "@playliquid/runtime-contracts",
+  "version": "0.1.0",
+  "description": "PlayLiquid GameOS Runtime/Experience Protocol contracts (PL-003). Typed runtime session lifecycle, the single canonical command/event path, the capability-mediated action protocol, multiplayer authority contracts, long-running work contracts, idempotency/stale-result semantics, replay/resume boundaries, and the Spark target profile. Pure types and pure functions only: no IO, no engine SDKs, no client implementation.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "node --test src/",
+    "harness": "node src/harness.ts",
+    "lint": "oxlint"
+  }
+}
