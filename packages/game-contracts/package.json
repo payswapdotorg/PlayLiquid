@@ -1,0 +1,22 @@
+{
+  "name": "@playliquid/game-contracts",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "PlayLiquid GameOS shared contract vocabulary: game identity (R1), spatial references (R15), avatar portability (R5) and platform capability declarations (R7). Pure types and pure functions only — no IO, no engine SDKs, no cross-package imports.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "typecheck": "tsc -p .",
+    "test": "node --test src/**/*.test.ts",
+    "selfcheck": "node src/selfcheck.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.9",
+    "typescript": "^6.0.3"
+  }
+}
