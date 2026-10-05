@@ -16,7 +16,7 @@
   "workOrders": [
     {
       "id": "PL-001",
-      "status": "READY",
+      "status": "MERGED",
       "depends": [],
       "writeSurface": [
         "packages/game-contracts",
@@ -24,8 +24,13 @@
       ],
       "branch": "work/pl-001",
       "pr": null,
-      "mergedSha": null,
-      "evidence": [],
+      "mergedSha": "feb54ee8d4aeeff0958fa3ce33c4247e93eb9def",
+      "evidence": [
+        {
+          "ts": "2026-10-05T17:19:44Z",
+          "note": "squash-merged via PR #3; TL gates: game-contracts standalone green; game-ir green with workspace:* sibling link (tsc 0 err, tests pass, oxlint clean); surface+secret scan clean"
+        }
+      ],
       "owner": "worker"
     },
     {
