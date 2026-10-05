@@ -1,0 +1,79 @@
+schemaVersion: 1
+product:
+  id: playliquid
+  name: PlayLiquid GameOS
+  repository: payswapdotorg/PlayLiquid
+  base:
+    repository: zai-org/ZCode
+    version: 3.14.3
+architecture:
+  semanticKernel: GameIR
+  compositionAuthority: PackageGraph
+  runtimePermissionAuthority: CapabilityBroker
+  projectLifecycleAuthority: Git
+  aiWorkspaceAuthority: ZCode
+  humanCapabilityProvider: payswapdotorg/Arena
+packageKinds:
+  - game
+  - world
+  - world-region
+  - asset
+  - asset-set
+  - avatar
+  - avatar-body
+  - avatar-brain
+  - skill
+  - system
+  - mechanic
+  - quest
+  - economy
+  - ui
+  - audio
+  - animation
+  - sensor
+  - actuator
+  - tool
+  - engine-binding
+  - simulation
+  - evaluation
+  - replay-suite
+  - dataset
+  - model-artifact
+  - build-target
+platformCapabilities:
+  - identity
+  - social
+  - leaderboard
+  - multiplayer
+  - matchmaking
+  - presence
+  - replay
+  - rewards
+  - achievements
+  - cloud-save
+  - analytics
+  - moderation
+  - competitive-integrity
+  - tournaments
+targets:
+  - web
+  - spark
+  - windows
+  - macos
+  - linux
+  - android
+  - ios
+  - steamdeck
+  - xr
+  - dedicated-server
+  - console
+engineAdapters:
+  - playcanvas
+  - unreal
+  - unity
+  - godot
+  - blender
+  - generic-cli
+  - filesystem
+  - git
+  - mcp
