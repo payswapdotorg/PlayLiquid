@@ -1,0 +1,24 @@
+{
+  "name": "@playliquid/platform-contracts",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "PlayLiquid GameOS platform capability contracts (PL-004). The typed capability surface of every GameOS platform service (R7, lock 17): leaderboard, multiplayer, replay, rewards, achievements, social, analytics, moderation and integrity — typed request/response contracts, game-declared semantic event vocabulary (lock 18), policy descriptors, entitlement/economy idempotency (R10), probabilistic integrity evidence (R11/E11), tenant isolation and least privilege (R20), and pure cross-capability policy validators. Pure types and pure functions only: no IO, no storage, no service implementations.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "node --test \"src/*.test.ts\"",
+    "harness": "node src/harness.ts",
+    "lint": "oxlint"
+  },
+  "dependencies": {
+    "@playliquid/game-contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.9",
+    "typescript": "^6.0.3"
+  }
+}
