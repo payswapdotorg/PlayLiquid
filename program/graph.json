@@ -30,7 +30,7 @@
     },
     {
       "id": "PL-002",
-      "status": "READY",
+      "status": "MERGED",
       "depends": [],
       "writeSurface": [
         "packages/package-system",
@@ -38,8 +38,13 @@
       ],
       "branch": "work/pl-002",
       "pr": null,
-      "mergedSha": null,
-      "evidence": [],
+      "mergedSha": "d84dd73d61fc92ecfbbceee72e5eea2eea36920a",
+      "evidence": [
+        {
+          "ts": "2026-10-05T17:15:04Z",
+          "note": "squash-merged via PR after TL gate re-run: tsc 0 errors, 103/103 node:test, oxlint clean, surface+secret scan clean"
+        }
+      ],
       "owner": "worker"
     },
     {
