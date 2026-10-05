@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "architectureVersion": "1.0",
+  "status": "FROZEN",
+  "repository": "payswapdotorg/PlayLiquid",
+  "requiredReadOrder": [
+    "AGENTS.md",
+    "AI_CONTINUATION.md",
+    "spec/PROJECT-STATE.md",
+    "spec/architecture.md",
+    "spec/architecture-lock.md",
+    "spec/requirements.md",
+    "spec/dependency-graph.md",
+    "spec/module-dependency-matrix.md",
+    "spec/work-items.md",
+    "spec/worker-contract.md",
+    "docs/handoff/FINAL-TECH-LEAD-HANDOFF.md",
+    "docs/handoff/EXECUTION-PLAN.md",
+    "docs/research/ARCHITECTURE-RESEARCH.md"
+  ],
+  "canonicalSpecs": [
+    "spec/architecture.md",
+    "spec/architecture-lock.md",
+    "spec/requirements.md",
+    "spec/dependency-graph.md",
+    "spec/module-dependency-matrix.md",
+    "spec/package-contract.md",
+    "spec/traceability.md"
+  ],
+  "program": [
+    "program/graph.json",
+    "scripts/program-check.mjs",
+    "scripts/program-frontier.mjs"
+  ],
+  "maxConcurrentWorkers": 3,
+  "workerRule": "one Work Order = one branch = one PR = one frozen write surface"
+}
