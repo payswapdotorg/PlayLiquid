@@ -835,6 +835,19 @@ importers:
         specifier: ^6.0.2
         version: 6.0.3
 
+  packages/platform-contracts:
+    dependencies:
+      '@playliquid/game-contracts':
+        specifier: workspace:*
+        version: link:../game-contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^25.9.9
+        version: 25.9.9
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
   packages/provider:
     dependencies:
       '@zcode/model-option-map':
