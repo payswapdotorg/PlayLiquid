@@ -1,0 +1,21 @@
+{
+  "name": "@playliquid/package-system",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "PlayLiquid package model and resolution contract layer — pure types, schemas and deterministic resolution for the Package Graph (spec/package-contract.md). No IO, no git client, no network.",
+  "license": "Apache-2.0",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "node --test \"src/**/*.test.ts\"",
+    "harness": "node src/harness.ts",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.2"
+  }
+}
