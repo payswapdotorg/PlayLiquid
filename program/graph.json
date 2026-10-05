@@ -72,15 +72,20 @@
     },
     {
       "id": "PL-004",
-      "status": "READY",
+      "status": "MERGED",
       "depends": [],
       "writeSurface": [
         "packages/platform-contracts"
       ],
       "branch": "work/pl-004",
       "pr": null,
-      "mergedSha": null,
-      "evidence": [],
+      "mergedSha": "f1982b31a6be81218a4722272c149cbf3a004e06",
+      "evidence": [
+        {
+          "ts": "2026-10-05T18:09:23Z",
+          "note": "squash-merged via PR after TL gate re-run in worktree (pnpm-linked): tsc PASS, node:test PASS, oxlint clean; surface+secret clean @ base 424a42d"
+        }
+      ],
       "owner": "worker"
     },
     {
