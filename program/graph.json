@@ -18,7 +18,10 @@
       "id": "PL-001",
       "status": "READY",
       "depends": [],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/game-contracts",
+        "packages/game-ir"
+      ],
       "branch": "work/pl-001",
       "pr": null,
       "mergedSha": null,
@@ -29,7 +32,10 @@
       "id": "PL-002",
       "status": "READY",
       "depends": [],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/package-system",
+        "spec/package-contract.md"
+      ],
       "branch": "work/pl-002",
       "pr": null,
       "mergedSha": null,
@@ -40,7 +46,9 @@
       "id": "PL-003",
       "status": "READY",
       "depends": [],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/runtime-contracts"
+      ],
       "branch": "work/pl-003",
       "pr": null,
       "mergedSha": null,
@@ -51,7 +59,9 @@
       "id": "PL-004",
       "status": "READY",
       "depends": [],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/platform-contracts"
+      ],
       "branch": "work/pl-004",
       "pr": null,
       "mergedSha": null,
@@ -62,7 +72,10 @@
       "id": "PL-005",
       "status": "READY",
       "depends": [],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/tool-fabric",
+        "packages/engine-adapter-contract"
+      ],
       "branch": "work/pl-005",
       "pr": null,
       "mergedSha": null,
@@ -75,7 +88,9 @@
       "depends": [
         "PL-001"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/lab-contracts"
+      ],
       "branch": "work/pl-006",
       "pr": null,
       "mergedSha": null,
@@ -88,7 +103,9 @@
       "depends": [
         "PL-006"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/arena-integration"
+      ],
       "branch": "work/pl-007",
       "pr": null,
       "mergedSha": null,
@@ -102,7 +119,10 @@
         "PL-003",
         "PL-005"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/build-contracts",
+        "packages/target-profiles"
+      ],
       "branch": "work/pl-008",
       "pr": null,
       "mergedSha": null,
@@ -115,7 +135,9 @@
       "depends": [
         "PL-004"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/platform-contracts/refinement-spec"
+      ],
       "branch": "work/pl-009",
       "pr": null,
       "mergedSha": null,
@@ -136,7 +158,10 @@
         "PL-008",
         "PL-009"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "architecture-policy.yaml",
+        "spec/module-dependency-matrix.md"
+      ],
       "branch": "work/pl-010",
       "pr": null,
       "mergedSha": null,
@@ -149,7 +174,10 @@
       "depends": [
         "PL-002"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/package-registry",
+        "packages/artifact-store"
+      ],
       "branch": "work/pl-011",
       "pr": null,
       "mergedSha": null,
@@ -163,7 +191,9 @@
         "PL-001",
         "PL-002"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/git-lineage"
+      ],
       "branch": "work/pl-012",
       "pr": null,
       "mergedSha": null,
@@ -177,7 +207,9 @@
         "PL-001",
         "PL-003"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/runtime-core"
+      ],
       "branch": "work/pl-013",
       "pr": null,
       "mergedSha": null,
@@ -190,7 +222,10 @@
       "depends": [
         "PL-003"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/simulation",
+        "packages/replay"
+      ],
       "branch": "work/pl-014",
       "pr": null,
       "mergedSha": null,
@@ -203,7 +238,12 @@
       "depends": [
         "PL-004"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/platform-identity",
+        "packages/platform-social",
+        "packages/platform-leaderboard",
+        "packages/platform-achievements"
+      ],
       "branch": "work/pl-015",
       "pr": null,
       "mergedSha": null,
@@ -217,7 +257,9 @@
         "PL-003",
         "PL-004"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/platform-multiplayer"
+      ],
       "branch": "work/pl-016",
       "pr": null,
       "mergedSha": null,
@@ -231,7 +273,9 @@
         "PL-004",
         "PL-009"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/platform-economy"
+      ],
       "branch": "work/pl-017",
       "pr": null,
       "mergedSha": null,
@@ -245,7 +289,9 @@
         "PL-009",
         "PL-014"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/platform-integrity"
+      ],
       "branch": "work/pl-018",
       "pr": null,
       "mergedSha": null,
@@ -258,7 +304,9 @@
       "depends": [
         "PL-005"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/tool-fabric-runtime"
+      ],
       "branch": "work/pl-019",
       "pr": null,
       "mergedSha": null,
@@ -273,7 +321,9 @@
         "PL-011",
         "PL-019"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/build-orchestrator"
+      ],
       "branch": "work/pl-020",
       "pr": null,
       "mergedSha": null,
@@ -287,7 +337,9 @@
         "PL-019",
         "PL-020"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/engine-playcanvas"
+      ],
       "branch": "work/pl-021",
       "pr": null,
       "mergedSha": null,
@@ -301,7 +353,9 @@
         "PL-019",
         "PL-020"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/engine-unreal"
+      ],
       "branch": "work/pl-022",
       "pr": null,
       "mergedSha": null,
@@ -315,7 +369,9 @@
         "PL-019",
         "PL-020"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/engine-unity"
+      ],
       "branch": "work/pl-023",
       "pr": null,
       "mergedSha": null,
@@ -329,7 +385,9 @@
         "PL-019",
         "PL-020"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/engine-godot"
+      ],
       "branch": "work/pl-024",
       "pr": null,
       "mergedSha": null,
@@ -342,7 +400,9 @@
       "depends": [
         "PL-019"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/tool-blender"
+      ],
       "branch": "work/pl-025",
       "pr": null,
       "mergedSha": null,
@@ -356,7 +416,10 @@
         "PL-001",
         "PL-003"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/avatar-runtime",
+        "packages/capability-broker"
+      ],
       "branch": "work/pl-026",
       "pr": null,
       "mergedSha": null,
@@ -369,7 +432,9 @@
       "depends": [
         "PL-026"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/sensory-runtime"
+      ],
       "branch": "work/pl-027",
       "pr": null,
       "mergedSha": null,
@@ -384,7 +449,9 @@
         "PL-014",
         "PL-026"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/lab-simulation"
+      ],
       "branch": "work/pl-028",
       "pr": null,
       "mergedSha": null,
@@ -399,7 +466,9 @@
         "PL-026",
         "PL-028"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/lab-organization"
+      ],
       "branch": "work/pl-029",
       "pr": null,
       "mergedSha": null,
@@ -413,7 +482,9 @@
         "PL-028",
         "PL-029"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/lab-learning"
+      ],
       "branch": "work/pl-030",
       "pr": null,
       "mergedSha": null,
@@ -427,7 +498,9 @@
         "PL-007",
         "PL-030"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/arena-integration-runtime"
+      ],
       "branch": "work/pl-031",
       "pr": null,
       "mergedSha": null,
@@ -441,7 +514,9 @@
         "PL-012",
         "PL-004"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/community"
+      ],
       "branch": "work/pl-032",
       "pr": null,
       "mergedSha": null,
@@ -457,7 +532,10 @@
         "PL-019",
         "PL-026"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/game-ui",
+        "packages/web/gameos"
+      ],
       "branch": "work/pl-033",
       "pr": null,
       "mergedSha": null,
@@ -472,7 +550,10 @@
         "PL-030",
         "PL-032"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/web/gameos-lab",
+        "packages/web/gameos-community"
+      ],
       "branch": "work/pl-034",
       "pr": null,
       "mergedSha": null,
@@ -486,7 +567,10 @@
         "PL-013",
         "PL-020"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/runtime-spark",
+        "packages/spark"
+      ],
       "branch": "work/pl-035",
       "pr": null,
       "mergedSha": null,
@@ -503,7 +587,9 @@
         "PL-023",
         "PL-024"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/target-builds"
+      ],
       "branch": "work/pl-036",
       "pr": null,
       "mergedSha": null,
@@ -522,7 +608,9 @@
         "PL-021",
         "PL-035"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "examples/native-game"
+      ],
       "branch": "work/pl-037",
       "pr": null,
       "mergedSha": null,
@@ -539,7 +627,9 @@
         "PL-024",
         "PL-025"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "examples/engine-integration"
+      ],
       "branch": "work/pl-038",
       "pr": null,
       "mergedSha": null,
@@ -555,7 +645,9 @@
         "PL-014",
         "PL-020"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "examples/large-world"
+      ],
       "branch": "work/pl-039",
       "pr": null,
       "mergedSha": null,
@@ -572,7 +664,10 @@
         "PL-031",
         "PL-032"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "examples/lab-journey",
+        "qa/e2e-lab"
+      ],
       "branch": "work/pl-040",
       "pr": null,
       "mergedSha": null,
@@ -589,7 +684,10 @@
         "PL-018",
         "PL-031"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "packages/security-gameos",
+        "qa/security"
+      ],
       "branch": "work/pl-041",
       "pr": null,
       "mergedSha": null,
@@ -605,7 +703,11 @@
         "PL-021",
         "PL-039"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "qa/performance",
+        "packages/runtime-core/perf",
+        "packages/build-orchestrator/perf"
+      ],
       "branch": "work/pl-042",
       "pr": null,
       "mergedSha": null,
@@ -621,7 +723,10 @@
         "PL-035",
         "PL-037"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "qa/browser",
+        "docs/journeys"
+      ],
       "branch": "work/pl-043",
       "pr": null,
       "mergedSha": null,
@@ -638,7 +743,11 @@
         "PL-041",
         "PL-043"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "services/gameos",
+        "deployment",
+        "docs/deployment"
+      ],
       "branch": "work/pl-044",
       "pr": null,
       "mergedSha": null,
@@ -658,12 +767,17 @@
         "PL-043",
         "PL-044"
       ],
-      "writeSurface": [],
+      "writeSurface": [
+        "spec/PROJECT-STATE.md",
+        "docs/handoff",
+        "program/graph.json"
+      ],
       "branch": "work/pl-045",
       "pr": null,
       "mergedSha": null,
       "evidence": [],
       "owner": "tech-lead"
     }
-  ]
+  ],
+  "generatedAt": "2026-10-05"
 }
