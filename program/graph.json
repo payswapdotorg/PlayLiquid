@@ -1,0 +1,669 @@
+{
+  "schemaVersion": 1,
+  "program": "PLGOS-1",
+  "repository": "payswapdotorg/PlayLiquid",
+  "baseArchitectureCommit": "21b51c153ecbbc545f39cffb0bfa530ef489ef9c",
+  "maxConcurrentWorkers": 3,
+  "rootOwner": "tech-lead",
+  "statuses": [
+    "BLOCKED",
+    "READY",
+    "ACTIVE",
+    "REVIEW",
+    "MERGED",
+    "REJECTED"
+  ],
+  "workOrders": [
+    {
+      "id": "PL-001",
+      "status": "READY",
+      "depends": [],
+      "writeSurface": [],
+      "branch": "work/pl-001",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-002",
+      "status": "READY",
+      "depends": [],
+      "writeSurface": [],
+      "branch": "work/pl-002",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-003",
+      "status": "READY",
+      "depends": [],
+      "writeSurface": [],
+      "branch": "work/pl-003",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-004",
+      "status": "READY",
+      "depends": [],
+      "writeSurface": [],
+      "branch": "work/pl-004",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-005",
+      "status": "READY",
+      "depends": [],
+      "writeSurface": [],
+      "branch": "work/pl-005",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-006",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-001"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-006",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-007",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-006"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-007",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-008",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-003",
+        "PL-005"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-008",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-009",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-004"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-009",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-010",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-001",
+        "PL-002",
+        "PL-003",
+        "PL-004",
+        "PL-005",
+        "PL-006",
+        "PL-007",
+        "PL-008",
+        "PL-009"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-010",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "tech-lead"
+    },
+    {
+      "id": "PL-011",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-002"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-011",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-012",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-001",
+        "PL-002"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-012",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-013",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-001",
+        "PL-003"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-013",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-014",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-003"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-014",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-015",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-004"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-015",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-016",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-003",
+        "PL-004"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-016",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-017",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-004",
+        "PL-009"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-017",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-018",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-009",
+        "PL-014"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-018",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-019",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-005"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-019",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-020",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-008",
+        "PL-011",
+        "PL-019"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-020",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-021",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-019",
+        "PL-020"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-021",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-022",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-019",
+        "PL-020"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-022",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-023",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-019",
+        "PL-020"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-023",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-024",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-019",
+        "PL-020"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-024",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-025",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-019"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-025",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-026",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-001",
+        "PL-003"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-026",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-027",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-026"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-027",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-028",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-006",
+        "PL-014",
+        "PL-026"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-028",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-029",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-006",
+        "PL-026",
+        "PL-028"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-029",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-030",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-028",
+        "PL-029"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-030",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-031",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-007",
+        "PL-030"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-031",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-032",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-012",
+        "PL-004"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-032",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-033",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-011",
+        "PL-013",
+        "PL-019",
+        "PL-026"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-033",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-034",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-028",
+        "PL-030",
+        "PL-032"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-034",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-035",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-013",
+        "PL-020"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-035",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-036",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-020",
+        "PL-021",
+        "PL-022",
+        "PL-023",
+        "PL-024"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-036",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-037",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-011",
+        "PL-013",
+        "PL-015",
+        "PL-017",
+        "PL-018",
+        "PL-021",
+        "PL-035"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-037",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-038",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-020",
+        "PL-022",
+        "PL-023",
+        "PL-024",
+        "PL-025"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-038",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-039",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-011",
+        "PL-013",
+        "PL-014",
+        "PL-020"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-039",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-040",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-028",
+        "PL-029",
+        "PL-030",
+        "PL-031",
+        "PL-032"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-040",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-041",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-011",
+        "PL-026",
+        "PL-017",
+        "PL-018",
+        "PL-031"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-041",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-042",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-014",
+        "PL-020",
+        "PL-021",
+        "PL-039"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-042",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-043",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-033",
+        "PL-034",
+        "PL-035",
+        "PL-037"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-043",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-044",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-033",
+        "PL-034",
+        "PL-036",
+        "PL-041",
+        "PL-043"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-044",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-045",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-037",
+        "PL-038",
+        "PL-039",
+        "PL-040",
+        "PL-041",
+        "PL-042",
+        "PL-043",
+        "PL-044"
+      ],
+      "writeSurface": [],
+      "branch": "work/pl-045",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "tech-lead"
+    }
+  ]
+}
