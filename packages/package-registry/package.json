@@ -1,0 +1,25 @@
+{
+  "name": "@playliquid/package-registry",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "PlayLiquid package registry (PL-011). An immutable, in-memory-first index over package records per spec/package-contract.md: fail-closed publish (mutation of an immutable coordinate is rejected, idempotent republish), deterministic resolution reusing @playliquid/package-system, lookup by identity/digest/capability/permission, stable listing, and the registry-to-CAS wiring that verifies lockfile pins against both the registry and the @playliquid/artifact-store (lock rule 10). Pure domain: no fs, no network — persistence flows through the RegistryStore port.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "node --test \"src/**/*.test.ts\"",
+    "harness": "node src/harness.ts",
+    "lint": "oxlint"
+  },
+  "dependencies": {
+    "@playliquid/artifact-store": "workspace:*",
+    "@playliquid/package-system": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.9",
+    "typescript": "^6.0.3"
+  }
+}

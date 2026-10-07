@@ -1,0 +1,24 @@
+{
+  "name": "@playliquid/artifact-store",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "PlayLiquid content-addressed artifact store (PL-011, E7/E10). Deterministic SHA-256 blob digests, dedupe by digest, fail-closed integrity verification on fetch, stream-chunked write/read ports with in-memory fakes, byte-range reads and content-derived manifest records. Pure domain: no fs, no network — adapters own IO through the chunked blob ports.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "node --test \"src/**/*.test.ts\"",
+    "harness": "node src/harness.ts",
+    "lint": "oxlint"
+  },
+  "dependencies": {
+    "@playliquid/package-system": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.9",
+    "typescript": "^6.0.3"
+  }
+}
