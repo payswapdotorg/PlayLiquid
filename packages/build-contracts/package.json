@@ -1,0 +1,26 @@
+{
+  "name": "@playliquid/build-contracts",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "PlayLiquid GameOS build pipeline contract layer (PL-008). Typed build inputs (GameIR digest + package lock + target profile + engine binding + toolchain/environment profile), build outputs (CAS artifact records, build manifest, provenance and verification evidence), build request/command contracts with idempotency keys (E6), the frozen build-stage state machine, and the pure BuildExecutor port. Pure types and pure functions only: no IO, no toolchain invocation, no engine SDKs, no artifact math (the digest/CAS authority is @playliquid/package-system, E7).",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "typecheck": "tsc -p .",
+    "test": "node --test src/**/*.test.ts",
+    "harness": "node src/harness.ts"
+  },
+  "dependencies": {
+    "@playliquid/game-ir": "workspace:*",
+    "@playliquid/package-system": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.9",
+    "typescript": "^6.0.3"
+  }
+}

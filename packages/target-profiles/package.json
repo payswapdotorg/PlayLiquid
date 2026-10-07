@@ -1,0 +1,26 @@
+{
+  "name": "@playliquid/target-profiles",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "PlayLiquid GameOS target/profile contract layer (PL-008). The frozen target taxonomy (web, spark, windows, macos, linux, android, ios, steamdeck, xr, dedicated-server, console — R12), typed per-target capability descriptors, runtime policy bindings (runtime-contracts vocabulary), engine-binding compatibility declarations, content-addressed immutable target profile records with seal/verify discipline, and pure validators (target/engine compatibility, profile digest integrity, evaluation-suite references). Spark carries its 9:16 mobile-first minimal-critical-boot properties as a distinct typed record — a target profile, never a second content model (lock rule 16). Pure types and pure functions only: no IO, no engine SDKs.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "typecheck": "tsc -p .",
+    "test": "node --test src/**/*.test.ts",
+    "harness": "node src/harness.ts"
+  },
+  "dependencies": {
+    "@playliquid/game-ir": "workspace:*",
+    "@playliquid/runtime-contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.9",
+    "typescript": "^6.0.3"
+  }
+}
