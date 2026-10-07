@@ -1,0 +1,25 @@
+{
+  "name": "@playliquid/arena-integration",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "PlayLiquid GameOS Arena integration contracts (PL-007). The typed, provider-neutral integration layer between the Game Engineering Lab and the external Arena (architecture.md §Arena, lock rules 6/32): frozen request-kind vocabulary and content-addressed wire request envelopes, authorization scopes for artifact return, typed response envelopes for the three declared return classes (results, evidence, authorized artifacts) with a pure response validator, ingestion-only verdicts producing evidence packages for the Lab's normal evidence path (Arena can never directly mutate PlayLiquid live state), an escalation lifecycle state machine with idempotent send/ingest (E6), audit-tracked authorization decisions, and a pure ArenaTransport port with deterministic in-memory fakes. Pure types and pure functions only: no IO, no network, no Arena SDK, no provider client. PENDING (Architecture Change Request, see index.ts): the Lab-side escalation request record built FROM lab-contracts' ArenaEscalationRef — blocked because PL-006 is not merged at base c9cf856; it will import-and-extend ArenaEscalationRef when @playliquid/lab-contracts lands and this package's dependency line is added by the TL.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "typecheck": "tsc -p .",
+    "test": "node --test src/**/*.test.ts",
+    "harness": "node src/harness.ts"
+  },
+  "dependencies": {
+    "@playliquid/game-contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.9",
+    "typescript": "^6.0.3"
+  }
+}
