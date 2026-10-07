@@ -1,6 +1,8 @@
 # @playliquid/platform-contracts
 
 Work Order PL-004 — Platform capability contracts (PlayLiquid GameOS).
+Refined by Work Order PL-009 — integrity/economy/replay contract
+refinement (see "PL-009 refinement areas" below).
 
 The typed capability surface of every GameOS platform service (R7, lock
 rule 17): leaderboard, multiplayer, replay, rewards, achievements,
@@ -26,6 +28,35 @@ sibling `@playliquid/game-contracts` (module-dependency-matrix).
 | Moderation | `src/moderation.ts` | R7, E8 typed negative paths, severity-scaled evidence |
 | Competitive integrity | `src/integrity.ts` | R7/R11/E11, confidence intervals, evidence refs, forbidden certainty fields |
 | Cross-capability rules | `src/policy.ts` | lock 18/19/41, R20 — `validateCapabilityPolicy` |
+
+## PL-009 refinement areas (additive)
+
+| Area | Module | Anchors |
+| --- | --- | --- |
+| Behavioral evidence records | `src/integrity-evidence.ts` | R11/E11 — digest-pinned opaque payloads, frozen trajectory/timing/outcome-pattern kinds, id+digest citations |
+| Integrity risk verdicts | `src/integrity-verdicts.ts` | R11 — frozen verdict vocabulary, width-derived confidence bands, `isBot`/`isHuman` unrepresentable (`FORBIDDEN_VERDICT_FIELDS`) |
+| Participation-mode declarations | `src/participation.ts` | explicit AI-player modes — disjoint `participation.*` markers, lossless map onto `AiPlayMode` |
+| Policy-driven enforcement | `src/integrity-enforcement.ts` | evidence-before-enforcement; decisions cite policy id + verdict + evidence ids; proportionate action vocabulary |
+| Entitlement lifecycle | `src/entitlement-lifecycle.ts` | R10 — frozen `granted → held → settled/revoked` state machine, idempotency keys on every command, stale-result rule |
+| Economy value carriers | `src/economy-values.ts` | zero numeric authority — opaque digests or typed kernel-value readings (game-ir ValueShape pinned by digest, projected kinds only) |
+| Entitlement settlement | `src/settlement.ts` | R10 — settlement eligibility declarations, typed validation verdicts, append-only settlement records with audit references |
+| Replay reuse lanes | `src/replay-lanes.ts` | R8 — per-lane request shapes (player/QA/integrity/simulation/lab), typed views over the ONE canonical descriptor, lane-scope oracle |
+| Replay provenance | `src/replay-provenance.ts` | R8 — digest-pinned linkage to authoritative session/runtime records; never re-declares session state |
+| QA assertions | `src/qa-assertions.ts` | R8 — expectation records over pinned replays; honest `inconclusive` outcomes; evidence digest mandatory |
+| Refinement barrel | `src/refinements.ts` | explicit PL-009 re-export list (root `index.ts` star-exports it to stay under the 400-line budget) |
+
+PL-009 design notes:
+
+- Every PL-004 export keeps its name and shape; refinements are new
+  modules plus new entries in the test/harness wiring.
+- The `KernelValueKind` union in `economy-values.ts` is a read-only
+  projection of game-ir's ValueShape primitive vocabulary (the shape
+  language itself is NOT re-declared; this package cannot import
+  game-ir per the module matrix). If game-ir's primitives change, the
+  projection follows via Architecture Change Request.
+- `decideEnforcement` returns `no-matching-rule` (a typed refusal)
+  when no policy rule fires: policy totality is an explicit authoring
+  choice, never a silent default.
 
 ## Lock-rule enforcement summary
 
@@ -59,7 +90,7 @@ sibling `@playliquid/game-contracts` (module-dependency-matrix).
 ```bash
 cd packages/platform-contracts
 npx tsc -p .                    # typecheck
-node --test "src/*.test.ts"     # 112 tests (see environment note below)
+node --test "src/*.test.ts"     # all colocated tests (PL-004 baseline + PL-009 refinement)
 node src/harness.ts             # pure-check runtime evidence (synthetic policy)
 npx oxlint packages/platform-contracts   # from repo root
 ```

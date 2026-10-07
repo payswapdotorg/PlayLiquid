@@ -72,12 +72,51 @@ test("house: exported vocabularies are frozen (E1)", () => {
     "INTEGRITY_SIGNAL_KINDS",
     "AI_PLAY_MODES",
     "FORBIDDEN_INTEGRITY_FIELDS",
+    // PL-009 refinement vocabularies.
+    "BEHAVIORAL_EVIDENCE_KINDS",
+    "INTEGRITY_VERDICT_KINDS",
+    "VERDICT_CONFIDENCE_BANDS",
+    "FORBIDDEN_VERDICT_FIELDS",
+    "PARTICIPATION_DECLARATION_KINDS",
+    "ENFORCEMENT_ACTION_KINDS",
+    "ENTITLEMENT_LIFECYCLE_STATES",
+    "ENTITLEMENT_LIFECYCLE_TRANSITIONS",
+    "ENTITLEMENT_REVOCATION_REASONS",
+    "KERNEL_VALUE_KINDS",
+    "REPLAY_LANES",
+    "REPLAY_EXPECTATION_KINDS",
+    "EXPECTATION_OUTCOMES",
   ];
   for (const name of frozenNames) {
     const table = (contracts as unknown as Record<string, unknown>)[name];
     assert.ok(table !== undefined, `${name} is exported`);
     assert.ok(Object.isFrozen(table), `${name} is frozen`);
   }
+});
+
+test("house: PL-009 lifecycle transition tables are deeply frozen (E1)", () => {
+  const transitions = (
+    contracts as unknown as { ENTITLEMENT_LIFECYCLE_TRANSITIONS: Record<string, readonly string[]> }
+  ).ENTITLEMENT_LIFECYCLE_TRANSITIONS;
+  for (const state of Object.keys(transitions)) {
+    assert.ok(Object.isFrozen(transitions[state]), `transitions[${state}] is frozen`);
+  }
+  const bands = (contracts as unknown as { VERDICT_CONFIDENCE_BANDS: readonly object[] })
+    .VERDICT_CONFIDENCE_BANDS;
+  for (const entry of bands) {
+    assert.ok(Object.isFrozen(entry), "confidence band entry is frozen");
+  }
+});
+
+test("house: PL-009 refinement oracles are pure admission/validation surface (E1/E2)", () => {
+  assert.equal(typeof contracts.validateIntegrityRiskVerdict, "function");
+  assert.equal(typeof contracts.decideEnforcement, "function");
+  assert.equal(typeof contracts.validateEnforcementDecision, "function");
+  assert.equal(typeof contracts.admitLifecycleCommand, "function");
+  assert.equal(typeof contracts.validateSettlement, "function");
+  assert.equal(typeof contracts.admitSettlement, "function");
+  assert.equal(typeof contracts.authorizeReplayLaneRequest, "function");
+  assert.equal(typeof contracts.validateExpectationResult, "function");
 });
 
 test("house: no runtime authority leaks into the contract surface (E1/E2)", () => {
