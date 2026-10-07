@@ -606,6 +606,80 @@ importers:
 
   apps/zcode-cli/tools/typescript: {}
 
+  packages/arena-integration:
+    dependencies:
+      '@playliquid/game-contracts':
+        specifier: workspace:*
+        version: link:../game-contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^25.9.9
+        version: 25.9.9
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
+  packages/artifact-store:
+    dependencies:
+      '@playliquid/package-system':
+        specifier: workspace:*
+        version: link:../package-system
+    devDependencies:
+      '@types/node':
+        specifier: ^25.9.9
+        version: 25.9.9
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
+  packages/avatar-runtime:
+    dependencies:
+      '@playliquid/capability-broker':
+        specifier: workspace:*
+        version: link:../capability-broker
+      '@playliquid/game-ir':
+        specifier: workspace:*
+        version: link:../game-ir
+      '@playliquid/runtime-contracts':
+        specifier: workspace:*
+        version: link:../runtime-contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^25.9.9
+        version: 25.9.9
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
+  packages/build-contracts:
+    dependencies:
+      '@playliquid/game-ir':
+        specifier: workspace:*
+        version: link:../game-ir
+      '@playliquid/package-system':
+        specifier: workspace:*
+        version: link:../package-system
+    devDependencies:
+      '@types/node':
+        specifier: ^25.9.9
+        version: 25.9.9
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
+  packages/capability-broker:
+    dependencies:
+      '@playliquid/game-ir':
+        specifier: workspace:*
+        version: link:../game-ir
+    devDependencies:
+      '@types/node':
+        specifier: ^25.9.9
+        version: 25.9.9
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
   packages/client:
     dependencies:
       '@zcode/rpc':
@@ -823,11 +897,43 @@ importers:
         specifier: ^6.0.3
         version: 6.0.3
 
+  packages/lab-contracts:
+    dependencies:
+      '@playliquid/game-contracts':
+        specifier: workspace:*
+        version: link:../game-contracts
+      '@playliquid/game-ir':
+        specifier: workspace:*
+        version: link:../game-ir
+    devDependencies:
+      '@types/node':
+        specifier: ^25.9.9
+        version: 25.9.9
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
   packages/model-option-map:
     devDependencies:
       typescript:
         specifier: ^6.0.2
         version: 6.0.2
+
+  packages/package-registry:
+    dependencies:
+      '@playliquid/artifact-store':
+        specifier: workspace:*
+        version: link:../artifact-store
+      '@playliquid/package-system':
+        specifier: workspace:*
+        version: link:../package-system
+    devDependencies:
+      '@types/node':
+        specifier: ^25.9.9
+        version: 25.9.9
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
 
   packages/package-system:
     devDependencies:
@@ -840,6 +946,22 @@ importers:
       '@playliquid/game-contracts':
         specifier: workspace:*
         version: link:../game-contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^25.9.9
+        version: 25.9.9
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
+  packages/platform-multiplayer:
+    dependencies:
+      '@playliquid/platform-contracts':
+        specifier: workspace:*
+        version: link:../platform-contracts
+      '@playliquid/runtime-contracts':
+        specifier: workspace:*
+        version: link:../runtime-contracts
     devDependencies:
       '@types/node':
         specifier: ^25.9.9
@@ -886,6 +1008,31 @@ importers:
         specifier: ^6.0.2
         version: 6.0.2
 
+  packages/replay:
+    dependencies:
+      '@playliquid/game-contracts':
+        specifier: workspace:*
+        version: link:../game-contracts
+      '@playliquid/game-ir':
+        specifier: workspace:*
+        version: link:../game-ir
+      '@playliquid/package-system':
+        specifier: workspace:*
+        version: link:../package-system
+      '@playliquid/runtime-contracts':
+        specifier: workspace:*
+        version: link:../runtime-contracts
+    devDependencies:
+      '@playliquid/simulation':
+        specifier: workspace:*
+        version: link:../simulation
+      '@types/node':
+        specifier: ^25.9.9
+        version: 25.9.9
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
   packages/rpc:
     devDependencies:
       ts-node:
@@ -896,6 +1043,19 @@ importers:
         version: 5.9.3
 
   packages/runtime-contracts: {}
+
+  packages/runtime-core:
+    dependencies:
+      '@playliquid/runtime-contracts':
+        specifier: workspace:*
+        version: link:../runtime-contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^25.9.9
+        version: 25.9.9
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
 
   packages/server:
     dependencies:
@@ -1067,6 +1227,41 @@ importers:
       typescript:
         specifier: ^6.0.2
         version: 6.0.2
+
+  packages/simulation:
+    dependencies:
+      '@playliquid/game-contracts':
+        specifier: workspace:*
+        version: link:../game-contracts
+      '@playliquid/game-ir':
+        specifier: workspace:*
+        version: link:../game-ir
+      '@playliquid/runtime-contracts':
+        specifier: workspace:*
+        version: link:../runtime-contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^25.9.9
+        version: 25.9.9
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
+  packages/target-profiles:
+    dependencies:
+      '@playliquid/game-ir':
+        specifier: workspace:*
+        version: link:../game-ir
+      '@playliquid/runtime-contracts':
+        specifier: workspace:*
+        version: link:../runtime-contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^25.9.9
+        version: 25.9.9
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
 
   packages/ui:
     dependencies:
@@ -13711,7 +13906,7 @@ snapshots:
 
   '@types/ws@8.18.1':
     dependencies:
-      '@types/node': 25.6.0
+      '@types/node': 25.9.9
 
   '@types/yauzl@2.10.3':
     dependencies:
