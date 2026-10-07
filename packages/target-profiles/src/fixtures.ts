@@ -156,7 +156,7 @@ export function fixtureDedicatedServerRecord(): PlainTargetProfileRecord {
     evaluationSuites: [],
     supersedes: null,
   };
-  return sealTargetProfileRecord(unsealed);
+  return sealTargetProfileRecord(unsealed) as PlainTargetProfileRecord;
 }
 
 /** An engine binding descriptor fixture declaring support for `targets`. */
