@@ -119,7 +119,7 @@
     },
     {
       "id": "PL-007",
-      "status": "BLOCKED",
+      "status": "MERGED",
       "depends": [
         "PL-006"
       ],
@@ -130,11 +130,15 @@
       "pr": null,
       "mergedSha": null,
       "evidence": [],
-      "owner": "worker"
+      "owner": "worker",
+      "merge": {
+        "commit": "559e7c9",
+        "mergedAt": "2026-10-07"
+      }
     },
     {
       "id": "PL-008",
-      "status": "BLOCKED",
+      "status": "MERGED",
       "depends": [
         "PL-003",
         "PL-005"
@@ -147,7 +151,11 @@
       "pr": null,
       "mergedSha": null,
       "evidence": [],
-      "owner": "worker"
+      "owner": "worker",
+      "merge": {
+        "commit": "1da7192",
+        "mergedAt": "2026-10-07"
+      }
     },
     {
       "id": "PL-009",
