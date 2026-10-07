@@ -1,819 +1,829 @@
 {
-  "schemaVersion": 1,
-  "program": "PLGOS-1",
-  "repository": "payswapdotorg/PlayLiquid",
-  "baseArchitectureCommit": "21b51c153ecbbc545f39cffb0bfa530ef489ef9c",
-  "maxConcurrentWorkers": 3,
-  "rootOwner": "tech-lead",
-  "statuses": [
-    "BLOCKED",
-    "READY",
-    "ACTIVE",
-    "REVIEW",
-    "MERGED",
-    "REJECTED"
-  ],
-  "workOrders": [
+ "schemaVersion": 1,
+ "program": "PLGOS-1",
+ "repository": "payswapdotorg/PlayLiquid",
+ "baseArchitectureCommit": "21b51c153ecbbc545f39cffb0bfa530ef489ef9c",
+ "maxConcurrentWorkers": 3,
+ "rootOwner": "tech-lead",
+ "statuses": [
+  "BLOCKED",
+  "READY",
+  "ACTIVE",
+  "REVIEW",
+  "MERGED",
+  "REJECTED"
+ ],
+ "workOrders": [
+  {
+   "id": "PL-001",
+   "status": "MERGED",
+   "depends": [],
+   "writeSurface": [
+    "packages/game-contracts",
+    "packages/game-ir"
+   ],
+   "branch": "work/pl-001",
+   "pr": null,
+   "mergedSha": "feb54ee8d4aeeff0958fa3ce33c4247e93eb9def",
+   "evidence": [
     {
-      "id": "PL-001",
-      "status": "MERGED",
-      "depends": [],
-      "writeSurface": [
-        "packages/game-contracts",
-        "packages/game-ir"
-      ],
-      "branch": "work/pl-001",
-      "pr": null,
-      "mergedSha": "feb54ee8d4aeeff0958fa3ce33c4247e93eb9def",
-      "evidence": [
-        {
-          "ts": "2026-10-05T17:19:44Z",
-          "note": "squash-merged via PR #3; TL gates: game-contracts standalone green; game-ir green with workspace:* sibling link (tsc 0 err, tests pass, oxlint clean); surface+secret scan clean"
-        }
-      ],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-002",
-      "status": "MERGED",
-      "depends": [],
-      "writeSurface": [
-        "packages/package-system",
-        "spec/package-contract.md"
-      ],
-      "branch": "work/pl-002",
-      "pr": null,
-      "mergedSha": "d84dd73d61fc92ecfbbceee72e5eea2eea36920a",
-      "evidence": [
-        {
-          "ts": "2026-10-05T17:15:04Z",
-          "note": "squash-merged via PR after TL gate re-run: tsc 0 errors, 103/103 node:test, oxlint clean, surface+secret scan clean"
-        }
-      ],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-003",
-      "status": "MERGED",
-      "depends": [],
-      "writeSurface": [
-        "packages/runtime-contracts"
-      ],
-      "branch": "work/pl-003",
-      "pr": null,
-      "mergedSha": "0360868606b059b3189186cc15c6a5dc608bcb62",
-      "evidence": [
-        {
-          "ts": "2026-10-05T17:15:56Z",
-          "note": "squash-merged via PR #2 after TL gate re-run in worktree: tsc PASS, node:test PASS, oxlint clean, surface+secret scan clean"
-        }
-      ],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-004",
-      "status": "MERGED",
-      "depends": [],
-      "writeSurface": [
-        "packages/platform-contracts"
-      ],
-      "branch": "work/pl-004",
-      "pr": null,
-      "mergedSha": "f1982b31a6be81218a4722272c149cbf3a004e06",
-      "evidence": [
-        {
-          "ts": "2026-10-05T18:09:23Z",
-          "note": "squash-merged via PR after TL gate re-run in worktree (pnpm-linked): tsc PASS, node:test PASS, oxlint clean; surface+secret clean @ base 424a42d"
-        }
-      ],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-005",
-      "status": "READY",
-      "depends": [],
-      "writeSurface": [
-        "packages/tool-fabric",
-        "packages/engine-adapter-contract"
-      ],
-      "branch": "work/pl-005",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-006",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-001"
-      ],
-      "writeSurface": [
-        "packages/lab-contracts"
-      ],
-      "branch": "work/pl-006",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-007",
-      "status": "MERGED",
-      "depends": [
-        "PL-006"
-      ],
-      "writeSurface": [
-        "packages/arena-integration"
-      ],
-      "branch": "work/pl-007",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker",
-      "merge": {
-        "commit": "559e7c9",
-        "mergedAt": "2026-10-07"
-      }
-    },
-    {
-      "id": "PL-008",
-      "status": "MERGED",
-      "depends": [
-        "PL-003",
-        "PL-005"
-      ],
-      "writeSurface": [
-        "packages/build-contracts",
-        "packages/target-profiles"
-      ],
-      "branch": "work/pl-008",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker",
-      "merge": {
-        "commit": "1da7192",
-        "mergedAt": "2026-10-07"
-      }
-    },
-    {
-      "id": "PL-009",
-      "status": "MERGED",
-      "depends": [
-        "PL-004"
-      ],
-      "writeSurface": [
-        "packages/platform-contracts/refinement-spec"
-      ],
-      "branch": "work/pl-009",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker",
-      "merge": {
-        "commit": "263eb5c",
-        "mergedAt": "2026-10-07"
-      }
-    },
-    {
-      "id": "PL-010",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-001",
-        "PL-002",
-        "PL-003",
-        "PL-004",
-        "PL-005",
-        "PL-006",
-        "PL-007",
-        "PL-008",
-        "PL-009"
-      ],
-      "writeSurface": [
-        "architecture-policy.yaml",
-        "spec/module-dependency-matrix.md"
-      ],
-      "branch": "work/pl-010",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "tech-lead"
-    },
-    {
-      "id": "PL-011",
-      "status": "MERGED",
-      "depends": [
-        "PL-002"
-      ],
-      "writeSurface": [
-        "packages/package-registry",
-        "packages/artifact-store"
-      ],
-      "branch": "work/pl-011",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker",
-      "merge": {
-        "commit": "c935bc9",
-        "mergedAt": "2026-10-07"
-      }
-    },
-    {
-      "id": "PL-012",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-001",
-        "PL-002"
-      ],
-      "writeSurface": [
-        "packages/git-lineage"
-      ],
-      "branch": "work/pl-012",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-013",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-001",
-        "PL-003"
-      ],
-      "writeSurface": [
-        "packages/runtime-core"
-      ],
-      "branch": "work/pl-013",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-014",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-003"
-      ],
-      "writeSurface": [
-        "packages/simulation",
-        "packages/replay"
-      ],
-      "branch": "work/pl-014",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-015",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-004"
-      ],
-      "writeSurface": [
-        "packages/platform-identity",
-        "packages/platform-social",
-        "packages/platform-leaderboard",
-        "packages/platform-achievements"
-      ],
-      "branch": "work/pl-015",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-016",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-003",
-        "PL-004"
-      ],
-      "writeSurface": [
-        "packages/platform-multiplayer"
-      ],
-      "branch": "work/pl-016",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-017",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-004",
-        "PL-009"
-      ],
-      "writeSurface": [
-        "packages/platform-economy"
-      ],
-      "branch": "work/pl-017",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-018",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-009",
-        "PL-014"
-      ],
-      "writeSurface": [
-        "packages/platform-integrity"
-      ],
-      "branch": "work/pl-018",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-019",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-005"
-      ],
-      "writeSurface": [
-        "packages/tool-fabric-runtime"
-      ],
-      "branch": "work/pl-019",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-020",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-008",
-        "PL-011",
-        "PL-019"
-      ],
-      "writeSurface": [
-        "packages/build-orchestrator"
-      ],
-      "branch": "work/pl-020",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-021",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-019",
-        "PL-020"
-      ],
-      "writeSurface": [
-        "packages/engine-playcanvas"
-      ],
-      "branch": "work/pl-021",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-022",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-019",
-        "PL-020"
-      ],
-      "writeSurface": [
-        "packages/engine-unreal"
-      ],
-      "branch": "work/pl-022",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-023",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-019",
-        "PL-020"
-      ],
-      "writeSurface": [
-        "packages/engine-unity"
-      ],
-      "branch": "work/pl-023",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-024",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-019",
-        "PL-020"
-      ],
-      "writeSurface": [
-        "packages/engine-godot"
-      ],
-      "branch": "work/pl-024",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-025",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-019"
-      ],
-      "writeSurface": [
-        "packages/tool-blender"
-      ],
-      "branch": "work/pl-025",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-026",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-001",
-        "PL-003"
-      ],
-      "writeSurface": [
-        "packages/avatar-runtime",
-        "packages/capability-broker"
-      ],
-      "branch": "work/pl-026",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-027",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-026"
-      ],
-      "writeSurface": [
-        "packages/sensory-runtime"
-      ],
-      "branch": "work/pl-027",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-028",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-006",
-        "PL-014",
-        "PL-026"
-      ],
-      "writeSurface": [
-        "packages/lab-simulation"
-      ],
-      "branch": "work/pl-028",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-029",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-006",
-        "PL-026",
-        "PL-028"
-      ],
-      "writeSurface": [
-        "packages/lab-organization"
-      ],
-      "branch": "work/pl-029",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-030",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-028",
-        "PL-029"
-      ],
-      "writeSurface": [
-        "packages/lab-learning"
-      ],
-      "branch": "work/pl-030",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-031",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-007",
-        "PL-030"
-      ],
-      "writeSurface": [
-        "packages/arena-integration-runtime"
-      ],
-      "branch": "work/pl-031",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-032",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-012",
-        "PL-004"
-      ],
-      "writeSurface": [
-        "packages/community"
-      ],
-      "branch": "work/pl-032",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-033",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-011",
-        "PL-013",
-        "PL-019",
-        "PL-026"
-      ],
-      "writeSurface": [
-        "packages/game-ui",
-        "packages/web/gameos"
-      ],
-      "branch": "work/pl-033",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-034",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-028",
-        "PL-030",
-        "PL-032"
-      ],
-      "writeSurface": [
-        "packages/web/gameos-lab",
-        "packages/web/gameos-community"
-      ],
-      "branch": "work/pl-034",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-035",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-013",
-        "PL-020"
-      ],
-      "writeSurface": [
-        "packages/runtime-spark",
-        "packages/spark"
-      ],
-      "branch": "work/pl-035",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-036",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-020",
-        "PL-021",
-        "PL-022",
-        "PL-023",
-        "PL-024"
-      ],
-      "writeSurface": [
-        "packages/target-builds"
-      ],
-      "branch": "work/pl-036",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-037",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-011",
-        "PL-013",
-        "PL-015",
-        "PL-017",
-        "PL-018",
-        "PL-021",
-        "PL-035"
-      ],
-      "writeSurface": [
-        "examples/native-game"
-      ],
-      "branch": "work/pl-037",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-038",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-020",
-        "PL-022",
-        "PL-023",
-        "PL-024",
-        "PL-025"
-      ],
-      "writeSurface": [
-        "examples/engine-integration"
-      ],
-      "branch": "work/pl-038",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-039",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-011",
-        "PL-013",
-        "PL-014",
-        "PL-020"
-      ],
-      "writeSurface": [
-        "examples/large-world"
-      ],
-      "branch": "work/pl-039",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-040",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-028",
-        "PL-029",
-        "PL-030",
-        "PL-031",
-        "PL-032"
-      ],
-      "writeSurface": [
-        "examples/lab-journey",
-        "qa/e2e-lab"
-      ],
-      "branch": "work/pl-040",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-041",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-011",
-        "PL-026",
-        "PL-017",
-        "PL-018",
-        "PL-031"
-      ],
-      "writeSurface": [
-        "packages/security-gameos",
-        "qa/security"
-      ],
-      "branch": "work/pl-041",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-042",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-014",
-        "PL-020",
-        "PL-021",
-        "PL-039"
-      ],
-      "writeSurface": [
-        "qa/performance",
-        "packages/runtime-core/perf",
-        "packages/build-orchestrator/perf"
-      ],
-      "branch": "work/pl-042",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-043",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-033",
-        "PL-034",
-        "PL-035",
-        "PL-037"
-      ],
-      "writeSurface": [
-        "qa/browser",
-        "docs/journeys"
-      ],
-      "branch": "work/pl-043",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-044",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-033",
-        "PL-034",
-        "PL-036",
-        "PL-041",
-        "PL-043"
-      ],
-      "writeSurface": [
-        "services/gameos",
-        "deployment",
-        "docs/deployment"
-      ],
-      "branch": "work/pl-044",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "worker"
-    },
-    {
-      "id": "PL-045",
-      "status": "BLOCKED",
-      "depends": [
-        "PL-037",
-        "PL-038",
-        "PL-039",
-        "PL-040",
-        "PL-041",
-        "PL-042",
-        "PL-043",
-        "PL-044"
-      ],
-      "writeSurface": [
-        "spec/PROJECT-STATE.md",
-        "docs/handoff",
-        "program/graph.json"
-      ],
-      "branch": "work/pl-045",
-      "pr": null,
-      "mergedSha": null,
-      "evidence": [],
-      "owner": "tech-lead"
+     "ts": "2026-10-05T17:19:44Z",
+     "note": "squash-merged via PR #3; TL gates: game-contracts standalone green; game-ir green with workspace:* sibling link (tsc 0 err, tests pass, oxlint clean); surface+secret scan clean"
     }
-  ],
-  "generatedAt": "2026-10-05"
+   ],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-002",
+   "status": "MERGED",
+   "depends": [],
+   "writeSurface": [
+    "packages/package-system",
+    "spec/package-contract.md"
+   ],
+   "branch": "work/pl-002",
+   "pr": null,
+   "mergedSha": "d84dd73d61fc92ecfbbceee72e5eea2eea36920a",
+   "evidence": [
+    {
+     "ts": "2026-10-05T17:15:04Z",
+     "note": "squash-merged via PR after TL gate re-run: tsc 0 errors, 103/103 node:test, oxlint clean, surface+secret scan clean"
+    }
+   ],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-003",
+   "status": "MERGED",
+   "depends": [],
+   "writeSurface": [
+    "packages/runtime-contracts"
+   ],
+   "branch": "work/pl-003",
+   "pr": null,
+   "mergedSha": "0360868606b059b3189186cc15c6a5dc608bcb62",
+   "evidence": [
+    {
+     "ts": "2026-10-05T17:15:56Z",
+     "note": "squash-merged via PR #2 after TL gate re-run in worktree: tsc PASS, node:test PASS, oxlint clean, surface+secret scan clean"
+    }
+   ],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-004",
+   "status": "MERGED",
+   "depends": [],
+   "writeSurface": [
+    "packages/platform-contracts"
+   ],
+   "branch": "work/pl-004",
+   "pr": null,
+   "mergedSha": "f1982b31a6be81218a4722272c149cbf3a004e06",
+   "evidence": [
+    {
+     "ts": "2026-10-05T18:09:23Z",
+     "note": "squash-merged via PR after TL gate re-run in worktree (pnpm-linked): tsc PASS, node:test PASS, oxlint clean; surface+secret clean @ base 424a42d"
+    }
+   ],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-005",
+   "status": "MERGED",
+   "depends": [],
+   "writeSurface": [
+    "packages/tool-fabric",
+    "packages/engine-adapter-contract"
+   ],
+   "branch": "work/pl-005",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [
+    "tsc -b 0 errors",
+    "oxlint 0-0 (25 files)",
+    "architecture:check 0 violations",
+    "program:check PASS",
+    "node --test 91/91 (tool-fabric 55, engine-adapter-contract 36)"
+   ],
+   "owner": "worker",
+   "merge": {
+    "commit": "e759aa4",
+    "mergedAt": "2026-10-07"
+   }
+  },
+  {
+   "id": "PL-006",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-001"
+   ],
+   "writeSurface": [
+    "packages/lab-contracts"
+   ],
+   "branch": "work/pl-006",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-007",
+   "status": "MERGED",
+   "depends": [
+    "PL-006"
+   ],
+   "writeSurface": [
+    "packages/arena-integration"
+   ],
+   "branch": "work/pl-007",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker",
+   "merge": {
+    "commit": "559e7c9",
+    "mergedAt": "2026-10-07"
+   }
+  },
+  {
+   "id": "PL-008",
+   "status": "MERGED",
+   "depends": [
+    "PL-003",
+    "PL-005"
+   ],
+   "writeSurface": [
+    "packages/build-contracts",
+    "packages/target-profiles"
+   ],
+   "branch": "work/pl-008",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker",
+   "merge": {
+    "commit": "1da7192",
+    "mergedAt": "2026-10-07"
+   }
+  },
+  {
+   "id": "PL-009",
+   "status": "MERGED",
+   "depends": [
+    "PL-004"
+   ],
+   "writeSurface": [
+    "packages/platform-contracts/refinement-spec"
+   ],
+   "branch": "work/pl-009",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker",
+   "merge": {
+    "commit": "263eb5c",
+    "mergedAt": "2026-10-07"
+   }
+  },
+  {
+   "id": "PL-010",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-001",
+    "PL-002",
+    "PL-003",
+    "PL-004",
+    "PL-005",
+    "PL-006",
+    "PL-007",
+    "PL-008",
+    "PL-009"
+   ],
+   "writeSurface": [
+    "architecture-policy.yaml",
+    "spec/module-dependency-matrix.md"
+   ],
+   "branch": "work/pl-010",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "tech-lead"
+  },
+  {
+   "id": "PL-011",
+   "status": "MERGED",
+   "depends": [
+    "PL-002"
+   ],
+   "writeSurface": [
+    "packages/package-registry",
+    "packages/artifact-store"
+   ],
+   "branch": "work/pl-011",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker",
+   "merge": {
+    "commit": "c935bc9",
+    "mergedAt": "2026-10-07"
+   }
+  },
+  {
+   "id": "PL-012",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-001",
+    "PL-002"
+   ],
+   "writeSurface": [
+    "packages/git-lineage"
+   ],
+   "branch": "work/pl-012",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-013",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-001",
+    "PL-003"
+   ],
+   "writeSurface": [
+    "packages/runtime-core"
+   ],
+   "branch": "work/pl-013",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-014",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-003"
+   ],
+   "writeSurface": [
+    "packages/simulation",
+    "packages/replay"
+   ],
+   "branch": "work/pl-014",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-015",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-004"
+   ],
+   "writeSurface": [
+    "packages/platform-identity",
+    "packages/platform-social",
+    "packages/platform-leaderboard",
+    "packages/platform-achievements"
+   ],
+   "branch": "work/pl-015",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-016",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-003",
+    "PL-004"
+   ],
+   "writeSurface": [
+    "packages/platform-multiplayer"
+   ],
+   "branch": "work/pl-016",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-017",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-004",
+    "PL-009"
+   ],
+   "writeSurface": [
+    "packages/platform-economy"
+   ],
+   "branch": "work/pl-017",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-018",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-009",
+    "PL-014"
+   ],
+   "writeSurface": [
+    "packages/platform-integrity"
+   ],
+   "branch": "work/pl-018",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-019",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-005"
+   ],
+   "writeSurface": [
+    "packages/tool-fabric-runtime"
+   ],
+   "branch": "work/pl-019",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-020",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-008",
+    "PL-011",
+    "PL-019"
+   ],
+   "writeSurface": [
+    "packages/build-orchestrator"
+   ],
+   "branch": "work/pl-020",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-021",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-019",
+    "PL-020"
+   ],
+   "writeSurface": [
+    "packages/engine-playcanvas"
+   ],
+   "branch": "work/pl-021",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-022",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-019",
+    "PL-020"
+   ],
+   "writeSurface": [
+    "packages/engine-unreal"
+   ],
+   "branch": "work/pl-022",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-023",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-019",
+    "PL-020"
+   ],
+   "writeSurface": [
+    "packages/engine-unity"
+   ],
+   "branch": "work/pl-023",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-024",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-019",
+    "PL-020"
+   ],
+   "writeSurface": [
+    "packages/engine-godot"
+   ],
+   "branch": "work/pl-024",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-025",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-019"
+   ],
+   "writeSurface": [
+    "packages/tool-blender"
+   ],
+   "branch": "work/pl-025",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-026",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-001",
+    "PL-003"
+   ],
+   "writeSurface": [
+    "packages/avatar-runtime",
+    "packages/capability-broker"
+   ],
+   "branch": "work/pl-026",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-027",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-026"
+   ],
+   "writeSurface": [
+    "packages/sensory-runtime"
+   ],
+   "branch": "work/pl-027",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-028",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-006",
+    "PL-014",
+    "PL-026"
+   ],
+   "writeSurface": [
+    "packages/lab-simulation"
+   ],
+   "branch": "work/pl-028",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-029",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-006",
+    "PL-026",
+    "PL-028"
+   ],
+   "writeSurface": [
+    "packages/lab-organization"
+   ],
+   "branch": "work/pl-029",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-030",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-028",
+    "PL-029"
+   ],
+   "writeSurface": [
+    "packages/lab-learning"
+   ],
+   "branch": "work/pl-030",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-031",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-007",
+    "PL-030"
+   ],
+   "writeSurface": [
+    "packages/arena-integration-runtime"
+   ],
+   "branch": "work/pl-031",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-032",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-012",
+    "PL-004"
+   ],
+   "writeSurface": [
+    "packages/community"
+   ],
+   "branch": "work/pl-032",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-033",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-011",
+    "PL-013",
+    "PL-019",
+    "PL-026"
+   ],
+   "writeSurface": [
+    "packages/game-ui",
+    "packages/web/gameos"
+   ],
+   "branch": "work/pl-033",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-034",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-028",
+    "PL-030",
+    "PL-032"
+   ],
+   "writeSurface": [
+    "packages/web/gameos-lab",
+    "packages/web/gameos-community"
+   ],
+   "branch": "work/pl-034",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-035",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-013",
+    "PL-020"
+   ],
+   "writeSurface": [
+    "packages/runtime-spark",
+    "packages/spark"
+   ],
+   "branch": "work/pl-035",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-036",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-020",
+    "PL-021",
+    "PL-022",
+    "PL-023",
+    "PL-024"
+   ],
+   "writeSurface": [
+    "packages/target-builds"
+   ],
+   "branch": "work/pl-036",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-037",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-011",
+    "PL-013",
+    "PL-015",
+    "PL-017",
+    "PL-018",
+    "PL-021",
+    "PL-035"
+   ],
+   "writeSurface": [
+    "examples/native-game"
+   ],
+   "branch": "work/pl-037",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-038",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-020",
+    "PL-022",
+    "PL-023",
+    "PL-024",
+    "PL-025"
+   ],
+   "writeSurface": [
+    "examples/engine-integration"
+   ],
+   "branch": "work/pl-038",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-039",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-011",
+    "PL-013",
+    "PL-014",
+    "PL-020"
+   ],
+   "writeSurface": [
+    "examples/large-world"
+   ],
+   "branch": "work/pl-039",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-040",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-028",
+    "PL-029",
+    "PL-030",
+    "PL-031",
+    "PL-032"
+   ],
+   "writeSurface": [
+    "examples/lab-journey",
+    "qa/e2e-lab"
+   ],
+   "branch": "work/pl-040",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-041",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-011",
+    "PL-026",
+    "PL-017",
+    "PL-018",
+    "PL-031"
+   ],
+   "writeSurface": [
+    "packages/security-gameos",
+    "qa/security"
+   ],
+   "branch": "work/pl-041",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-042",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-014",
+    "PL-020",
+    "PL-021",
+    "PL-039"
+   ],
+   "writeSurface": [
+    "qa/performance",
+    "packages/runtime-core/perf",
+    "packages/build-orchestrator/perf"
+   ],
+   "branch": "work/pl-042",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-043",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-033",
+    "PL-034",
+    "PL-035",
+    "PL-037"
+   ],
+   "writeSurface": [
+    "qa/browser",
+    "docs/journeys"
+   ],
+   "branch": "work/pl-043",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-044",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-033",
+    "PL-034",
+    "PL-036",
+    "PL-041",
+    "PL-043"
+   ],
+   "writeSurface": [
+    "services/gameos",
+    "deployment",
+    "docs/deployment"
+   ],
+   "branch": "work/pl-044",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "worker"
+  },
+  {
+   "id": "PL-045",
+   "status": "BLOCKED",
+   "depends": [
+    "PL-037",
+    "PL-038",
+    "PL-039",
+    "PL-040",
+    "PL-041",
+    "PL-042",
+    "PL-043",
+    "PL-044"
+   ],
+   "writeSurface": [
+    "spec/PROJECT-STATE.md",
+    "docs/handoff",
+    "program/graph.json"
+   ],
+   "branch": "work/pl-045",
+   "pr": null,
+   "mergedSha": null,
+   "evidence": [],
+   "owner": "tech-lead"
+  }
+ ],
+ "generatedAt": "2026-10-05"
 }
