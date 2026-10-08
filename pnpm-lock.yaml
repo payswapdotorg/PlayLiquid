@@ -896,6 +896,21 @@ importers:
       typescript:
         specifier: ^6.0.3
         version: 6.0.3
+  packages/git-lineage:
+    dependencies:
+      '@playliquid/game-ir':
+        specifier: workspace:*
+        version: link:../game-ir
+      '@playliquid/package-system':
+        specifier: workspace:*
+        version: link:../package-system
+    devDependencies:
+      '@types/node':
+        specifier: ^25.9.9
+        version: 25.9.9
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
 
   packages/lab-contracts:
     dependencies:

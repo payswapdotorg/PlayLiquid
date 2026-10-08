@@ -1,0 +1,26 @@
+{
+  "name": "@playliquid/git-lineage",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "PlayLiquid GameOS Git lifecycle contract layer (PL-012): typed lineage/fork/overlay contracts over package-system identities — the lineage edge vocabulary, whole-package fork records, narrow overlay operation records, semantic-diff classification and pure lineage validation with R19 provenance/license gate shapes. Pure contracts only: no IO, no git CLI, no filesystem, no network, no diff engine, no merge algorithm (later work orders).",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "node --test \"src/**/*.test.ts\"",
+    "harness": "node src/harness.ts",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix"
+  },
+  "dependencies": {
+    "@playliquid/game-ir": "workspace:*",
+    "@playliquid/package-system": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.9",
+    "typescript": "^6.0.3"
+  }
+}
