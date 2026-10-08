@@ -114,7 +114,7 @@
   },
   {
    "id": "PL-006",
-   "status": "BLOCKED",
+   "status": "MERGED",
    "depends": [
     "PL-001"
    ],
@@ -124,8 +124,17 @@
    "branch": "work/pl-006",
    "pr": null,
    "mergedSha": null,
-   "evidence": [],
-   "owner": "worker"
+   "evidence": [
+    "tsc -b 0 errors",
+    "oxlint 0-0",
+    "architecture 0 violations",
+    "node --test 74/74"
+   ],
+   "owner": "worker",
+   "merge": {
+    "commit": "ceafd06",
+    "mergedAt": "2026-10-08"
+   }
   },
   {
    "id": "PL-007",
