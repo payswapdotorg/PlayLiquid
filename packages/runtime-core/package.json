@@ -1,0 +1,25 @@
+{
+  "name": "@playliquid/runtime-core",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "PlayLiquid GameOS Interactive Runtime core (PL-013). The interactive runtime session kernel: the Experience Protocol surface (load, reset, observe, act, step, snapshot, restore, replay seam, terminate) implemented over @playliquid/runtime-contracts as the single canonical command/event path (E2, lock 12), with the CapabilityPort seam to the Capability Broker (lock 4; broker itself is PL-026), injected host-side ports (renderer surface, input source, transport, snapshot store, clock) and in-memory fakes for tests. Pure kernel logic: no IO, no timers, no engine SDKs, no rendering/input/networking implementations — those are host adapters.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "typecheck": "tsc -p .",
+    "test": "node --test src/**/*.test.ts",
+    "harness": "node src/harness.ts"
+  },
+  "dependencies": {
+    "@playliquid/runtime-contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.9",
+    "typescript": "^6.0.3"
+  }
+}
