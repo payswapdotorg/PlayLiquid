@@ -241,7 +241,7 @@
   },
   {
    "id": "PL-012",
-   "status": "BLOCKED",
+   "status": "MERGED",
    "depends": [
     "PL-001",
     "PL-002"
@@ -251,8 +251,13 @@
    ],
    "branch": "work/pl-012",
    "pr": null,
-   "mergedSha": null,
-   "evidence": [],
+   "mergedSha": "020a5885235f666112b82d00e9eccf7a224363f6",
+   "evidence": [
+    {
+     "ts": "2026-10-08T23:50:36Z",
+     "note": "narrative-harvest merge (new TL): \u00a710b tool-call replay incl. two Bash heredoc surgeries (overlay split + append) of certified delivery (19 files); gates re-run: tsc 6.0.3 = 0, node --test 54/54, oxlint 0-0, arch 0; harness valid; lockfile importer added"
+    }
+   ],
    "owner": "worker"
   },
   {
