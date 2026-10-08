@@ -1,0 +1,26 @@
+{
+  "name": "@playliquid/lab-contracts",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "PlayLiquid GameOS Game Engineering Lab contracts (PL-006). The typed contract layer of the Lab: development-organization descriptors (agents, roles, bodies, ZCode model assignments, tools, capabilities, topology, memory, humans, budget, scheduling, review — R16, lock 25/26), the lab-loop stage vocabulary with typed links, immutable project evidence and append-only calibration (R17, E10, lock 27), explicitly-labeled estimates disjoint from observed evidence (E11, lock 28/29), the capability-gap resolution ladder (R18, lock 30/31/32) and the game-ir evaluation-suite seam (ports only — simulation, search and learning arrive in PL-028..030). Pure types and pure functions only: no IO, no simulation engine, no search algorithms, no Arena SDK, no provider types.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "typecheck": "tsc -p .",
+    "test": "node --test src/**/*.test.ts",
+    "harness": "node src/harness.ts"
+  },
+  "dependencies": {
+    "@playliquid/game-contracts": "workspace:*",
+    "@playliquid/game-ir": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.9",
+    "typescript": "^6.0.3"
+  }
+}
