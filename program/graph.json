@@ -257,7 +257,7 @@
   },
   {
    "id": "PL-013",
-   "status": "BLOCKED",
+   "status": "MERGED",
    "depends": [
     "PL-001",
     "PL-003"
@@ -267,8 +267,13 @@
    ],
    "branch": "work/pl-013",
    "pr": null,
-   "mergedSha": null,
-   "evidence": [],
+   "mergedSha": "666cd6ce14223bd0c9990b1a4fa89d559cadfdf6",
+   "evidence": [
+    {
+     "ts": "2026-10-08T23:47:36Z",
+     "note": "narrative-harvest merge (new TL): \u00a710b tool-call replay of certified 2nd-session delivery (25 files, base c9cf856); sequential-MultiEdit semantics applied; gates re-run at station: tsc 6.0.3 = 0 errors, node --test 86/86, oxlint 0-0, architecture:check 0 violations; harness integrityOk"
+    }
+   ],
    "owner": "worker"
   },
   {
