@@ -322,7 +322,7 @@
   },
   {
    "id": "PL-016",
-   "status": "BLOCKED",
+   "status": "MERGED",
    "depends": [
     "PL-003",
     "PL-004"
@@ -332,8 +332,13 @@
    ],
    "branch": "work/pl-016",
    "pr": null,
-   "mergedSha": null,
-   "evidence": [],
+   "mergedSha": "5e245ea840c94a9f97eb7a733ef0d1d7501377fb",
+   "evidence": [
+    {
+     "ts": "2026-10-09T00:02:34Z",
+     "note": "narrative-harvest merge (new TL): \u00a710b tool-call replay of certified delivery (28 files); chat-pasted re-emission envelopes REJECTED as mangled, delivery tree used; gates re-run: tsc 6.0.3 = 0, 82/82 node:test, oxlint 0-0, arch 0, harness ok"
+    }
+   ],
    "owner": "worker"
   },
   {
