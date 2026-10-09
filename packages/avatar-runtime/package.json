@@ -1,0 +1,28 @@
+{
+  "name": "@playliquid/avatar-runtime",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "PlayLiquid GameOS Avatar Runtime (PL-026). Avatar = Body + Intelligence: composes avatar definitions whose body/sensors/actuators/memory/intelligence are separately versioned sub-records (skills referenced as packages — no skill engine), drives sensor input and actuator output ports, and routes EVERY action through the Capability Broker so avatar-agent intents become broker-mediated canonical commands per @playliquid/runtime-contracts (lock rules 13/14). Ports are pure interfaces with in-memory fakes; the interactive/simulation runtimes host execution — this package builds no second kernel. Host restriction of avatar capabilities follows the frozen game-contracts R5 vocabulary; runtime authority is broker grants (R20 least privilege). No IO, no timers, no globals.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "typecheck": "tsc -p .",
+    "test": "node --test src/**/*.test.ts",
+    "harness": "node src/harness.ts"
+  },
+  "dependencies": {
+    "@playliquid/game-contracts": "workspace:*",
+    "@playliquid/game-ir": "workspace:*",
+    "@playliquid/capability-broker": "workspace:*",
+    "@playliquid/runtime-contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.9",
+    "typescript": "^6.0.3"
+  }
+}
