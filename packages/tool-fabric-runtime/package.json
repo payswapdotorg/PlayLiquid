@@ -1,0 +1,25 @@
+{
+  "name": "@playliquid/tool-fabric-runtime",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "PlayLiquid GameOS Tool Fabric runtime (PL-019): the runtime side of the Tool Fabric contracts — a tool/engine adapter registry with deterministic request resolution, an invocation pipeline over the tool-fabric call protocol (surface mediation, capability mediation, manifest shape validation), a content-addressed artifact exchange guard (no inline bytes), a queued/resumable job model with typed status transitions, and pure executor/clock ports with the node process adapter and in-memory fakes behind them. Provider-neutral: no engine SDKs, no engine types, no IO in the domain.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "typecheck": "tsc -p .",
+    "test": "node --test src/**/*.test.ts"
+  },
+  "dependencies": {
+    "@playliquid/tool-fabric": "workspace:*",
+    "@playliquid/engine-adapter-contract": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^6.0.3"
+  }
+}
