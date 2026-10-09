@@ -491,7 +491,7 @@
   },
   {
    "id": "PL-026",
-   "status": "BLOCKED",
+   "status": "MERGED",
    "depends": [
     "PL-001",
     "PL-003"
@@ -502,8 +502,13 @@
    ],
    "branch": "work/pl-026",
    "pr": null,
-   "mergedSha": null,
-   "evidence": [],
+   "mergedSha": "9499c5adb36c9ce4f6eaea4f219d1cd11639f5c7",
+   "evidence": [
+    {
+     "ts": "2026-10-09T08:15:00Z",
+     "note": "narrative-harvest rebuild of certified worker delivery (32 files, worker commit 8a67a31-equivalent; 5 python surgeries replayed); gates GREEN at station: tsc 0 @ts6.0.3, capability-broker 49/49 + avatar-runtime 35/35 node:test, oxlint 0-0 both, harnesses ok, architecture:check full+changed 0 new"
+    }
+   ],
    "owner": "worker"
   },
   {
