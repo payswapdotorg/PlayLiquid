@@ -3,39 +3,39 @@
   "violations": [
     {
       "rule": "cycle",
-      "file": "/home/z/playliquid/packages/platform-multiplayer/src/outcomes.ts",
+      "file": "packages/platform-multiplayer/src/outcomes.ts",
       "module": "platform-multiplayer",
-      "detail": "/home/z/playliquid/packages/platform-multiplayer/src/outcomes.ts -> /home/z/playliquid/packages/platform-multiplayer/src/ports.ts",
-      "message": "检测到循环依赖：/home/z/playliquid/packages/platform-multiplayer/src/outcomes.ts -> /home/z/playliquid/packages/platform-multiplayer/src/ports.ts -> /home/z/playliquid/packages/platform-multiplayer/src/outcomes.ts",
-      "fingerprint": "13a3b3af47d5100f",
+      "detail": "packages/platform-multiplayer/src/outcomes.ts -> packages/platform-multiplayer/src/ports.ts",
+      "message": "检测到循环依赖：packages/platform-multiplayer/src/outcomes.ts -> packages/platform-multiplayer/src/ports.ts -> packages/platform-multiplayer/src/outcomes.ts",
+      "fingerprint": "2c054b98ebc98a65",
       "global": true
     },
     {
       "rule": "cycle",
-      "file": "/home/z/playliquid/packages/runtime-core/src/construction.ts",
+      "file": "packages/runtime-core/src/construction.ts",
       "module": "runtime-core",
-      "detail": "/home/z/playliquid/packages/runtime-core/src/construction.ts -> /home/z/playliquid/packages/runtime-core/src/kernel.ts",
-      "message": "检测到循环依赖：/home/z/playliquid/packages/runtime-core/src/construction.ts -> /home/z/playliquid/packages/runtime-core/src/kernel.ts -> /home/z/playliquid/packages/runtime-core/src/construction.ts",
-      "fingerprint": "356f3d3f0700f729",
+      "detail": "packages/runtime-core/src/construction.ts -> packages/runtime-core/src/kernel.ts",
+      "message": "检测到循环依赖：packages/runtime-core/src/construction.ts -> packages/runtime-core/src/kernel.ts -> packages/runtime-core/src/construction.ts",
+      "fingerprint": "6838b33cae076702",
+      "global": true
+    },
+    {
+      "rule": "cycle",
+      "file": "packages/engine-adapter-contract/src/adapter.ts",
+      "module": "engine-adapter-contract",
+      "detail": "packages/engine-adapter-contract/src/adapter.ts -> packages/engine-adapter-contract/src/exchange.ts",
+      "message": "检测到循环依赖：packages/engine-adapter-contract/src/adapter.ts -> packages/engine-adapter-contract/src/exchange.ts -> packages/engine-adapter-contract/src/adapter.ts",
+      "fingerprint": "9cb2dbd53e520920",
       "global": true
     },
     {
       "rule": "disable-count",
-      "file": "/home/z/playliquid/packages/game-contracts/src/git.ts",
+      "file": "packages/game-contracts/src/git.ts",
       "module": "game-contracts",
       "detail": "1",
       "message": "文件包含 1 条 lint disable",
-      "fingerprint": "44fda6dfbc8939c4",
+      "fingerprint": "dccffd0bfc99bc59",
       "global": false
-    },
-    {
-      "rule": "cycle",
-      "file": "/home/z/playliquid/packages/engine-adapter-contract/src/adapter.ts",
-      "module": "engine-adapter-contract",
-      "detail": "/home/z/playliquid/packages/engine-adapter-contract/src/adapter.ts -> /home/z/playliquid/packages/engine-adapter-contract/src/exchange.ts",
-      "message": "检测到循环依赖：/home/z/playliquid/packages/engine-adapter-contract/src/adapter.ts -> /home/z/playliquid/packages/engine-adapter-contract/src/exchange.ts -> /home/z/playliquid/packages/engine-adapter-contract/src/adapter.ts",
-      "fingerprint": "70c5d4f7a73f3196",
-      "global": true
     }
   ]
 }

@@ -21,14 +21,30 @@ function fingerprint(rule, file, detail = "") {
   return createHash("sha256").update(`${rule}\0${file}\0${detail}`).digest("hex").slice(0, 16);
 }
 
+// 2026-10-09 (PL-017 evidence follow-up): fingerprints must be STATION-
+// INDEPENDENT. The old code hashed absolute clone paths, so a baseline
+// recorded at one station (e.g. /home/z/playliquid) never matched the same
+// violation computed at another (e.g. a worker sandbox clone path) — every
+// station saw the shared baseline as "new violations". All fingerprint
+// inputs (and the stored file/detail/message fields) are now repo-relative.
+let fingerprintRoot = null;
+
+function relativize(value, root) {
+  if (typeof value !== "string" || !root) return value;
+  const prefix = root.endsWith(path.sep) ? root : `${root}${path.sep}`;
+  return value.split(prefix).join("");
+}
+
 function violation({ rule, file, detail, message, module, global = false }) {
+  const file2 = relativize(posix(file), fingerprintRoot);
+  const detail2 = relativize(detail, fingerprintRoot);
   return {
     rule,
-    file: posix(file),
+    file: file2,
     module: module?.id ?? null,
-    detail,
-    message,
-    fingerprint: fingerprint(rule, posix(file), detail),
+    detail: detail2,
+    message: relativize(message, fingerprintRoot),
+    fingerprint: fingerprint(rule, file2, detail2),
     global,
   };
 }
@@ -79,6 +95,10 @@ async function readBaseline(cwd) {
 }
 
 export async function checkArchitecture({ cwd = process.cwd(), changedFiles = null } = {}) {
+  // fingerprints (and stored violation fields) are repo-relative — see the
+  // relativize() note above. Single-shot CLI process: set for the duration
+  // of the check; every violation is created inside this call frame.
+  fingerprintRoot = path.resolve(cwd);
   const policy = await loadPolicy(cwd);
   const files = await discoverFiles(policy);
   const knownFiles = new Set(files);
