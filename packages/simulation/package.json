@@ -1,0 +1,26 @@
+{
+  "name": "@playliquid/simulation",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "PlayLiquid GameOS headless Simulation Runtime (PL-014). A distinct execution path from the Interactive Runtime that shares the Experience Protocol contracts (lock 12): deterministic fixed-tick stepping over a seeded RNG port, resettable/snapshot-able/replayable sessions with byte-stable snapshots, partition-aware step planning over GameIR spatial types, and no wall-clock authority — injected clock/scheduler ports only. Pure domain kernel + ports with in-memory fakes: no IO, no rendering, no engine SDKs.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "oxlint",
+    "typecheck": "tsc -p .",
+    "test": "node --test src/**/*.test.ts",
+    "harness": "node src/harness.ts"
+  },
+  "dependencies": {
+    "@playliquid/runtime-contracts": "workspace:*",
+    "@playliquid/game-ir": "workspace:*",
+    "@playliquid/game-contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.9",
+    "typescript": "^6.0.3"
+  }
+}

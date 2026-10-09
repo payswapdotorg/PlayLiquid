@@ -1,0 +1,28 @@
+{
+  "name": "@playliquid/replay",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "PlayLiquid GameOS replay platform primitive (PL-014, lock 15 / R8). Immutable, content-addressed replay records (game/world snapshot ref + command stream ref + capture range + provenance); a ReplaySource port reusable by players, QA, integrity and Lab; a deterministic re-execution engine that replays a recorded command stream against a Simulation Runtime session through the canonical command admission gate; and the probabilistic competitive-integrity evidence seam (R11): a verifier port comparing recorded vs re-executed event streams and emitting a typed verdict + confidence. Derivation appends artifacts and never rewrites source records (E10). Pure types, pure functions and in-memory fakes: no IO, no storage, no service implementation.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "oxlint",
+    "typecheck": "tsc -p .",
+    "test": "node --test src/**/*.test.ts",
+    "harness": "node src/harness.ts"
+  },
+  "dependencies": {
+    "@playliquid/runtime-contracts": "workspace:*",
+    "@playliquid/package-system": "workspace:*",
+    "@playliquid/game-ir": "workspace:*",
+    "@playliquid/game-contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@playliquid/simulation": "workspace:*",
+    "@types/node": "^25.9.9",
+    "typescript": "^6.0.3"
+  }
+}
