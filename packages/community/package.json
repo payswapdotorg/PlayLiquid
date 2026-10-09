@@ -1,0 +1,28 @@
+{
+  "name": "@playliquid/community",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "PlayLiquid GameOS community contribution service (PL-032). Typed contribution records over the architecture's §Community vocabulary with full provenance chains — contributor subject (platform-identity vocabulary via the platform-contracts branded primitives and a SubjectDirectory seam), origin lineage (git-lineage LineageNode vocabulary, referenced not re-implemented) and content digests (package-system computeDigest, the single digest authority). Contribution state machine submitted→triaged→under-review→accepted/rejected/withdrawn with authority-stamped append-only transition history (E10) and content-addressed idempotency receipts; R18 typed capability-gap linkage through a read-only GapDirectory seam (the Lab owns the ladder); E8 trust model: third-party contributions are untrusted until qualified at accept. Pure domain: the service instance is the single mutable-state owner; persistence, time, identity, Lab gap facts and package-registry qualification live behind ports with deterministic in-memory fakes; no IO, no timers, no globals.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "node --test \"src/**/*.test.ts\"",
+    "harness": "node src/harness.ts",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix --fix-suggestions"
+  },
+  "dependencies": {
+    "@playliquid/game-ir": "workspace:*",
+    "@playliquid/git-lineage": "workspace:*",
+    "@playliquid/package-system": "workspace:*",
+    "@playliquid/platform-contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.9",
+    "typescript": "^6.0.3"
+  }
+}
