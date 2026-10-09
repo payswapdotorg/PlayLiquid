@@ -283,7 +283,7 @@
   },
   {
    "id": "PL-014",
-   "status": "BLOCKED",
+   "status": "MERGED",
    "depends": [
     "PL-003"
    ],
@@ -293,8 +293,13 @@
    ],
    "branch": "work/pl-014",
    "pr": null,
-   "mergedSha": null,
-   "evidence": [],
+   "mergedSha": "f476821f75577c487b826a282a2218b203df7a00",
+   "evidence": [
+    {
+     "ts": "2026-10-09T00:00:54Z",
+     "note": "narrative-harvest merge (new TL): \u00a710b tool-call replay of certified delivery (47 files); 11 python heredoc/-c surgeries replayed; 6 divergent files byte-verified via Read-tool snapshots; gates re-run: tsc 6.0.3 = 0, sim 55/55 + replay 63/63 node:test, oxlint 0-0, arch 0, both harnesses PASS"
+    }
+   ],
    "owner": "worker"
   },
   {
