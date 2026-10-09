@@ -55,6 +55,114 @@ modules:
   - id: zcode-cli
     roots: [apps/zcode-cli]
     managed: false
+  - id: game-contracts
+    roots: [packages/game-contracts/src]
+    managed: true
+    requires: []
+    publicEntrypoints: [packages/game-contracts/src/index.ts]
+    owner: GameOS
+  - id: game-ir
+    roots: [packages/game-ir/src]
+    managed: true
+    requires: [game-contracts]
+    publicEntrypoints: [packages/game-ir/src/index.ts]
+    owner: GameOS
+  - id: package-system
+    roots: [packages/package-system/src]
+    managed: true
+    requires: []
+    publicEntrypoints: [packages/package-system/src/index.ts]
+    owner: GameOS
+  - id: runtime-contracts
+    roots: [packages/runtime-contracts/src]
+    managed: true
+    requires: []
+    publicEntrypoints: [packages/runtime-contracts/src/index.ts]
+    owner: Runtime
+  - id: platform-contracts
+    roots: [packages/platform-contracts/src]
+    managed: true
+    requires: [game-contracts]
+    publicEntrypoints: [packages/platform-contracts/src/index.ts]
+    owner: Platform
+  - id: tool-fabric
+    roots: [packages/tool-fabric/src]
+    managed: true
+    requires: []
+    publicEntrypoints: [packages/tool-fabric/src/index.ts]
+    owner: Tools
+  - id: engine-adapter-contract
+    roots: [packages/engine-adapter-contract/src]
+    managed: true
+    requires: []
+    publicEntrypoints: [packages/engine-adapter-contract/src/index.ts]
+    owner: Tools
+  - id: lab-contracts
+    roots: [packages/lab-contracts/src]
+    managed: true
+    requires: [game-contracts, game-ir]
+    publicEntrypoints: [packages/lab-contracts/src/index.ts]
+    owner: Lab
+  - id: arena-integration
+    roots: [packages/arena-integration/src]
+    managed: true
+    requires: [game-contracts]
+    publicEntrypoints: [packages/arena-integration/src/index.ts]
+    owner: Integration
+  - id: build-contracts
+    roots: [packages/build-contracts/src]
+    managed: true
+    requires: [game-ir, package-system]
+    publicEntrypoints: [packages/build-contracts/src/index.ts]
+    owner: Build
+  - id: target-profiles
+    roots: [packages/target-profiles/src]
+    managed: true
+    requires: [game-ir, runtime-contracts]
+    publicEntrypoints: [packages/target-profiles/src/index.ts]
+    owner: Build
+  - id: artifact-store
+    roots: [packages/artifact-store/src]
+    managed: true
+    requires: [package-system]
+    publicEntrypoints: [packages/artifact-store/src/index.ts]
+    owner: Platform
+  - id: package-registry
+    roots: [packages/package-registry/src]
+    managed: true
+    requires: [artifact-store, package-system]
+    publicEntrypoints: [packages/package-registry/src/index.ts]
+    owner: Platform
+  - id: git-lineage
+    roots: [packages/git-lineage/src]
+    managed: true
+    requires: [game-ir, package-system]
+    publicEntrypoints: [packages/git-lineage/src/index.ts]
+    owner: GameOS
+  - id: runtime-core
+    roots: [packages/runtime-core/src]
+    managed: true
+    requires: [runtime-contracts]
+    publicEntrypoints: [packages/runtime-core/src/index.ts]
+    owner: Runtime
+  - id: simulation
+    roots: [packages/simulation/src]
+    managed: true
+    requires: [game-contracts, game-ir, runtime-contracts]
+    publicEntrypoints: [packages/simulation/src/index.ts]
+    owner: Simulation
+  - id: replay
+    roots: [packages/replay/src]
+    managed: true
+    requires: [game-contracts, game-ir, package-system, runtime-contracts]
+    publicEntrypoints: [packages/replay/src/index.ts]
+    owner: Platform
+  - id: platform-multiplayer
+    roots: [packages/platform-multiplayer/src]
+    managed: true
+    requires: [platform-contracts, runtime-contracts]
+    publicEntrypoints: [packages/platform-multiplayer/src/index.ts]
+    owner: Platform
 
 global:
   maxFileLines: 400
@@ -64,4 +172,23 @@ global:
   forbidDeepImports: true
   managedOnly: true
 
-exceptions: []
+exceptions:
+  - rule: max-file-lines
+    expires: 2026-11-30
+    paths:
+      - packages/tool-fabric/src/call-protocol.ts
+      - packages/lab-contracts/src/organization.ts
+      - packages/lab-contracts/src/loop.ts
+      - packages/package-registry/src/cas-binding.ts
+      - packages/package-registry/src/registry-index.test.ts
+      - packages/package-registry/src/cas-binding.test.ts
+      - packages/artifact-store/src/store.test.ts
+      - packages/artifact-store/src/store.ts
+      - packages/git-lineage/src/overlay.ts
+      - packages/git-lineage/src/validate-lineage.ts
+      - packages/runtime-core/src/negative.test.ts
+      - packages/runtime-core/src/kernel.test.ts
+      - packages/runtime-core/src/kernel.ts
+      - packages/simulation/src/session.ts
+      - packages/platform-multiplayer/src/outcomes.ts
+      - packages/platform-multiplayer/src/kernel.test.ts
