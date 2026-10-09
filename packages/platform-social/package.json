@@ -1,0 +1,26 @@
+{
+  "name": "@playliquid/platform-social",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "PlayLiquid GameOS social graph service (PL-015). Follow/block relation read model with tenant-scoped queries, negative paths (block beats follow, self-follow refused) and event-sourced admission over @playliquid/platform-contracts (SocialServicePolicy, adjudicateSocialAction, SocialActionRequest/SocialRelation shapes) with game-ir canonical event evidence (@playliquid/game-ir GameEvent hashing and value guards). Pure domain: the service instance is the single mutable-state owner; persistence, time, subject directory and grants live behind ports with in-memory fakes; no IO, no timers, no globals.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "node --test \"src/**/*.test.ts\"",
+    "harness": "node src/harness.ts",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix --fix-suggestions"
+  },
+  "dependencies": {
+    "@playliquid/game-ir": "workspace:*",
+    "@playliquid/platform-contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.9",
+    "typescript": "^6.0.3"
+  }
+}
