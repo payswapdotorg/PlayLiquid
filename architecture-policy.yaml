@@ -163,6 +163,48 @@ modules:
     requires: [platform-contracts, runtime-contracts]
     publicEntrypoints: [packages/platform-multiplayer/src/index.ts]
     owner: Platform
+  - id: capability-broker
+    roots: [packages/capability-broker/src]
+    managed: true
+    requires: [runtime-contracts, game-ir]
+    publicEntrypoints: [packages/capability-broker/src/index.ts]
+    owner: Runtime
+  - id: avatar-runtime
+    roots: [packages/avatar-runtime/src]
+    managed: true
+    requires: [game-contracts, game-ir, capability-broker, runtime-contracts]
+    publicEntrypoints: [packages/avatar-runtime/src/index.ts]
+    owner: Runtime
+  - id: tool-fabric-runtime
+    roots: [packages/tool-fabric-runtime/src]
+    managed: true
+    requires: [tool-fabric, engine-adapter-contract]
+    publicEntrypoints: [packages/tool-fabric-runtime/src/index.ts]
+    owner: Tools
+  - id: platform-identity
+    roots: [packages/platform-identity/src]
+    managed: true
+    requires: [platform-contracts]
+    publicEntrypoints: [packages/platform-identity/src/index.ts]
+    owner: Platform
+  - id: platform-social
+    roots: [packages/platform-social/src]
+    managed: true
+    requires: [platform-contracts, game-ir]
+    publicEntrypoints: [packages/platform-social/src/index.ts]
+    owner: Platform
+  - id: platform-leaderboard
+    roots: [packages/platform-leaderboard/src]
+    managed: true
+    requires: [platform-contracts]
+    publicEntrypoints: [packages/platform-leaderboard/src/index.ts]
+    owner: Platform
+  - id: platform-achievements
+    roots: [packages/platform-achievements/src]
+    managed: true
+    requires: [platform-contracts]
+    publicEntrypoints: [packages/platform-achievements/src/index.ts]
+    owner: Platform
 
 global:
   maxFileLines: 400

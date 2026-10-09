@@ -637,6 +637,9 @@ importers:
       '@playliquid/capability-broker':
         specifier: workspace:*
         version: link:../capability-broker
+      '@playliquid/game-contracts':
+        specifier: workspace:*
+        version: link:../game-contracts
       '@playliquid/game-ir':
         specifier: workspace:*
         version: link:../game-ir
@@ -672,6 +675,9 @@ importers:
       '@playliquid/game-ir':
         specifier: workspace:*
         version: link:../game-ir
+      '@playliquid/runtime-contracts':
+        specifier: workspace:*
+        version: link:../runtime-contracts
     devDependencies:
       '@types/node':
         specifier: ^25.9.9
@@ -859,6 +865,15 @@ importers:
         specifier: ^8.0.2
         version: 8.0.8(@types/node@25.9.9)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.9.0)
 
+  packages/engine-adapter-contract:
+    devDependencies:
+      '@types/node':
+        specifier: ^24.0.0
+        version: 24.12.2
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
   packages/formal-proof:
     dependencies:
       d3:
@@ -896,6 +911,7 @@ importers:
       typescript:
         specifier: ^6.0.3
         version: 6.0.3
+
   packages/git-lineage:
     dependencies:
       '@playliquid/game-ir':
@@ -956,11 +972,50 @@ importers:
         specifier: ^6.0.2
         version: 6.0.3
 
+  packages/platform-achievements:
+    dependencies:
+      '@playliquid/platform-contracts':
+        specifier: workspace:*
+        version: link:../platform-contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^25.9.9
+        version: 25.9.9
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
   packages/platform-contracts:
     dependencies:
       '@playliquid/game-contracts':
         specifier: workspace:*
         version: link:../game-contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^25.9.9
+        version: 25.9.9
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
+  packages/platform-identity:
+    dependencies:
+      '@playliquid/platform-contracts':
+        specifier: workspace:*
+        version: link:../platform-contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^25.9.9
+        version: 25.9.9
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
+  packages/platform-leaderboard:
+    dependencies:
+      '@playliquid/platform-contracts':
+        specifier: workspace:*
+        version: link:../platform-contracts
     devDependencies:
       '@types/node':
         specifier: ^25.9.9
@@ -977,6 +1032,22 @@ importers:
       '@playliquid/runtime-contracts':
         specifier: workspace:*
         version: link:../runtime-contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^25.9.9
+        version: 25.9.9
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
+  packages/platform-social:
+    dependencies:
+      '@playliquid/game-ir':
+        specifier: workspace:*
+        version: link:../game-ir
+      '@playliquid/platform-contracts':
+        specifier: workspace:*
+        version: link:../platform-contracts
     devDependencies:
       '@types/node':
         specifier: ^25.9.9
@@ -1274,6 +1345,31 @@ importers:
       '@types/node':
         specifier: ^25.9.9
         version: 25.9.9
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
+  packages/tool-fabric:
+    devDependencies:
+      '@types/node':
+        specifier: ^24.0.0
+        version: 24.12.2
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
+  packages/tool-fabric-runtime:
+    dependencies:
+      '@playliquid/engine-adapter-contract':
+        specifier: workspace:*
+        version: link:../engine-adapter-contract
+      '@playliquid/tool-fabric':
+        specifier: workspace:*
+        version: link:../tool-fabric
+    devDependencies:
+      '@types/node':
+        specifier: ^24.0.0
+        version: 24.12.2
       typescript:
         specifier: ^6.0.3
         version: 6.0.3

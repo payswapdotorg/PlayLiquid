@@ -26,20 +26,22 @@ promotion). Rows for not-yet-implemented work orders remain design intent.
 | simulation | @playliquid/simulation | Simulation | game-contracts, game-ir, runtime-contracts |
 | replay | @playliquid/replay | Platform | game-contracts, game-ir, package-system, runtime-contracts |
 | platform-multiplayer | @playliquid/platform-multiplayer | Platform | platform-contracts, runtime-contracts |
+| capability-broker | @playliquid/capability-broker | Runtime | runtime-contracts, game-ir (runtime-contracts pinned by work order — the frozen capability protocol the broker operates) |
+| avatar-runtime | @playliquid/avatar-runtime | Runtime | game-contracts, game-ir, capability-broker, runtime-contracts (game-contracts justified: frozen R5 vocabulary) |
+| tool-fabric-runtime | @playliquid/tool-fabric-runtime | Tools | tool-fabric, engine-adapter-contract (adapter seam) |
+| platform-identity | @playliquid/platform-identity | Platform | platform-contracts |
+| platform-social | @playliquid/platform-social | Platform | platform-contracts, game-ir |
+| platform-leaderboard | @playliquid/platform-leaderboard | Platform | platform-contracts |
+| platform-achievements | @playliquid/platform-achievements | Platform | platform-contracts |
 
 ## Design intent (work orders not yet merged)
 
 | Module | Owner | Main dependency |
 |---|---|---|
-| capability-broker | Runtime | game-ir |
-| avatar-runtime | Runtime | game-ir, capability-broker, runtime-contracts |
 | sensory-runtime | Runtime | avatar-runtime |
-| leaderboard | Platform | platform-contracts |
 | economy | Platform | platform-contracts, integrity |
 | integrity | Platform | replay, runtime-contracts |
-| social | Platform | platform-contracts, game-ir |
 | build-orchestrator | Build | build-contracts, tool-fabric-runtime |
-| tool-fabric-runtime | Tools | tool-fabric |
 | community | Product | git-lineage, game-ir |
 | game-ui | Product | public contracts/read models |
 
