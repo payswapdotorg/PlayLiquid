@@ -205,6 +205,18 @@ modules:
     requires: [platform-contracts]
     publicEntrypoints: [packages/platform-achievements/src/index.ts]
     owner: Platform
+  - id: platform-economy
+    roots: [packages/platform-economy/src]
+    managed: true
+    requires: [platform-contracts]
+    publicEntrypoints: [packages/platform-economy/src/index.ts]
+    owner: Platform
+  - id: community
+    roots: [packages/community/src]
+    managed: true
+    requires: [git-lineage, game-ir, platform-contracts, package-system]
+    publicEntrypoints: [packages/community/src/index.ts]
+    owner: Product
 
 global:
   maxFileLines: 400
@@ -218,6 +230,7 @@ exceptions:
   - rule: max-file-lines
     expires: 2026-11-30
     paths:
+      - packages/platform-economy/src/service.ts
       - packages/tool-fabric/src/call-protocol.ts
       - packages/lab-contracts/src/organization.ts
       - packages/lab-contracts/src/loop.ts

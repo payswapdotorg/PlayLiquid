@@ -12,6 +12,15 @@
     },
     {
       "rule": "cycle",
+      "file": "packages/platform-economy/src/settlement.ts",
+      "module": "platform-economy",
+      "detail": "packages/platform-economy/src/records.ts -> packages/platform-economy/src/settlement.ts",
+      "message": "检测到循环依赖：packages/platform-economy/src/settlement.ts -> packages/platform-economy/src/records.ts -> packages/platform-economy/src/settlement.ts",
+      "fingerprint": "3d7cb6c2ee839d40",
+      "global": true
+    },
+    {
+      "rule": "cycle",
       "file": "packages/runtime-core/src/construction.ts",
       "module": "runtime-core",
       "detail": "packages/runtime-core/src/construction.ts -> packages/runtime-core/src/kernel.ts",

@@ -702,6 +702,28 @@ importers:
         specifier: ^6.0.2
         version: 6.0.2
 
+  packages/community:
+    dependencies:
+      '@playliquid/game-ir':
+        specifier: workspace:*
+        version: link:../game-ir
+      '@playliquid/git-lineage':
+        specifier: workspace:*
+        version: link:../git-lineage
+      '@playliquid/package-system':
+        specifier: workspace:*
+        version: link:../package-system
+      '@playliquid/platform-contracts':
+        specifier: workspace:*
+        version: link:../platform-contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^25.9.9
+        version: 25.9.9
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
   packages/desktop:
     dependencies:
       '@arms/rum-electron':
@@ -990,6 +1012,19 @@ importers:
       '@playliquid/game-contracts':
         specifier: workspace:*
         version: link:../game-contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^25.9.9
+        version: 25.9.9
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
+  packages/platform-economy:
+    dependencies:
+      '@playliquid/platform-contracts':
+        specifier: workspace:*
+        version: link:../platform-contracts
     devDependencies:
       '@types/node':
         specifier: ^25.9.9

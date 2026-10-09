@@ -33,16 +33,16 @@ promotion). Rows for not-yet-implemented work orders remain design intent.
 | platform-social | @playliquid/platform-social | Platform | platform-contracts, game-ir |
 | platform-leaderboard | @playliquid/platform-leaderboard | Platform | platform-contracts |
 | platform-achievements | @playliquid/platform-achievements | Platform | platform-contracts |
+| platform-economy | @playliquid/platform-economy | Platform | platform-contracts (integrity consumed as PORT — the RewardIntegrityPort seam, PL-018 wires later) |
+| community | @playliquid/community | Product | git-lineage, game-ir, platform-contracts, package-system (design-intent row + typed transitive vocabulary of lineage coordinates) |
 
 ## Design intent (work orders not yet merged)
 
 | Module | Owner | Main dependency |
 |---|---|---|
 | sensory-runtime | Runtime | avatar-runtime |
-| economy | Platform | platform-contracts, integrity |
 | integrity | Platform | replay, runtime-contracts |
 | build-orchestrator | Build | build-contracts, tool-fabric-runtime |
-| community | Product | git-lineage, game-ir |
 | game-ui | Product | public contracts/read models |
 
 Rules:
