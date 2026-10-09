@@ -220,6 +220,10 @@
     {
      "ts": "2026-10-09T00:07:00Z",
      "note": "TL governance promotion: 18 merged packages -> managed modules (policy requires from package manifests, module.ts+contract.ts artifacts); matrix reconciled with implemented ground truth; 16 dated max-file-lines exceptions + 4-legacy-violation baseline; arch check full + changed: 0 new; all package gates re-verified green post-promotion"
+    },
+    {
+     "ts": "2026-10-09T09:40:00Z",
+     "note": "governance promotion wave 2: 7 packages from PL-015/019/026 promoted (capability-broker, avatar-runtime, tool-fabric-runtime, platform-identity, platform-social, platform-leaderboard, platform-achievements); requires from manifests; lockfile entries committed; matrix reconciled; arch full+changed 0 new; no new exceptions"
     }
    ],
    "owner": "tech-lead"
