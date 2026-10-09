@@ -197,7 +197,7 @@
   },
   {
    "id": "PL-010",
-   "status": "BLOCKED",
+   "status": "MERGED",
    "depends": [
     "PL-001",
     "PL-002",
@@ -215,8 +215,13 @@
    ],
    "branch": "work/pl-010",
    "pr": null,
-   "mergedSha": null,
-   "evidence": [],
+   "mergedSha": "e655d512dff267c34de53e7b131c242cf33d7efb",
+   "evidence": [
+    {
+     "ts": "2026-10-09T00:07:00Z",
+     "note": "TL governance promotion: 18 merged packages -> managed modules (policy requires from package manifests, module.ts+contract.ts artifacts); matrix reconciled with implemented ground truth; 16 dated max-file-lines exceptions + 4-legacy-violation baseline; arch check full + changed: 0 new; all package gates re-verified green post-promotion"
+    }
+   ],
    "owner": "tech-lead"
   },
   {
