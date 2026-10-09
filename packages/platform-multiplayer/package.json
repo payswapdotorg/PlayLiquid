@@ -1,0 +1,26 @@
+{
+  "name": "@playliquid/platform-multiplayer",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "PlayLiquid GameOS multiplayer authority service (PL-016). The server-side binding of platform multiplayer policy (@playliquid/platform-contracts) with the runtime session authority machinery (@playliquid/runtime-contracts): an authoritative session kernel on the canonical command/event path, platform session admission, typed intent admission, protected-outcome enforcement (R9 / lock 19), frozen topology rules, and fixed-tick seeded determinism (E9). Ports everywhere effects would live (transport, session store, clock, scheduler, simulator seam) — pure domain, no IO, no network, no timers.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "node --test \"src/**/*.test.ts\"",
+    "harness": "node src/harness.ts",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix --fix-suggestions"
+  },
+  "dependencies": {
+    "@playliquid/platform-contracts": "workspace:*",
+    "@playliquid/runtime-contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.9",
+    "typescript": "^6.0.3"
+  }
+}
