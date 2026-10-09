@@ -1,0 +1,26 @@
+{
+  "name": "@playliquid/capability-broker",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "PlayLiquid GameOS Capability Broker (PL-026). THE runtime permission authority for avatar/agent actions (lock rule 4): one owner of grant admission, budget consumption and denial reasons. A pure core over @playliquid/runtime-contracts capability semantics (the capability envelope, CapabilityGrant, consumeBudget, resolveActionRequest) with an authoritative grant registry (admit/revoke/expiry-by-tick), broker policy derived from GameIR avatar-binding restrictions and rule-node intent coverage, and deterministic budget evaluation. Avatar-agent actions are broker-mediated canonical commands only (lock rules 13/14) — the broker never grants raw engine authority. No IO, no timers, no globals; in-memory fakes for tests.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "typecheck": "tsc -p .",
+    "test": "node --test src/**/*.test.ts",
+    "harness": "node src/harness.ts"
+  },
+  "dependencies": {
+    "@playliquid/runtime-contracts": "workspace:*",
+    "@playliquid/game-ir": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.9",
+    "typescript": "^6.0.3"
+  }
+}
