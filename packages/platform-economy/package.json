@@ -1,0 +1,25 @@
+{
+  "name": "@playliquid/platform-economy",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "PlayLiquid GameOS rewards/economy platform authority service (PL-017). Games declare eligible semantic events via SettlementEligibilityDeclaration admission (total-validated, duplicate-refusing typed conflicts); the PLATFORM owns validation, entitlements and settlement: an entitlement ledger of grants/balances/holds/settlements scoped by tenant+subject (E1 single owner), deterministic settlement over @playliquid/platform-contracts oracles (validateSettlement, settleGrant, settleLedgerEntry, admitLifecycleCommand, admitSettlement) with event-keyed idempotency (E9/E10: a completed settlement never re-applies; replays return the recorded receipt), the RewardIntegrityPort seam consulted before settlement (PL-018 wired by the host later — evidence/confidence only, never a verdict, R11), and an EconomyValueResolver port for digest-pinned magnitudes (zero numeric authority in contracts). Tenant isolation with least-privilege grants (R20), anti-abuse refusals negatively tested (E8). Pure domain: the service instance is the single mutable-state owner; persistence, time, integrity evidence and value resolution live behind ports with in-memory fakes; no IO, no timers, no globals.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "node --test \"src/**/*.test.ts\"",
+    "harness": "node src/harness.ts",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix --fix-suggestions"
+  },
+  "dependencies": {
+    "@playliquid/platform-contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.9",
+    "typescript": "^6.0.3"
+  }
+}
