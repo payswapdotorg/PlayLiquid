@@ -309,7 +309,7 @@
   },
   {
    "id": "PL-015",
-   "status": "BLOCKED",
+   "status": "MERGED",
    "depends": [
     "PL-004"
    ],
@@ -321,8 +321,13 @@
    ],
    "branch": "work/pl-015",
    "pr": null,
-   "mergedSha": null,
-   "evidence": [],
+   "mergedSha": "46d0689ff011a1cb96ab186a2ef1bbd1324886f7",
+   "evidence": [
+    {
+     "ts": "2026-10-09T09:20:00Z",
+     "note": "narrative-harvest rebuild of certified worker delivery (worker commit 4947432-equivalent; interleaved replay with python -c/-heredoc/for-loop surgeries and cp seedings); gates GREEN: tsc 0 @ts6.0.3, identity 28/28 + social 32/32 + leaderboard 31/31 + achievements 26/26 node:test, oxlint 0-0, harnesses all ok, architecture:check full+changed 0 new; requires edges per matrix (identity/leaderboard/achievements: platform-contracts; social: platform-contracts+game-ir); TL governance promotion for the 4 new packages pending (lockfile entries + architecture-policy)"
+    }
+   ],
    "owner": "worker"
   },
   {
