@@ -357,7 +357,7 @@
   },
   {
    "id": "PL-017",
-   "status": "BLOCKED",
+   "status": "MERGED",
    "depends": [
     "PL-004",
     "PL-009"
@@ -367,8 +367,13 @@
    ],
    "branch": "work/pl-017",
    "pr": null,
-   "mergedSha": null,
-   "evidence": [],
+   "mergedSha": "66ff3b828d42439ef2a16e2b7541156b6d57fa55",
+   "evidence": [
+    {
+     "ts": "2026-10-09T14:1x:00Z",
+     "note": "narrative-harvest merge: chat d1dafddc delivery replayed (180 tool ops) + 3 recorded TL surgeries; gates green at station (tsc 0, 69/69 node:test, oxlint 0-0, arch full+changed 0 new, harness ok); worker-reported TL actions: (a) .architecture-baseline.json fingerprints embed absolute repo paths (path-case mismatch for fresh clones \u2014 needs path-relative fingerprints or re-record), (b) SHA-256 K-constant typos in platform-leaderboard/identity/achievements digest.ts (internally self-consistent, not FIPS; economy ships vector-tested correct implementation)"
+    }
+   ],
    "owner": "worker"
   },
   {
