@@ -1,0 +1,25 @@
+{
+  "name": "@playliquid/platform-achievements",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "PlayLiquid GameOS achievements service (PL-015). Achievement awarding over @playliquid/platform-contracts (AchievementDefinition/AchievementEventBinding declaration shapes, AchievementProgress records, evaluateUnlock as THE unlock oracle, AchievementQueryRequest/ProgressPage read shapes): condition evaluation as pure predicates over event evidence, award-once semantics with evidence-keyed idempotency (E10: re-application returns the recorded result, never a second mutation), progress tracking with monotonic accumulation, and tenant isolation with least-privilege capability grants (R20). Pure domain: the service instance is the single mutable-state owner; persistence, time and grants live behind ports with in-memory fakes; no IO, no timers, no globals.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "node --test \"src/**/*.test.ts\"",
+    "harness": "node src/harness.ts",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix --fix-suggestions"
+  },
+  "dependencies": {
+    "@playliquid/platform-contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.9",
+    "typescript": "^6.0.3"
+  }
+}
