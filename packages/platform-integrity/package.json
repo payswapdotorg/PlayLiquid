@@ -1,0 +1,27 @@
+{
+  "name": "@playliquid/platform-integrity",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "PlayLiquid GameOS competitive-integrity platform service (PL-018). Behavioral-evidence evaluation over @playliquid/platform-contracts frozen shapes (BehavioralEvidenceRecord admission as THE digest-pinned evidence carrier, IntegritySignal/aggregateIntegritySignals as the aggregation oracle, IntegrityReport/IntegrityRiskVerdict with the frozen deviation vocabulary and derived confidence bands) consuming @playliquid/replay command-stream artifacts and re-execution verdicts as TYPED READ-ONLY input (R8 integrity lane; fail-closed verifyCommandStream admission, never mutated) and @playliquid/runtime-contracts command-envelope vocabulary (origin/actor provenance statistics). Explicit AI-player modes are first-class: per-mode calibration makes declared AI-assisted sessions evaluate differently from claimed-human, and the declaration is evidence, never a bypass (typed declaration-mismatch refusals, E8). Outputs are probabilistic evidence/confidence/risk only — certainty fields are unrepresentable, enforcement lives outside via the host-composed decideEnforcement oracle (R11/lock 29), and a RewardIntegrityPort-compatible adapter surfaces the subject standing for economy settlement. Tenant isolation with least-privilege grants (R20), deterministic seeded heuristics with injected clock (E9), append-only evidence/report/verdict history where recomputation mints NEW versions and never edits (E10), anti-gaming negative tests (E8). Pure domain: the service instance is the single mutable-state owner; persistence and time live behind ports with in-memory fakes; no IO, no timers, no globals.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "node --test \"src/**/*.test.ts\"",
+    "harness": "node src/harness.ts",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix --fix-suggestions"
+  },
+  "dependencies": {
+    "@playliquid/platform-contracts": "workspace:*",
+    "@playliquid/replay": "workspace:*",
+    "@playliquid/runtime-contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.9",
+    "typescript": "^6.0.3"
+  }
+}
