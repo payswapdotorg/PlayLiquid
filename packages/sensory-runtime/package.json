@@ -1,0 +1,31 @@
+{
+  "name": "@playliquid/sensory-runtime",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "PlayLiquid GameOS sensory runtime (PL-027). The simulation/lab host of sensor EXECUTION for composed avatars (avatar-runtime PL-026 deliberately left execution to the runtimes): typed per-channel SensorySample records that REFINE avatar-runtime's SensorSample (channel id, frozen game-contracts SensorCapabilityId, channel-appropriate typed payload shapes, content digest, epoch); per-capability codec admission of raw producer frames with total validation and kebab-case typed refusals (capability/channel binding coherence, range and normalization invariants); a deterministic host that binds a composed avatar (R5 restriction projection included) to per-channel producer ports under an injected ServiceClock, records restriction filtering as POLICY rather than silence, and appends admitted samples to a content-addressed append-only sensory history (E10: immutable, digest-pinned, idempotent by content key — same key, recorded receipt, no second mutation). The perception seam: a SensorInputPort adapter feeds the history to avatar-runtime's existing perception→decision→action driver unmodified (contracts-only import of the managed module). Tenancy (R20): all records and polls are tenant-scoped; cross-tenant reads/probes are typed refusals. Pure domain: clock and producers are ports; in-memory seeded fakes are the only in-repo implementation; no rendering, no audio capture, no device IO, no physics, no Math.random, no wall-clock, no globals (E3/E9).",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "node --test \"src/**/*.test.ts\"",
+    "harness": "node src/harness.ts",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix --fix-suggestions"
+  },
+  "dependencies": {
+    "@playliquid/avatar-runtime": "workspace:*",
+    "@playliquid/game-contracts": "workspace:*",
+    "@playliquid/game-ir": "workspace:*",
+    "@playliquid/runtime-contracts": "workspace:*",
+    "@playliquid/platform-contracts": "workspace:*",
+    "@playliquid/package-system": "workspace:*",
+    "@playliquid/capability-broker": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.9",
+    "typescript": "^6.0.3"
+  }
+}
