@@ -223,6 +223,12 @@ modules:
     requires: [platform-contracts, replay, runtime-contracts]
     publicEntrypoints: [packages/platform-integrity/src/index.ts]
     owner: Platform
+  - id: lab-simulation
+    roots: [packages/lab-simulation/src]
+    managed: true
+    requires: [lab-contracts, simulation, replay, avatar-runtime, capability-broker, game-contracts, game-ir, runtime-contracts, platform-contracts, package-system]
+    publicEntrypoints: [packages/lab-simulation/src/index.ts]
+    owner: Lab
 
 global:
   maxFileLines: 400
