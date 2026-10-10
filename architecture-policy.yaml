@@ -217,6 +217,12 @@ modules:
     requires: [git-lineage, game-ir, platform-contracts, package-system]
     publicEntrypoints: [packages/community/src/index.ts]
     owner: Product
+  - id: platform-integrity
+    roots: [packages/platform-integrity/src]
+    managed: true
+    requires: [platform-contracts, replay, runtime-contracts]
+    publicEntrypoints: [packages/platform-integrity/src/index.ts]
+    owner: Platform
 
 global:
   maxFileLines: 400

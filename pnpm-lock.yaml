@@ -1046,6 +1046,25 @@ importers:
         specifier: ^6.0.3
         version: 6.0.3
 
+  packages/platform-integrity:
+    dependencies:
+      '@playliquid/platform-contracts':
+        specifier: workspace:*
+        version: link:../platform-contracts
+      '@playliquid/replay':
+        specifier: workspace:*
+        version: link:../replay
+      '@playliquid/runtime-contracts':
+        specifier: workspace:*
+        version: link:../runtime-contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^25.9.9
+        version: 25.9.9
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
   packages/platform-leaderboard:
     dependencies:
       '@playliquid/platform-contracts':
