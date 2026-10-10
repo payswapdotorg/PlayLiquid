@@ -37,6 +37,7 @@ promotion). Rows for not-yet-implemented work orders remain design intent.
 | platform-integrity | @playliquid/platform-integrity | Platform | platform-contracts, replay, runtime-contracts (platform-contracts justified: frozen integrity vocabulary; recorded in module.ts requires) |
 | community | @playliquid/community | Product | git-lineage, game-ir, platform-contracts, package-system (design-intent row + typed transitive vocabulary of lineage coordinates) |
 | lab-simulation | @playliquid/lab-simulation | Lab | lab-contracts, simulation, replay, avatar-runtime, capability-broker, game-contracts, game-ir, runtime-contracts, platform-contracts, package-system (PL-028; game-contracts/platform-contracts/package-system/game-ir/runtime-contracts justified per module.ts — frozen vocabulary, tenant isolation, canonical JSON authority, world value language, session/actor/command vocabulary) |
+| tool-blender | @playliquid/tool-blender | Tools | engine-adapter-contract, tool-fabric-runtime, tool-fabric, platform-contracts (PL-025; platform-contracts justified per module.ts — TenantId/SubjectId tenant-isolation vocabulary, platform-economy/lab-simulation precedent, R20 cross-tenant discipline) |
 
 ## Design intent (work orders not yet merged)
 

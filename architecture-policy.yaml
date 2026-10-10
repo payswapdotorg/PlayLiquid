@@ -181,6 +181,12 @@ modules:
     requires: [tool-fabric, engine-adapter-contract]
     publicEntrypoints: [packages/tool-fabric-runtime/src/index.ts]
     owner: Tools
+  - id: tool-blender
+    roots: [packages/tool-blender/src]
+    managed: true
+    requires: [engine-adapter-contract, tool-fabric-runtime, tool-fabric, platform-contracts]
+    publicEntrypoints: [packages/tool-blender/src/index.ts]
+    owner: Tools
   - id: platform-identity
     roots: [packages/platform-identity/src]
     managed: true

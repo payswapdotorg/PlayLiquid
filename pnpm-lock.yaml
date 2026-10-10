@@ -1443,6 +1443,28 @@ importers:
         specifier: ^6.0.3
         version: 6.0.3
 
+  packages/tool-blender:
+    dependencies:
+      '@playliquid/engine-adapter-contract':
+        specifier: workspace:*
+        version: link:../engine-adapter-contract
+      '@playliquid/platform-contracts':
+        specifier: workspace:*
+        version: link:../platform-contracts
+      '@playliquid/tool-fabric':
+        specifier: workspace:*
+        version: link:../tool-fabric
+      '@playliquid/tool-fabric-runtime':
+        specifier: workspace:*
+        version: link:../tool-fabric-runtime
+    devDependencies:
+      '@types/node':
+        specifier: ^25.9.9
+        version: 25.9.9
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
   packages/tool-fabric:
     devDependencies:
       '@types/node':
