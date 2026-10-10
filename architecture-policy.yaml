@@ -175,6 +175,12 @@ modules:
     requires: [game-contracts, game-ir, capability-broker, runtime-contracts]
     publicEntrypoints: [packages/avatar-runtime/src/index.ts]
     owner: Runtime
+  - id: sensory-runtime
+    roots: [packages/sensory-runtime/src]
+    managed: true
+    requires: [avatar-runtime, game-contracts, game-ir, runtime-contracts, platform-contracts, package-system, capability-broker]
+    publicEntrypoints: [packages/sensory-runtime/src/index.ts]
+    owner: Runtime
   - id: tool-fabric-runtime
     roots: [packages/tool-fabric-runtime/src]
     managed: true
@@ -255,6 +261,7 @@ exceptions:
       - packages/package-registry/src/cas-binding.ts
       - packages/package-registry/src/registry-index.test.ts
       - packages/package-registry/src/cas-binding.test.ts
+      - packages/sensory-runtime/src/runtime.negative.test.ts
       - packages/artifact-store/src/store.test.ts
       - packages/artifact-store/src/store.ts
       - packages/git-lineage/src/overlay.ts
