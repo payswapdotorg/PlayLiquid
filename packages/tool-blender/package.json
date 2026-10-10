@@ -1,0 +1,28 @@
+{
+  "name": "@playliquid/tool-blender",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "PlayLiquid GameOS Blender tool adapter (PL-025). A tool.blender adapter implementing the neutral Adapter seam from @playliquid/engine-adapter-contract, registered into the Tool Fabric runtime (PL-019). Blender-specific behavior lives ONLY here (E4): a fixed capability surface scoped to what Blender offers as an authoring/asset tool (inspect project/scene/asset, modify/import/export, run editor action/script), each modeled as a typed, versioned command payload with total validation — typed kebab-case rejection codes, path-tagged, never any, never silent coercion. Blender-side execution stays behind the BlenderBridgePort (pure interface): the adapter turns a validated neutral dispatch into a bridge-specific invocation (headless command/scene script envelope); the in-memory fake bridge is the test host. NO process spawning, no IO, no timers, no globals (E3) — the real Blender invocation is the host's job (E11, deliberate deferral). Every outcome is stamped with an AdapterAuthority produced by the adapter/bridge; client-claimed outcomes are rejected by a total check. Lifecycle transitions go exclusively through the contract's advanceLifecycle validator; dispatch in a non-active state is a typed refusal. Deterministic (E9): content-derived command ids, injected clock, seeded fakes. Append-only evidence (E10): each dispatch/outcome pair is recorded as an immutable, content-addressed, digest-pinned exchange record, never edited.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "node --test \"src/**/*.test.ts\"",
+    "harness": "node src/harness.ts",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix --fix-suggestions"
+  },
+  "dependencies": {
+    "@playliquid/engine-adapter-contract": "workspace:*",
+    "@playliquid/tool-fabric-runtime": "workspace:*",
+    "@playliquid/tool-fabric": "workspace:*",
+    "@playliquid/platform-contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.9",
+    "typescript": "^6.0.3"
+  }
+}
