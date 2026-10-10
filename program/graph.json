@@ -542,7 +542,7 @@
     },
     {
       "id": "PL-027",
-      "status": "BLOCKED",
+      "status": "MERGED",
       "depends": [
         "PL-026"
       ],
@@ -551,8 +551,13 @@
       ],
       "branch": "work/pl-027",
       "pr": null,
-      "mergedSha": null,
-      "evidence": [],
+      "mergedSha": "2c0192c",
+      "evidence": [
+        "delivery: worker chat 7d6282f7 final completion report (23 files, +4015, worker head a0a69e9, base 6d62828)",
+        "replay: generic tl_replay 285 ops (28 Write/9 MultiEdit/15 Edit/194 Bash) including python3-heredoc package.json mutation (op126 capability-broker dep, VFile-shim exec) \u2014 23 files; 4 edit_not_found = 4 worker-side failed MultiEdits (faithful)",
+        "gates at station: tsc 0 errors; node --test 73/73/0/0; harness exit 0 ok=true; oxlint 0-0 on 21 files; architecture --changed 4/4/0-new + full 5/5/0-new",
+        "TL rebuild commit 1028a6d on work/pl-027; merged no-ff as 2c0192c; no TL corrections required"
+      ],
       "owner": "worker"
     },
     {
