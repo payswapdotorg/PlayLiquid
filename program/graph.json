@@ -1,898 +1,903 @@
 {
- "schemaVersion": 1,
- "program": "PLGOS-1",
- "repository": "payswapdotorg/PlayLiquid",
- "baseArchitectureCommit": "21b51c153ecbbc545f39cffb0bfa530ef489ef9c",
- "maxConcurrentWorkers": 3,
- "rootOwner": "tech-lead",
- "statuses": [
-  "BLOCKED",
-  "READY",
-  "ACTIVE",
-  "REVIEW",
-  "MERGED",
-  "REJECTED"
- ],
- "workOrders": [
-  {
-   "id": "PL-001",
-   "status": "MERGED",
-   "depends": [],
-   "writeSurface": [
-    "packages/game-contracts",
-    "packages/game-ir"
-   ],
-   "branch": "work/pl-001",
-   "pr": null,
-   "mergedSha": "feb54ee8d4aeeff0958fa3ce33c4247e93eb9def",
-   "evidence": [
+  "schemaVersion": 1,
+  "program": "PLGOS-1",
+  "repository": "payswapdotorg/PlayLiquid",
+  "baseArchitectureCommit": "21b51c153ecbbc545f39cffb0bfa530ef489ef9c",
+  "maxConcurrentWorkers": 3,
+  "rootOwner": "tech-lead",
+  "statuses": [
+    "BLOCKED",
+    "READY",
+    "ACTIVE",
+    "REVIEW",
+    "MERGED",
+    "REJECTED"
+  ],
+  "workOrders": [
     {
-     "ts": "2026-10-05T17:19:44Z",
-     "note": "squash-merged via PR #3; TL gates: game-contracts standalone green; game-ir green with workspace:* sibling link (tsc 0 err, tests pass, oxlint clean); surface+secret scan clean"
-    }
-   ],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-002",
-   "status": "MERGED",
-   "depends": [],
-   "writeSurface": [
-    "packages/package-system",
-    "spec/package-contract.md"
-   ],
-   "branch": "work/pl-002",
-   "pr": null,
-   "mergedSha": "d84dd73d61fc92ecfbbceee72e5eea2eea36920a",
-   "evidence": [
-    {
-     "ts": "2026-10-05T17:15:04Z",
-     "note": "squash-merged via PR after TL gate re-run: tsc 0 errors, 103/103 node:test, oxlint clean, surface+secret scan clean"
-    }
-   ],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-003",
-   "status": "MERGED",
-   "depends": [],
-   "writeSurface": [
-    "packages/runtime-contracts"
-   ],
-   "branch": "work/pl-003",
-   "pr": null,
-   "mergedSha": "0360868606b059b3189186cc15c6a5dc608bcb62",
-   "evidence": [
-    {
-     "ts": "2026-10-05T17:15:56Z",
-     "note": "squash-merged via PR #2 after TL gate re-run in worktree: tsc PASS, node:test PASS, oxlint clean, surface+secret scan clean"
-    }
-   ],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-004",
-   "status": "MERGED",
-   "depends": [],
-   "writeSurface": [
-    "packages/platform-contracts"
-   ],
-   "branch": "work/pl-004",
-   "pr": null,
-   "mergedSha": "f1982b31a6be81218a4722272c149cbf3a004e06",
-   "evidence": [
-    {
-     "ts": "2026-10-05T18:09:23Z",
-     "note": "squash-merged via PR after TL gate re-run in worktree (pnpm-linked): tsc PASS, node:test PASS, oxlint clean; surface+secret clean @ base 424a42d"
-    }
-   ],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-005",
-   "status": "MERGED",
-   "depends": [],
-   "writeSurface": [
-    "packages/tool-fabric",
-    "packages/engine-adapter-contract"
-   ],
-   "branch": "work/pl-005",
-   "pr": null,
-   "mergedSha": null,
-   "evidence": [
-    "tsc -b 0 errors",
-    "oxlint 0-0 (25 files)",
-    "architecture:check 0 violations",
-    "program:check PASS",
-    "node --test 91/91 (tool-fabric 55, engine-adapter-contract 36)"
-   ],
-   "owner": "worker",
-   "merge": {
-    "commit": "e759aa4",
-    "mergedAt": "2026-10-07"
-   }
-  },
-  {
-   "id": "PL-006",
-   "status": "MERGED",
-   "depends": [
-    "PL-001"
-   ],
-   "writeSurface": [
-    "packages/lab-contracts"
-   ],
-   "branch": "work/pl-006",
-   "pr": null,
-   "mergedSha": null,
-   "evidence": [
-    "tsc -b 0 errors",
-    "oxlint 0-0",
-    "architecture 0 violations",
-    "node --test 74/74"
-   ],
-   "owner": "worker",
-   "merge": {
-    "commit": "ceafd06",
-    "mergedAt": "2026-10-08"
-   }
-  },
-  {
-   "id": "PL-007",
-   "status": "MERGED",
-   "depends": [
-    "PL-006"
-   ],
-   "writeSurface": [
-    "packages/arena-integration"
-   ],
-   "branch": "work/pl-007",
-   "pr": null,
-   "mergedSha": null,
-   "evidence": [],
-   "owner": "worker",
-   "merge": {
-    "commit": "559e7c9",
-    "mergedAt": "2026-10-07"
-   }
-  },
-  {
-   "id": "PL-008",
-   "status": "MERGED",
-   "depends": [
-    "PL-003",
-    "PL-005"
-   ],
-   "writeSurface": [
-    "packages/build-contracts",
-    "packages/target-profiles"
-   ],
-   "branch": "work/pl-008",
-   "pr": null,
-   "mergedSha": null,
-   "evidence": [],
-   "owner": "worker",
-   "merge": {
-    "commit": "1da7192",
-    "mergedAt": "2026-10-07"
-   }
-  },
-  {
-   "id": "PL-009",
-   "status": "MERGED",
-   "depends": [
-    "PL-004"
-   ],
-   "writeSurface": [
-    "packages/platform-contracts/refinement-spec"
-   ],
-   "branch": "work/pl-009",
-   "pr": null,
-   "mergedSha": null,
-   "evidence": [],
-   "owner": "worker",
-   "merge": {
-    "commit": "263eb5c",
-    "mergedAt": "2026-10-07"
-   }
-  },
-  {
-   "id": "PL-010",
-   "status": "MERGED",
-   "depends": [
-    "PL-001",
-    "PL-002",
-    "PL-003",
-    "PL-004",
-    "PL-005",
-    "PL-006",
-    "PL-007",
-    "PL-008",
-    "PL-009"
-   ],
-   "writeSurface": [
-    "architecture-policy.yaml",
-    "spec/module-dependency-matrix.md"
-   ],
-   "branch": "work/pl-010",
-   "pr": null,
-   "mergedSha": "e655d512dff267c34de53e7b131c242cf33d7efb",
-   "evidence": [
-    {
-     "ts": "2026-10-09T00:07:00Z",
-     "note": "TL governance promotion: 18 merged packages -> managed modules (policy requires from package manifests, module.ts+contract.ts artifacts); matrix reconciled with implemented ground truth; 16 dated max-file-lines exceptions + 4-legacy-violation baseline; arch check full + changed: 0 new; all package gates re-verified green post-promotion"
+      "id": "PL-001",
+      "status": "MERGED",
+      "depends": [],
+      "writeSurface": [
+        "packages/game-contracts",
+        "packages/game-ir"
+      ],
+      "branch": "work/pl-001",
+      "pr": null,
+      "mergedSha": "feb54ee8d4aeeff0958fa3ce33c4247e93eb9def",
+      "evidence": [
+        {
+          "ts": "2026-10-05T17:19:44Z",
+          "note": "squash-merged via PR #3; TL gates: game-contracts standalone green; game-ir green with workspace:* sibling link (tsc 0 err, tests pass, oxlint clean); surface+secret scan clean"
+        }
+      ],
+      "owner": "worker"
     },
     {
-     "ts": "2026-10-09T09:40:00Z",
-     "note": "governance promotion wave 2: 7 packages from PL-015/019/026 promoted (capability-broker, avatar-runtime, tool-fabric-runtime, platform-identity, platform-social, platform-leaderboard, platform-achievements); requires from manifests; lockfile entries committed; matrix reconciled; arch full+changed 0 new; no new exceptions"
-    }
-   ],
-   "owner": "tech-lead"
-  },
-  {
-   "id": "PL-011",
-   "status": "MERGED",
-   "depends": [
-    "PL-002"
-   ],
-   "writeSurface": [
-    "packages/package-registry",
-    "packages/artifact-store"
-   ],
-   "branch": "work/pl-011",
-   "pr": null,
-   "mergedSha": null,
-   "evidence": [],
-   "owner": "worker",
-   "merge": {
-    "commit": "c935bc9",
-    "mergedAt": "2026-10-07"
-   }
-  },
-  {
-   "id": "PL-012",
-   "status": "MERGED",
-   "depends": [
-    "PL-001",
-    "PL-002"
-   ],
-   "writeSurface": [
-    "packages/git-lineage"
-   ],
-   "branch": "work/pl-012",
-   "pr": null,
-   "mergedSha": "020a5885235f666112b82d00e9eccf7a224363f6",
-   "evidence": [
+      "id": "PL-002",
+      "status": "MERGED",
+      "depends": [],
+      "writeSurface": [
+        "packages/package-system",
+        "spec/package-contract.md"
+      ],
+      "branch": "work/pl-002",
+      "pr": null,
+      "mergedSha": "d84dd73d61fc92ecfbbceee72e5eea2eea36920a",
+      "evidence": [
+        {
+          "ts": "2026-10-05T17:15:04Z",
+          "note": "squash-merged via PR after TL gate re-run: tsc 0 errors, 103/103 node:test, oxlint clean, surface+secret scan clean"
+        }
+      ],
+      "owner": "worker"
+    },
     {
-     "ts": "2026-10-08T23:50:36Z",
-     "note": "narrative-harvest merge (new TL): §10b tool-call replay incl. two Bash heredoc surgeries (overlay split + append) of certified delivery (19 files); gates re-run: tsc 6.0.3 = 0, node --test 54/54, oxlint 0-0, arch 0; harness valid; lockfile importer added"
-    }
-   ],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-013",
-   "status": "MERGED",
-   "depends": [
-    "PL-001",
-    "PL-003"
-   ],
-   "writeSurface": [
-    "packages/runtime-core"
-   ],
-   "branch": "work/pl-013",
-   "pr": null,
-   "mergedSha": "666cd6ce14223bd0c9990b1a4fa89d559cadfdf6",
-   "evidence": [
+      "id": "PL-003",
+      "status": "MERGED",
+      "depends": [],
+      "writeSurface": [
+        "packages/runtime-contracts"
+      ],
+      "branch": "work/pl-003",
+      "pr": null,
+      "mergedSha": "0360868606b059b3189186cc15c6a5dc608bcb62",
+      "evidence": [
+        {
+          "ts": "2026-10-05T17:15:56Z",
+          "note": "squash-merged via PR #2 after TL gate re-run in worktree: tsc PASS, node:test PASS, oxlint clean, surface+secret scan clean"
+        }
+      ],
+      "owner": "worker"
+    },
     {
-     "ts": "2026-10-08T23:47:36Z",
-     "note": "narrative-harvest merge (new TL): §10b tool-call replay of certified 2nd-session delivery (25 files, base c9cf856); sequential-MultiEdit semantics applied; gates re-run at station: tsc 6.0.3 = 0 errors, node --test 86/86, oxlint 0-0, architecture:check 0 violations; harness integrityOk"
-    }
-   ],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-014",
-   "status": "MERGED",
-   "depends": [
-    "PL-003"
-   ],
-   "writeSurface": [
-    "packages/simulation",
-    "packages/replay"
-   ],
-   "branch": "work/pl-014",
-   "pr": null,
-   "mergedSha": "f476821f75577c487b826a282a2218b203df7a00",
-   "evidence": [
+      "id": "PL-004",
+      "status": "MERGED",
+      "depends": [],
+      "writeSurface": [
+        "packages/platform-contracts"
+      ],
+      "branch": "work/pl-004",
+      "pr": null,
+      "mergedSha": "f1982b31a6be81218a4722272c149cbf3a004e06",
+      "evidence": [
+        {
+          "ts": "2026-10-05T18:09:23Z",
+          "note": "squash-merged via PR after TL gate re-run in worktree (pnpm-linked): tsc PASS, node:test PASS, oxlint clean; surface+secret clean @ base 424a42d"
+        }
+      ],
+      "owner": "worker"
+    },
     {
-     "ts": "2026-10-09T00:00:54Z",
-     "note": "narrative-harvest merge (new TL): §10b tool-call replay of certified delivery (47 files); 11 python heredoc/-c surgeries replayed; 6 divergent files byte-verified via Read-tool snapshots; gates re-run: tsc 6.0.3 = 0, sim 55/55 + replay 63/63 node:test, oxlint 0-0, arch 0, both harnesses PASS"
-    }
-   ],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-015",
-   "status": "MERGED",
-   "depends": [
-    "PL-004"
-   ],
-   "writeSurface": [
-    "packages/platform-identity",
-    "packages/platform-social",
-    "packages/platform-leaderboard",
-    "packages/platform-achievements"
-   ],
-   "branch": "work/pl-015",
-   "pr": null,
-   "mergedSha": "46d0689ff011a1cb96ab186a2ef1bbd1324886f7",
-   "evidence": [
+      "id": "PL-005",
+      "status": "MERGED",
+      "depends": [],
+      "writeSurface": [
+        "packages/tool-fabric",
+        "packages/engine-adapter-contract"
+      ],
+      "branch": "work/pl-005",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [
+        "tsc -b 0 errors",
+        "oxlint 0-0 (25 files)",
+        "architecture:check 0 violations",
+        "program:check PASS",
+        "node --test 91/91 (tool-fabric 55, engine-adapter-contract 36)"
+      ],
+      "owner": "worker",
+      "merge": {
+        "commit": "e759aa4",
+        "mergedAt": "2026-10-07"
+      }
+    },
     {
-     "ts": "2026-10-09T09:20:00Z",
-     "note": "narrative-harvest rebuild of certified worker delivery (worker commit 4947432-equivalent; interleaved replay with python -c/-heredoc/for-loop surgeries and cp seedings); gates GREEN: tsc 0 @ts6.0.3, identity 28/28 + social 32/32 + leaderboard 31/31 + achievements 26/26 node:test, oxlint 0-0, harnesses all ok, architecture:check full+changed 0 new; requires edges per matrix (identity/leaderboard/achievements: platform-contracts; social: platform-contracts+game-ir); TL governance promotion for the 4 new packages pending (lockfile entries + architecture-policy)"
-    }
-   ],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-016",
-   "status": "MERGED",
-   "depends": [
-    "PL-003",
-    "PL-004"
-   ],
-   "writeSurface": [
-    "packages/platform-multiplayer"
-   ],
-   "branch": "work/pl-016",
-   "pr": null,
-   "mergedSha": "5e245ea840c94a9f97eb7a733ef0d1d7501377fb",
-   "evidence": [
+      "id": "PL-006",
+      "status": "MERGED",
+      "depends": [
+        "PL-001"
+      ],
+      "writeSurface": [
+        "packages/lab-contracts"
+      ],
+      "branch": "work/pl-006",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [
+        "tsc -b 0 errors",
+        "oxlint 0-0",
+        "architecture 0 violations",
+        "node --test 74/74"
+      ],
+      "owner": "worker",
+      "merge": {
+        "commit": "ceafd06",
+        "mergedAt": "2026-10-08"
+      }
+    },
     {
-     "ts": "2026-10-09T00:02:34Z",
-     "note": "narrative-harvest merge (new TL): §10b tool-call replay of certified delivery (28 files); chat-pasted re-emission envelopes REJECTED as mangled, delivery tree used; gates re-run: tsc 6.0.3 = 0, 82/82 node:test, oxlint 0-0, arch 0, harness ok"
-    }
-   ],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-017",
-   "status": "MERGED",
-   "depends": [
-    "PL-004",
-    "PL-009"
-   ],
-   "writeSurface": [
-    "packages/platform-economy"
-   ],
-   "branch": "work/pl-017",
-   "pr": null,
-   "mergedSha": "66ff3b828d42439ef2a16e2b7541156b6d57fa55",
-   "evidence": [
+      "id": "PL-007",
+      "status": "MERGED",
+      "depends": [
+        "PL-006"
+      ],
+      "writeSurface": [
+        "packages/arena-integration"
+      ],
+      "branch": "work/pl-007",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker",
+      "merge": {
+        "commit": "559e7c9",
+        "mergedAt": "2026-10-07"
+      }
+    },
     {
-     "ts": "2026-10-09T14:1x:00Z",
-     "note": "narrative-harvest merge: chat d1dafddc delivery replayed (180 tool ops) + 3 recorded TL surgeries; gates green at station (tsc 0, 69/69 node:test, oxlint 0-0, arch full+changed 0 new, harness ok); worker-reported TL actions: (a) .architecture-baseline.json fingerprints embed absolute repo paths (path-case mismatch for fresh clones — needs path-relative fingerprints or re-record), (b) SHA-256 K-constant typos in platform-leaderboard/identity/achievements digest.ts (internally self-consistent, not FIPS; economy ships vector-tested correct implementation)"
-    }
-   ],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-018",
-   "status": "MERGED",
-   "depends": [
-    "PL-009",
-    "PL-014"
-   ],
-   "writeSurface": [
-    "packages/platform-integrity"
-   ],
-   "branch": "work/pl-018",
-   "pr": null,
-   "mergedSha": "4bf49db",
-   "evidence": [
-    "delivery: worker chat 87c2a6f9 final completion report (24 files, +4114, worker head a03ee07, base 91c8552)",
-    "replay: interleave_replay 257 ops (27 Write/56 edit_ok; 2 recorded-fail ops skipped per result-proof) -> 24 files +4114 exact match",
-    "gates at station: tsc -p . 0 errors; node --test 49/49; harness ok:true failures:[] exit 0; oxlint 0-0; architecture --changed 4/4/0-new + full 5/5/0-new",
-    "TL rebuild commit 19e4df2 on work/pl-018; merged no-ff as 4bf49db"
-   ],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-019",
-   "status": "MERGED",
-   "depends": [
-    "PL-005"
-   ],
-   "writeSurface": [
-    "packages/tool-fabric-runtime"
-   ],
-   "branch": "work/pl-019",
-   "pr": null,
-   "mergedSha": "183eb9dd90d472ee32919291b3b6dd073e5f777c",
-   "evidence": [
+      "id": "PL-008",
+      "status": "MERGED",
+      "depends": [
+        "PL-003",
+        "PL-005"
+      ],
+      "writeSurface": [
+        "packages/build-contracts",
+        "packages/target-profiles"
+      ],
+      "branch": "work/pl-008",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker",
+      "merge": {
+        "commit": "1da7192",
+        "mergedAt": "2026-10-07"
+      }
+    },
     {
-     "ts": "2026-10-09T08:45:00Z",
-     "note": "narrative-harvest rebuild of certified worker delivery (32 files, worker commit 867dd8f-equivalent); gates GREEN at station: tsc 0 @ts6.0.3, 96/96 node:test, oxlint 0-0, architecture:check full+changed 0 new; deps: tool-fabric (matrix main) + engine-adapter-contract (adapter seam)"
-    }
-   ],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-020",
-   "status": "BLOCKED",
-   "depends": [
-    "PL-008",
-    "PL-011",
-    "PL-019"
-   ],
-   "writeSurface": [
-    "packages/build-orchestrator"
-   ],
-   "branch": "work/pl-020",
-   "pr": null,
-   "mergedSha": null,
-   "evidence": [],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-021",
-   "status": "BLOCKED",
-   "depends": [
-    "PL-019",
-    "PL-020"
-   ],
-   "writeSurface": [
-    "packages/engine-playcanvas"
-   ],
-   "branch": "work/pl-021",
-   "pr": null,
-   "mergedSha": null,
-   "evidence": [],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-022",
-   "status": "BLOCKED",
-   "depends": [
-    "PL-019",
-    "PL-020"
-   ],
-   "writeSurface": [
-    "packages/engine-unreal"
-   ],
-   "branch": "work/pl-022",
-   "pr": null,
-   "mergedSha": null,
-   "evidence": [],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-023",
-   "status": "BLOCKED",
-   "depends": [
-    "PL-019",
-    "PL-020"
-   ],
-   "writeSurface": [
-    "packages/engine-unity"
-   ],
-   "branch": "work/pl-023",
-   "pr": null,
-   "mergedSha": null,
-   "evidence": [],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-024",
-   "status": "BLOCKED",
-   "depends": [
-    "PL-019",
-    "PL-020"
-   ],
-   "writeSurface": [
-    "packages/engine-godot"
-   ],
-   "branch": "work/pl-024",
-   "pr": null,
-   "mergedSha": null,
-   "evidence": [],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-025",
-   "status": "BLOCKED",
-   "depends": [
-    "PL-019"
-   ],
-   "writeSurface": [
-    "packages/tool-blender"
-   ],
-   "branch": "work/pl-025",
-   "pr": null,
-   "mergedSha": null,
-   "evidence": [],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-026",
-   "status": "MERGED",
-   "depends": [
-    "PL-001",
-    "PL-003"
-   ],
-   "writeSurface": [
-    "packages/avatar-runtime",
-    "packages/capability-broker"
-   ],
-   "branch": "work/pl-026",
-   "pr": null,
-   "mergedSha": "9499c5adb36c9ce4f6eaea4f219d1cd11639f5c7",
-   "evidence": [
+      "id": "PL-009",
+      "status": "MERGED",
+      "depends": [
+        "PL-004"
+      ],
+      "writeSurface": [
+        "packages/platform-contracts/refinement-spec"
+      ],
+      "branch": "work/pl-009",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker",
+      "merge": {
+        "commit": "263eb5c",
+        "mergedAt": "2026-10-07"
+      }
+    },
     {
-     "ts": "2026-10-09T08:15:00Z",
-     "note": "narrative-harvest rebuild of certified worker delivery (32 files, worker commit 8a67a31-equivalent; 5 python surgeries replayed); gates GREEN at station: tsc 0 @ts6.0.3, capability-broker 49/49 + avatar-runtime 35/35 node:test, oxlint 0-0 both, harnesses ok, architecture:check full+changed 0 new"
+      "id": "PL-010",
+      "status": "MERGED",
+      "depends": [
+        "PL-001",
+        "PL-002",
+        "PL-003",
+        "PL-004",
+        "PL-005",
+        "PL-006",
+        "PL-007",
+        "PL-008",
+        "PL-009"
+      ],
+      "writeSurface": [
+        "architecture-policy.yaml",
+        "spec/module-dependency-matrix.md"
+      ],
+      "branch": "work/pl-010",
+      "pr": null,
+      "mergedSha": "e655d512dff267c34de53e7b131c242cf33d7efb",
+      "evidence": [
+        {
+          "ts": "2026-10-09T00:07:00Z",
+          "note": "TL governance promotion: 18 merged packages -> managed modules (policy requires from package manifests, module.ts+contract.ts artifacts); matrix reconciled with implemented ground truth; 16 dated max-file-lines exceptions + 4-legacy-violation baseline; arch check full + changed: 0 new; all package gates re-verified green post-promotion"
+        },
+        {
+          "ts": "2026-10-09T09:40:00Z",
+          "note": "governance promotion wave 2: 7 packages from PL-015/019/026 promoted (capability-broker, avatar-runtime, tool-fabric-runtime, platform-identity, platform-social, platform-leaderboard, platform-achievements); requires from manifests; lockfile entries committed; matrix reconciled; arch full+changed 0 new; no new exceptions"
+        }
+      ],
+      "owner": "tech-lead"
+    },
+    {
+      "id": "PL-011",
+      "status": "MERGED",
+      "depends": [
+        "PL-002"
+      ],
+      "writeSurface": [
+        "packages/package-registry",
+        "packages/artifact-store"
+      ],
+      "branch": "work/pl-011",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker",
+      "merge": {
+        "commit": "c935bc9",
+        "mergedAt": "2026-10-07"
+      }
+    },
+    {
+      "id": "PL-012",
+      "status": "MERGED",
+      "depends": [
+        "PL-001",
+        "PL-002"
+      ],
+      "writeSurface": [
+        "packages/git-lineage"
+      ],
+      "branch": "work/pl-012",
+      "pr": null,
+      "mergedSha": "020a5885235f666112b82d00e9eccf7a224363f6",
+      "evidence": [
+        {
+          "ts": "2026-10-08T23:50:36Z",
+          "note": "narrative-harvest merge (new TL): §10b tool-call replay incl. two Bash heredoc surgeries (overlay split + append) of certified delivery (19 files); gates re-run: tsc 6.0.3 = 0, node --test 54/54, oxlint 0-0, arch 0; harness valid; lockfile importer added"
+        }
+      ],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-013",
+      "status": "MERGED",
+      "depends": [
+        "PL-001",
+        "PL-003"
+      ],
+      "writeSurface": [
+        "packages/runtime-core"
+      ],
+      "branch": "work/pl-013",
+      "pr": null,
+      "mergedSha": "666cd6ce14223bd0c9990b1a4fa89d559cadfdf6",
+      "evidence": [
+        {
+          "ts": "2026-10-08T23:47:36Z",
+          "note": "narrative-harvest merge (new TL): §10b tool-call replay of certified 2nd-session delivery (25 files, base c9cf856); sequential-MultiEdit semantics applied; gates re-run at station: tsc 6.0.3 = 0 errors, node --test 86/86, oxlint 0-0, architecture:check 0 violations; harness integrityOk"
+        }
+      ],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-014",
+      "status": "MERGED",
+      "depends": [
+        "PL-003"
+      ],
+      "writeSurface": [
+        "packages/simulation",
+        "packages/replay"
+      ],
+      "branch": "work/pl-014",
+      "pr": null,
+      "mergedSha": "f476821f75577c487b826a282a2218b203df7a00",
+      "evidence": [
+        {
+          "ts": "2026-10-09T00:00:54Z",
+          "note": "narrative-harvest merge (new TL): §10b tool-call replay of certified delivery (47 files); 11 python heredoc/-c surgeries replayed; 6 divergent files byte-verified via Read-tool snapshots; gates re-run: tsc 6.0.3 = 0, sim 55/55 + replay 63/63 node:test, oxlint 0-0, arch 0, both harnesses PASS"
+        }
+      ],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-015",
+      "status": "MERGED",
+      "depends": [
+        "PL-004"
+      ],
+      "writeSurface": [
+        "packages/platform-identity",
+        "packages/platform-social",
+        "packages/platform-leaderboard",
+        "packages/platform-achievements"
+      ],
+      "branch": "work/pl-015",
+      "pr": null,
+      "mergedSha": "46d0689ff011a1cb96ab186a2ef1bbd1324886f7",
+      "evidence": [
+        {
+          "ts": "2026-10-09T09:20:00Z",
+          "note": "narrative-harvest rebuild of certified worker delivery (worker commit 4947432-equivalent; interleaved replay with python -c/-heredoc/for-loop surgeries and cp seedings); gates GREEN: tsc 0 @ts6.0.3, identity 28/28 + social 32/32 + leaderboard 31/31 + achievements 26/26 node:test, oxlint 0-0, harnesses all ok, architecture:check full+changed 0 new; requires edges per matrix (identity/leaderboard/achievements: platform-contracts; social: platform-contracts+game-ir); TL governance promotion for the 4 new packages pending (lockfile entries + architecture-policy)"
+        }
+      ],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-016",
+      "status": "MERGED",
+      "depends": [
+        "PL-003",
+        "PL-004"
+      ],
+      "writeSurface": [
+        "packages/platform-multiplayer"
+      ],
+      "branch": "work/pl-016",
+      "pr": null,
+      "mergedSha": "5e245ea840c94a9f97eb7a733ef0d1d7501377fb",
+      "evidence": [
+        {
+          "ts": "2026-10-09T00:02:34Z",
+          "note": "narrative-harvest merge (new TL): §10b tool-call replay of certified delivery (28 files); chat-pasted re-emission envelopes REJECTED as mangled, delivery tree used; gates re-run: tsc 6.0.3 = 0, 82/82 node:test, oxlint 0-0, arch 0, harness ok"
+        }
+      ],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-017",
+      "status": "MERGED",
+      "depends": [
+        "PL-004",
+        "PL-009"
+      ],
+      "writeSurface": [
+        "packages/platform-economy"
+      ],
+      "branch": "work/pl-017",
+      "pr": null,
+      "mergedSha": "66ff3b828d42439ef2a16e2b7541156b6d57fa55",
+      "evidence": [
+        {
+          "ts": "2026-10-09T14:1x:00Z",
+          "note": "narrative-harvest merge: chat d1dafddc delivery replayed (180 tool ops) + 3 recorded TL surgeries; gates green at station (tsc 0, 69/69 node:test, oxlint 0-0, arch full+changed 0 new, harness ok); worker-reported TL actions: (a) .architecture-baseline.json fingerprints embed absolute repo paths (path-case mismatch for fresh clones — needs path-relative fingerprints or re-record), (b) SHA-256 K-constant typos in platform-leaderboard/identity/achievements digest.ts (internally self-consistent, not FIPS; economy ships vector-tested correct implementation)"
+        }
+      ],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-018",
+      "status": "MERGED",
+      "depends": [
+        "PL-009",
+        "PL-014"
+      ],
+      "writeSurface": [
+        "packages/platform-integrity"
+      ],
+      "branch": "work/pl-018",
+      "pr": null,
+      "mergedSha": "4bf49db",
+      "evidence": [
+        "delivery: worker chat 87c2a6f9 final completion report (24 files, +4114, worker head a03ee07, base 91c8552)",
+        "replay: interleave_replay 257 ops (27 Write/56 edit_ok; 2 recorded-fail ops skipped per result-proof) -> 24 files +4114 exact match",
+        "gates at station: tsc -p . 0 errors; node --test 49/49; harness ok:true failures:[] exit 0; oxlint 0-0; architecture --changed 4/4/0-new + full 5/5/0-new",
+        "TL rebuild commit 19e4df2 on work/pl-018; merged no-ff as 4bf49db"
+      ],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-019",
+      "status": "MERGED",
+      "depends": [
+        "PL-005"
+      ],
+      "writeSurface": [
+        "packages/tool-fabric-runtime"
+      ],
+      "branch": "work/pl-019",
+      "pr": null,
+      "mergedSha": "183eb9dd90d472ee32919291b3b6dd073e5f777c",
+      "evidence": [
+        {
+          "ts": "2026-10-09T08:45:00Z",
+          "note": "narrative-harvest rebuild of certified worker delivery (32 files, worker commit 867dd8f-equivalent); gates GREEN at station: tsc 0 @ts6.0.3, 96/96 node:test, oxlint 0-0, architecture:check full+changed 0 new; deps: tool-fabric (matrix main) + engine-adapter-contract (adapter seam)"
+        }
+      ],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-020",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-008",
+        "PL-011",
+        "PL-019"
+      ],
+      "writeSurface": [
+        "packages/build-orchestrator"
+      ],
+      "branch": "work/pl-020",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-021",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-019",
+        "PL-020"
+      ],
+      "writeSurface": [
+        "packages/engine-playcanvas"
+      ],
+      "branch": "work/pl-021",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-022",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-019",
+        "PL-020"
+      ],
+      "writeSurface": [
+        "packages/engine-unreal"
+      ],
+      "branch": "work/pl-022",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-023",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-019",
+        "PL-020"
+      ],
+      "writeSurface": [
+        "packages/engine-unity"
+      ],
+      "branch": "work/pl-023",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-024",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-019",
+        "PL-020"
+      ],
+      "writeSurface": [
+        "packages/engine-godot"
+      ],
+      "branch": "work/pl-024",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-025",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-019"
+      ],
+      "writeSurface": [
+        "packages/tool-blender"
+      ],
+      "branch": "work/pl-025",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-026",
+      "status": "MERGED",
+      "depends": [
+        "PL-001",
+        "PL-003"
+      ],
+      "writeSurface": [
+        "packages/avatar-runtime",
+        "packages/capability-broker"
+      ],
+      "branch": "work/pl-026",
+      "pr": null,
+      "mergedSha": "9499c5adb36c9ce4f6eaea4f219d1cd11639f5c7",
+      "evidence": [
+        {
+          "ts": "2026-10-09T08:15:00Z",
+          "note": "narrative-harvest rebuild of certified worker delivery (32 files, worker commit 8a67a31-equivalent; 5 python surgeries replayed); gates GREEN at station: tsc 0 @ts6.0.3, capability-broker 49/49 + avatar-runtime 35/35 node:test, oxlint 0-0 both, harnesses ok, architecture:check full+changed 0 new"
+        }
+      ],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-027",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-026"
+      ],
+      "writeSurface": [
+        "packages/sensory-runtime"
+      ],
+      "branch": "work/pl-027",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-028",
+      "status": "MERGED",
+      "depends": [
+        "PL-006",
+        "PL-014",
+        "PL-026"
+      ],
+      "writeSurface": [
+        "packages/lab-simulation"
+      ],
+      "branch": "work/pl-028",
+      "pr": null,
+      "mergedSha": "ec0325d",
+      "evidence": [
+        "delivery: worker chat a51d4330 final completion report (23 files, +4075, worker head 348f758, base 91c8552)",
+        "replay: interleave_replay 406 ops (28 Write/37 MultiEdit/25 Edit; 237 Bash/74 Read) -> 23 files +4075 exact match",
+        "gates at station: tsc -p . 0 errors; node --test 55/55; harness exit 0 (17 steps, 0 failures); oxlint 0-0; architecture --changed 4/4/0-new",
+        "TL rebuild commit bc19c4e on work/pl-028; merged no-ff as ec0325d"
+      ],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-029",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-006",
+        "PL-026",
+        "PL-028"
+      ],
+      "writeSurface": [
+        "packages/lab-organization"
+      ],
+      "branch": "work/pl-029",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-030",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-028",
+        "PL-029"
+      ],
+      "writeSurface": [
+        "packages/lab-learning"
+      ],
+      "branch": "work/pl-030",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-031",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-007",
+        "PL-030"
+      ],
+      "writeSurface": [
+        "packages/arena-integration-runtime"
+      ],
+      "branch": "work/pl-031",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-032",
+      "status": "MERGED",
+      "depends": [
+        "PL-012",
+        "PL-004"
+      ],
+      "writeSurface": [
+        "packages/community"
+      ],
+      "branch": "work/pl-032",
+      "pr": null,
+      "mergedSha": "629778d",
+      "evidence": [
+        "delivery: worker chat 6a688289 turn-3 completion report (19 files, +3672, worker commit 69086ed) — harvested 336 tool ops",
+        "replay: interleave_replay @ base 89aee30 + 2 TL surgeries (op-254 sed cloneRecord→cloneContribution + isTerminalStatus append; op-315 edit-0 payload cast — chat MultiEdit semantics proven sequential-apply/abort-at-first-failure, engine patched)",
+        "gates at station: tsc -p . 0 errors (@ts 6.0.2); node --test 64/64 0 fail; harness ok (failures: []); oxlint 0-0 (17 files); architecture:check --changed 3 baseline/0 new OK (station-fingerprint artifact resolved TL-side by 16598c2)",
+        "acceptance: R18 typed CapabilityGapLink via read-only GapDirectory port (lab-contracts owns ladder); R19 provenance first-class, no second release gate; E1 CommunityService single owner; E3 zero-IO domain; E8 untrusted-until-qualified + forged-provenance/cross-tenant/tamper/promotion/replay batteries",
+        "notes: worker sandbox reset between turns (turn-1 tree lost; turn-2 redid setup then delivered); orphaned intermediates (digest.ts/digest.test.ts/gap.test.ts/vocabulary.ts) removed to match the worker's commit list"
+      ],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-033",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-011",
+        "PL-013",
+        "PL-019",
+        "PL-026"
+      ],
+      "writeSurface": [
+        "packages/game-ui",
+        "packages/web/gameos"
+      ],
+      "branch": "work/pl-033",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-034",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-028",
+        "PL-030",
+        "PL-032"
+      ],
+      "writeSurface": [
+        "packages/web/gameos-lab",
+        "packages/web/gameos-community"
+      ],
+      "branch": "work/pl-034",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-035",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-013",
+        "PL-020"
+      ],
+      "writeSurface": [
+        "packages/runtime-spark",
+        "packages/spark"
+      ],
+      "branch": "work/pl-035",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-036",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-020",
+        "PL-021",
+        "PL-022",
+        "PL-023",
+        "PL-024"
+      ],
+      "writeSurface": [
+        "packages/target-builds"
+      ],
+      "branch": "work/pl-036",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-037",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-011",
+        "PL-013",
+        "PL-015",
+        "PL-017",
+        "PL-018",
+        "PL-021",
+        "PL-035"
+      ],
+      "writeSurface": [
+        "examples/native-game"
+      ],
+      "branch": "work/pl-037",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-038",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-020",
+        "PL-022",
+        "PL-023",
+        "PL-024",
+        "PL-025"
+      ],
+      "writeSurface": [
+        "examples/engine-integration"
+      ],
+      "branch": "work/pl-038",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-039",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-011",
+        "PL-013",
+        "PL-014",
+        "PL-020"
+      ],
+      "writeSurface": [
+        "examples/large-world"
+      ],
+      "branch": "work/pl-039",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-040",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-028",
+        "PL-029",
+        "PL-030",
+        "PL-031",
+        "PL-032"
+      ],
+      "writeSurface": [
+        "examples/lab-journey",
+        "qa/e2e-lab"
+      ],
+      "branch": "work/pl-040",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-041",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-011",
+        "PL-026",
+        "PL-017",
+        "PL-018",
+        "PL-031"
+      ],
+      "writeSurface": [
+        "packages/security-gameos",
+        "qa/security"
+      ],
+      "branch": "work/pl-041",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-042",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-014",
+        "PL-020",
+        "PL-021",
+        "PL-039"
+      ],
+      "writeSurface": [
+        "qa/performance",
+        "packages/runtime-core/perf",
+        "packages/build-orchestrator/perf"
+      ],
+      "branch": "work/pl-042",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-043",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-033",
+        "PL-034",
+        "PL-035",
+        "PL-037"
+      ],
+      "writeSurface": [
+        "qa/browser",
+        "docs/journeys"
+      ],
+      "branch": "work/pl-043",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-044",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-033",
+        "PL-034",
+        "PL-036",
+        "PL-041",
+        "PL-043"
+      ],
+      "writeSurface": [
+        "services/gameos",
+        "deployment",
+        "docs/deployment"
+      ],
+      "branch": "work/pl-044",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "worker"
+    },
+    {
+      "id": "PL-045",
+      "status": "BLOCKED",
+      "depends": [
+        "PL-037",
+        "PL-038",
+        "PL-039",
+        "PL-040",
+        "PL-041",
+        "PL-042",
+        "PL-043",
+        "PL-044"
+      ],
+      "writeSurface": [
+        "spec/PROJECT-STATE.md",
+        "docs/handoff",
+        "program/graph.json"
+      ],
+      "branch": "work/pl-045",
+      "pr": null,
+      "mergedSha": null,
+      "evidence": [],
+      "owner": "tech-lead"
     }
-   ],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-027",
-   "status": "BLOCKED",
-   "depends": [
-    "PL-026"
-   ],
-   "writeSurface": [
-    "packages/sensory-runtime"
-   ],
-   "branch": "work/pl-027",
-   "pr": null,
-   "mergedSha": null,
-   "evidence": [],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-028",
-   "status": "BLOCKED",
-   "depends": [
-    "PL-006",
-    "PL-014",
-    "PL-026"
-   ],
-   "writeSurface": [
-    "packages/lab-simulation"
-   ],
-   "branch": "work/pl-028",
-   "pr": null,
-   "mergedSha": null,
-   "evidence": [],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-029",
-   "status": "BLOCKED",
-   "depends": [
-    "PL-006",
-    "PL-026",
-    "PL-028"
-   ],
-   "writeSurface": [
-    "packages/lab-organization"
-   ],
-   "branch": "work/pl-029",
-   "pr": null,
-   "mergedSha": null,
-   "evidence": [],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-030",
-   "status": "BLOCKED",
-   "depends": [
-    "PL-028",
-    "PL-029"
-   ],
-   "writeSurface": [
-    "packages/lab-learning"
-   ],
-   "branch": "work/pl-030",
-   "pr": null,
-   "mergedSha": null,
-   "evidence": [],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-031",
-   "status": "BLOCKED",
-   "depends": [
-    "PL-007",
-    "PL-030"
-   ],
-   "writeSurface": [
-    "packages/arena-integration-runtime"
-   ],
-   "branch": "work/pl-031",
-   "pr": null,
-   "mergedSha": null,
-   "evidence": [],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-032",
-   "status": "MERGED",
-   "depends": [
-    "PL-012",
-    "PL-004"
-   ],
-   "writeSurface": [
-    "packages/community"
-   ],
-   "branch": "work/pl-032",
-   "pr": null,
-   "mergedSha": "629778d",
-   "evidence": [
-    "delivery: worker chat 6a688289 turn-3 completion report (19 files, +3672, worker commit 69086ed) — harvested 336 tool ops",
-    "replay: interleave_replay @ base 89aee30 + 2 TL surgeries (op-254 sed cloneRecord→cloneContribution + isTerminalStatus append; op-315 edit-0 payload cast — chat MultiEdit semantics proven sequential-apply/abort-at-first-failure, engine patched)",
-    "gates at station: tsc -p . 0 errors (@ts 6.0.2); node --test 64/64 0 fail; harness ok (failures: []); oxlint 0-0 (17 files); architecture:check --changed 3 baseline/0 new OK (station-fingerprint artifact resolved TL-side by 16598c2)",
-    "acceptance: R18 typed CapabilityGapLink via read-only GapDirectory port (lab-contracts owns ladder); R19 provenance first-class, no second release gate; E1 CommunityService single owner; E3 zero-IO domain; E8 untrusted-until-qualified + forged-provenance/cross-tenant/tamper/promotion/replay batteries",
-    "notes: worker sandbox reset between turns (turn-1 tree lost; turn-2 redid setup then delivered); orphaned intermediates (digest.ts/digest.test.ts/gap.test.ts/vocabulary.ts) removed to match the worker's commit list"
-   ],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-033",
-   "status": "BLOCKED",
-   "depends": [
-    "PL-011",
-    "PL-013",
-    "PL-019",
-    "PL-026"
-   ],
-   "writeSurface": [
-    "packages/game-ui",
-    "packages/web/gameos"
-   ],
-   "branch": "work/pl-033",
-   "pr": null,
-   "mergedSha": null,
-   "evidence": [],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-034",
-   "status": "BLOCKED",
-   "depends": [
-    "PL-028",
-    "PL-030",
-    "PL-032"
-   ],
-   "writeSurface": [
-    "packages/web/gameos-lab",
-    "packages/web/gameos-community"
-   ],
-   "branch": "work/pl-034",
-   "pr": null,
-   "mergedSha": null,
-   "evidence": [],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-035",
-   "status": "BLOCKED",
-   "depends": [
-    "PL-013",
-    "PL-020"
-   ],
-   "writeSurface": [
-    "packages/runtime-spark",
-    "packages/spark"
-   ],
-   "branch": "work/pl-035",
-   "pr": null,
-   "mergedSha": null,
-   "evidence": [],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-036",
-   "status": "BLOCKED",
-   "depends": [
-    "PL-020",
-    "PL-021",
-    "PL-022",
-    "PL-023",
-    "PL-024"
-   ],
-   "writeSurface": [
-    "packages/target-builds"
-   ],
-   "branch": "work/pl-036",
-   "pr": null,
-   "mergedSha": null,
-   "evidence": [],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-037",
-   "status": "BLOCKED",
-   "depends": [
-    "PL-011",
-    "PL-013",
-    "PL-015",
-    "PL-017",
-    "PL-018",
-    "PL-021",
-    "PL-035"
-   ],
-   "writeSurface": [
-    "examples/native-game"
-   ],
-   "branch": "work/pl-037",
-   "pr": null,
-   "mergedSha": null,
-   "evidence": [],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-038",
-   "status": "BLOCKED",
-   "depends": [
-    "PL-020",
-    "PL-022",
-    "PL-023",
-    "PL-024",
-    "PL-025"
-   ],
-   "writeSurface": [
-    "examples/engine-integration"
-   ],
-   "branch": "work/pl-038",
-   "pr": null,
-   "mergedSha": null,
-   "evidence": [],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-039",
-   "status": "BLOCKED",
-   "depends": [
-    "PL-011",
-    "PL-013",
-    "PL-014",
-    "PL-020"
-   ],
-   "writeSurface": [
-    "examples/large-world"
-   ],
-   "branch": "work/pl-039",
-   "pr": null,
-   "mergedSha": null,
-   "evidence": [],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-040",
-   "status": "BLOCKED",
-   "depends": [
-    "PL-028",
-    "PL-029",
-    "PL-030",
-    "PL-031",
-    "PL-032"
-   ],
-   "writeSurface": [
-    "examples/lab-journey",
-    "qa/e2e-lab"
-   ],
-   "branch": "work/pl-040",
-   "pr": null,
-   "mergedSha": null,
-   "evidence": [],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-041",
-   "status": "BLOCKED",
-   "depends": [
-    "PL-011",
-    "PL-026",
-    "PL-017",
-    "PL-018",
-    "PL-031"
-   ],
-   "writeSurface": [
-    "packages/security-gameos",
-    "qa/security"
-   ],
-   "branch": "work/pl-041",
-   "pr": null,
-   "mergedSha": null,
-   "evidence": [],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-042",
-   "status": "BLOCKED",
-   "depends": [
-    "PL-014",
-    "PL-020",
-    "PL-021",
-    "PL-039"
-   ],
-   "writeSurface": [
-    "qa/performance",
-    "packages/runtime-core/perf",
-    "packages/build-orchestrator/perf"
-   ],
-   "branch": "work/pl-042",
-   "pr": null,
-   "mergedSha": null,
-   "evidence": [],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-043",
-   "status": "BLOCKED",
-   "depends": [
-    "PL-033",
-    "PL-034",
-    "PL-035",
-    "PL-037"
-   ],
-   "writeSurface": [
-    "qa/browser",
-    "docs/journeys"
-   ],
-   "branch": "work/pl-043",
-   "pr": null,
-   "mergedSha": null,
-   "evidence": [],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-044",
-   "status": "BLOCKED",
-   "depends": [
-    "PL-033",
-    "PL-034",
-    "PL-036",
-    "PL-041",
-    "PL-043"
-   ],
-   "writeSurface": [
-    "services/gameos",
-    "deployment",
-    "docs/deployment"
-   ],
-   "branch": "work/pl-044",
-   "pr": null,
-   "mergedSha": null,
-   "evidence": [],
-   "owner": "worker"
-  },
-  {
-   "id": "PL-045",
-   "status": "BLOCKED",
-   "depends": [
-    "PL-037",
-    "PL-038",
-    "PL-039",
-    "PL-040",
-    "PL-041",
-    "PL-042",
-    "PL-043",
-    "PL-044"
-   ],
-   "writeSurface": [
-    "spec/PROJECT-STATE.md",
-    "docs/handoff",
-    "program/graph.json"
-   ],
-   "branch": "work/pl-045",
-   "pr": null,
-   "mergedSha": null,
-   "evidence": [],
-   "owner": "tech-lead"
-  }
- ],
- "generatedAt": "2026-10-05"
+  ],
+  "generatedAt": "2026-10-05"
 }
