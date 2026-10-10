@@ -1,0 +1,34 @@
+{
+  "name": "@playliquid/lab-simulation",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "PlayLiquid GameOS Lab simulation/evaluation service (PL-028). The simulation/evaluation stage of the Lab loop (spec/architecture.md §Lab loop): typed evaluation-intake admission binding a candidate organization (lab-contracts dimensions) + a project-evidence bundle + evaluation parameters as one content-addressed record with typed duplicate/malformed refusals (E1); a deterministic runner (E9) that executes the candidate organization against the evidence bundle on the @playliquid/simulation machinery with @playliquid/capability-broker as the least-privilege action authority inside the simulated organization (R20) and @playliquid/replay capture so replay stays reusable by the Lab (R8); EPISTEMIC LABELING (E11, lock 28/29) enforced at the type boundary — every result record carries the labeled-estimate marker, nothing is ever observed ground truth; a typed calibration seam where immutable observations (E10, lock 27) are consumed append-only. Pure domain: the service instance is the single mutable-state owner; persistence, time, suites, evidence ledgers and observation ledgers live behind ports with deterministic in-memory fakes; no IO, no timers, no globals.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "node --test \"src/**/*.test.ts\"",
+    "harness": "node src/harness.ts",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix --fix-suggestions"
+  },
+  "dependencies": {
+    "@playliquid/lab-contracts": "workspace:*",
+    "@playliquid/simulation": "workspace:*",
+    "@playliquid/replay": "workspace:*",
+    "@playliquid/avatar-runtime": "workspace:*",
+    "@playliquid/capability-broker": "workspace:*",
+    "@playliquid/platform-contracts": "workspace:*",
+    "@playliquid/package-system": "workspace:*",
+    "@playliquid/game-contracts": "workspace:*",
+    "@playliquid/game-ir": "workspace:*",
+    "@playliquid/runtime-contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.9",
+    "typescript": "^6.0.3"
+  }
+}
