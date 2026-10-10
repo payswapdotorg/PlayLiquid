@@ -378,7 +378,7 @@
   },
   {
    "id": "PL-018",
-   "status": "BLOCKED",
+   "status": "MERGED",
    "depends": [
     "PL-009",
     "PL-014"
@@ -388,8 +388,13 @@
    ],
    "branch": "work/pl-018",
    "pr": null,
-   "mergedSha": null,
-   "evidence": [],
+   "mergedSha": "4bf49db",
+   "evidence": [
+    "delivery: worker chat 87c2a6f9 final completion report (24 files, +4114, worker head a03ee07, base 91c8552)",
+    "replay: interleave_replay 257 ops (27 Write/56 edit_ok; 2 recorded-fail ops skipped per result-proof) -> 24 files +4114 exact match",
+    "gates at station: tsc -p . 0 errors; node --test 49/49; harness ok:true failures:[] exit 0; oxlint 0-0; architecture --changed 4/4/0-new + full 5/5/0-new",
+    "TL rebuild commit 19e4df2 on work/pl-018; merged no-ff as 4bf49db"
+   ],
    "owner": "worker"
   },
   {
