@@ -264,7 +264,7 @@
       "evidence": [
         {
           "ts": "2026-10-08T23:50:36Z",
-          "note": "narrative-harvest merge (new TL): §10b tool-call replay incl. two Bash heredoc surgeries (overlay split + append) of certified delivery (19 files); gates re-run: tsc 6.0.3 = 0, node --test 54/54, oxlint 0-0, arch 0; harness valid; lockfile importer added"
+          "note": "narrative-harvest merge (new TL): \u00a710b tool-call replay incl. two Bash heredoc surgeries (overlay split + append) of certified delivery (19 files); gates re-run: tsc 6.0.3 = 0, node --test 54/54, oxlint 0-0, arch 0; harness valid; lockfile importer added"
         }
       ],
       "owner": "worker"
@@ -285,7 +285,7 @@
       "evidence": [
         {
           "ts": "2026-10-08T23:47:36Z",
-          "note": "narrative-harvest merge (new TL): §10b tool-call replay of certified 2nd-session delivery (25 files, base c9cf856); sequential-MultiEdit semantics applied; gates re-run at station: tsc 6.0.3 = 0 errors, node --test 86/86, oxlint 0-0, architecture:check 0 violations; harness integrityOk"
+          "note": "narrative-harvest merge (new TL): \u00a710b tool-call replay of certified 2nd-session delivery (25 files, base c9cf856); sequential-MultiEdit semantics applied; gates re-run at station: tsc 6.0.3 = 0 errors, node --test 86/86, oxlint 0-0, architecture:check 0 violations; harness integrityOk"
         }
       ],
       "owner": "worker"
@@ -306,7 +306,7 @@
       "evidence": [
         {
           "ts": "2026-10-09T00:00:54Z",
-          "note": "narrative-harvest merge (new TL): §10b tool-call replay of certified delivery (47 files); 11 python heredoc/-c surgeries replayed; 6 divergent files byte-verified via Read-tool snapshots; gates re-run: tsc 6.0.3 = 0, sim 55/55 + replay 63/63 node:test, oxlint 0-0, arch 0, both harnesses PASS"
+          "note": "narrative-harvest merge (new TL): \u00a710b tool-call replay of certified delivery (47 files); 11 python heredoc/-c surgeries replayed; 6 divergent files byte-verified via Read-tool snapshots; gates re-run: tsc 6.0.3 = 0, sim 55/55 + replay 63/63 node:test, oxlint 0-0, arch 0, both harnesses PASS"
         }
       ],
       "owner": "worker"
@@ -350,7 +350,7 @@
       "evidence": [
         {
           "ts": "2026-10-09T00:02:34Z",
-          "note": "narrative-harvest merge (new TL): §10b tool-call replay of certified delivery (28 files); chat-pasted re-emission envelopes REJECTED as mangled, delivery tree used; gates re-run: tsc 6.0.3 = 0, 82/82 node:test, oxlint 0-0, arch 0, harness ok"
+          "note": "narrative-harvest merge (new TL): \u00a710b tool-call replay of certified delivery (28 files); chat-pasted re-emission envelopes REJECTED as mangled, delivery tree used; gates re-run: tsc 6.0.3 = 0, 82/82 node:test, oxlint 0-0, arch 0, harness ok"
         }
       ],
       "owner": "worker"
@@ -371,7 +371,7 @@
       "evidence": [
         {
           "ts": "2026-10-09T14:1x:00Z",
-          "note": "narrative-harvest merge: chat d1dafddc delivery replayed (180 tool ops) + 3 recorded TL surgeries; gates green at station (tsc 0, 69/69 node:test, oxlint 0-0, arch full+changed 0 new, harness ok); worker-reported TL actions: (a) .architecture-baseline.json fingerprints embed absolute repo paths (path-case mismatch for fresh clones — needs path-relative fingerprints or re-record), (b) SHA-256 K-constant typos in platform-leaderboard/identity/achievements digest.ts (internally self-consistent, not FIPS; economy ships vector-tested correct implementation)"
+          "note": "narrative-harvest merge: chat d1dafddc delivery replayed (180 tool ops) + 3 recorded TL surgeries; gates green at station (tsc 0, 69/69 node:test, oxlint 0-0, arch full+changed 0 new, harness ok); worker-reported TL actions: (a) .architecture-baseline.json fingerprints embed absolute repo paths (path-case mismatch for fresh clones \u2014 needs path-relative fingerprints or re-record), (b) SHA-256 K-constant typos in platform-leaderboard/identity/achievements digest.ts (internally self-consistent, not FIPS; economy ships vector-tested correct implementation)"
         }
       ],
       "owner": "worker"
@@ -500,7 +500,7 @@
     },
     {
       "id": "PL-025",
-      "status": "BLOCKED",
+      "status": "MERGED",
       "depends": [
         "PL-019"
       ],
@@ -509,8 +509,13 @@
       ],
       "branch": "work/pl-025",
       "pr": null,
-      "mergedSha": null,
-      "evidence": [],
+      "mergedSha": "ff396dc",
+      "evidence": [
+        "delivery: worker chat 3374acfe final completion report (20 files, worker head a81a852, base eca5ad3)",
+        "replay: surgical replay 229 ops (27 Write/8 MultiEdit/8 Edit/121 Bash) + 4 Bash file-surgery mutations (mv payloads->payload-model + truncate 229, negative.test split 356/310) -> 20 files exact",
+        "gates at station (post 2 TL corrections): tsc 0 errors; node --test 48/48; harness exit 0 (19/19, 0 failures); oxlint 0-0 on 18 files; architecture --changed 4/4/0-new + full 5/5/0-new",
+        "TL corrections: digest.ts FIPS K[11]/K[20] constants (0x550c7dc3, 0x4a7484aa); negative-capabilities.test.ts tenant claims on 4 payloads. TL rebuild commit a35a84a on work/pl-025; merged no-ff as ff396dc"
+      ],
       "owner": "worker"
     },
     {
@@ -635,8 +640,8 @@
       "pr": null,
       "mergedSha": "629778d",
       "evidence": [
-        "delivery: worker chat 6a688289 turn-3 completion report (19 files, +3672, worker commit 69086ed) — harvested 336 tool ops",
-        "replay: interleave_replay @ base 89aee30 + 2 TL surgeries (op-254 sed cloneRecord→cloneContribution + isTerminalStatus append; op-315 edit-0 payload cast — chat MultiEdit semantics proven sequential-apply/abort-at-first-failure, engine patched)",
+        "delivery: worker chat 6a688289 turn-3 completion report (19 files, +3672, worker commit 69086ed) \u2014 harvested 336 tool ops",
+        "replay: interleave_replay @ base 89aee30 + 2 TL surgeries (op-254 sed cloneRecord\u2192cloneContribution + isTerminalStatus append; op-315 edit-0 payload cast \u2014 chat MultiEdit semantics proven sequential-apply/abort-at-first-failure, engine patched)",
         "gates at station: tsc -p . 0 errors (@ts 6.0.2); node --test 64/64 0 fail; harness ok (failures: []); oxlint 0-0 (17 files); architecture:check --changed 3 baseline/0 new OK (station-fingerprint artifact resolved TL-side by 16598c2)",
         "acceptance: R18 typed CapabilityGapLink via read-only GapDirectory port (lab-contracts owns ladder); R19 provenance first-class, no second release gate; E1 CommunityService single owner; E3 zero-IO domain; E8 untrusted-until-qualified + forged-provenance/cross-tenant/tamper/promotion/replay batteries",
         "notes: worker sandbox reset between turns (turn-1 tree lost; turn-2 redid setup then delivered); orphaned intermediates (digest.ts/digest.test.ts/gap.test.ts/vocabulary.ts) removed to match the worker's commit list"
