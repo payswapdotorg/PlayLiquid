@@ -38,6 +38,7 @@ promotion). Rows for not-yet-implemented work orders remain design intent.
 | community | @playliquid/community | Product | git-lineage, game-ir, platform-contracts, package-system (design-intent row + typed transitive vocabulary of lineage coordinates) |
 | lab-simulation | @playliquid/lab-simulation | Lab | lab-contracts, simulation, replay, avatar-runtime, capability-broker, game-contracts, game-ir, runtime-contracts, platform-contracts, package-system (PL-028; game-contracts/platform-contracts/package-system/game-ir/runtime-contracts justified per module.ts — frozen vocabulary, tenant isolation, canonical JSON authority, world value language, session/actor/command vocabulary) |
 | tool-blender | @playliquid/tool-blender | Tools | engine-adapter-contract, tool-fabric-runtime, tool-fabric, platform-contracts (PL-025; platform-contracts justified per module.ts — TenantId/SubjectId tenant-isolation vocabulary, platform-economy/lab-simulation precedent, R20 cross-tenant discipline) |
+| game-ui | @playliquid/game-ui | Product | package-system, runtime-core, runtime-contracts, tool-fabric-runtime, avatar-runtime, capability-broker, game-contracts (PL-033; per module.ts — read-model projections of authoritative public contracts only; runtime-contracts/game-contracts declared directly and deliberately: branded primitives + frozen R5 restriction vocabulary, avatar-runtime manifest precedent; peer-react provided by the host web app) |
 | sensory-runtime | @playliquid/sensory-runtime | Runtime | avatar-runtime, game-contracts, game-ir, runtime-contracts, platform-contracts, package-system, capability-broker (PL-027; capability-broker justified per delivery report — harness driver-cycle seam + perception tests, avatar-runtime manifest precedent; platform-contracts/package-system per module.ts — TenantId tenant isolation, canonical JSON envelope keys, community/lab precedent) |
 
 ## Design intent (work orders not yet merged)
@@ -45,7 +46,6 @@ promotion). Rows for not-yet-implemented work orders remain design intent.
 | Module | Owner | Main dependency |
 |---|---|---|
 | build-orchestrator | Build | build-contracts, tool-fabric-runtime |
-| game-ui | Product | public contracts/read models |
 
 Rules:
 - managed modules expose only public contracts;

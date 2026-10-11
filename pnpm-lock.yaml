@@ -934,6 +934,49 @@ importers:
         specifier: ^6.0.3
         version: 6.0.3
 
+  packages/game-ui:
+    dependencies:
+      '@playliquid/avatar-runtime':
+        specifier: workspace:*
+        version: link:../avatar-runtime
+      '@playliquid/capability-broker':
+        specifier: workspace:*
+        version: link:../capability-broker
+      '@playliquid/game-contracts':
+        specifier: workspace:*
+        version: link:../game-contracts
+      '@playliquid/package-system':
+        specifier: workspace:*
+        version: link:../package-system
+      '@playliquid/runtime-contracts':
+        specifier: workspace:*
+        version: link:../runtime-contracts
+      '@playliquid/runtime-core':
+        specifier: workspace:*
+        version: link:../runtime-core
+      '@playliquid/tool-fabric-runtime':
+        specifier: workspace:*
+        version: link:../tool-fabric-runtime
+      react:
+        specifier: 19.2.7
+        version: 19.2.7
+      react-dom:
+        specifier: 19.2.7
+        version: 19.2.7(react@19.2.7)
+    devDependencies:
+      '@types/node':
+        specifier: ^25.9.9
+        version: 25.9.9
+      '@types/react':
+        specifier: ^19.2.14
+        version: 19.2.14
+      '@types/react-dom':
+        specifier: ^19.2.3
+        version: 19.2.3(@types/react@19.2.14)
+      typescript:
+        specifier: ^6.0.2
+        version: 6.0.3
+
   packages/git-lineage:
     dependencies:
       '@playliquid/game-ir':

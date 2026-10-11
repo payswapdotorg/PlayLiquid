@@ -241,6 +241,12 @@ modules:
     requires: [lab-contracts, simulation, replay, avatar-runtime, capability-broker, game-contracts, game-ir, runtime-contracts, platform-contracts, package-system]
     publicEntrypoints: [packages/lab-simulation/src/index.ts]
     owner: Lab
+  - id: game-ui
+    roots: [packages/game-ui/src]
+    managed: true
+    requires: [package-system, runtime-core, runtime-contracts, tool-fabric-runtime, avatar-runtime, capability-broker, game-contracts]
+    publicEntrypoints: [packages/game-ui/src/index.ts]
+    owner: Product
 
 global:
   maxFileLines: 400
@@ -272,3 +278,4 @@ exceptions:
       - packages/simulation/src/session.ts
       - packages/platform-multiplayer/src/outcomes.ts
       - packages/platform-multiplayer/src/kernel.test.ts
+      - packages/game-ui/src/fixtures/demo.ts
