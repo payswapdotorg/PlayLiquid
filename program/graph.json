@@ -419,7 +419,7 @@
     },
     {
       "id": "PL-020",
-      "status": "BLOCKED",
+      "status": "MERGED",
       "depends": [
         "PL-008",
         "PL-011",
@@ -430,8 +430,14 @@
       ],
       "branch": "work/pl-020",
       "pr": null,
-      "mergedSha": null,
-      "evidence": [],
+      "mergedSha": "2a3a595",
+      "evidence": [
+        "delivery: worker chat 916f8f56 final completion report (35 files, +6058, worker commit a2958c8, base 16598c2)",
+        "replay: generic tl_replay 860 ops (41 Write/75 edit_ok/25 MultiEdit/19 Edit; 1 faithful edit_skip_failed; 4 skipped bash ops all read-only; 8 unparsed redirects all 2>&1 pipes; 2 Task subagent calls failed-and-research-only, no exposure) - 34 package files replayed; pnpm-lock.yaml materialized by pnpm install (+44 workspace importer) = 35 files +6058 exact match",
+        "ZERO TL corrections - clean delivery (first since PL-027)",
+        "gates at station: tsc 0; node --test 101/101/0/0; harness exit 0 ok=true 32 steps 0 failures; oxlint 0-0 on 32 files; architecture --changed OK (3 baseline, 0 new); full arch on main post-merge 5/5/0-new",
+        "TL rebuild commit 0067a49 on work/pl-020; merged no-ff as 2a3a595"
+      ],
       "owner": "worker"
     },
     {
