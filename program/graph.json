@@ -458,7 +458,7 @@
     },
     {
       "id": "PL-022",
-      "status": "BLOCKED",
+      "status": "MERGED",
       "depends": [
         "PL-019",
         "PL-020"
@@ -468,8 +468,8 @@
       ],
       "branch": "work/pl-022",
       "pr": null,
-      "mergedSha": null,
-      "evidence": [],
+      "mergedSha": "3356338",
+      "evidence": "subagent worker delivery 390612b, station re-verify green (tsc 0, 74/74, harness 32/32, oxlint 0-0/21, arch 4/4/0-new); 23 files +4045",
       "owner": "worker"
     },
     {
