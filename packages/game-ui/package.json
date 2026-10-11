@@ -1,0 +1,37 @@
+{
+  "name": "@playliquid/game-ui",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "PlayLiquid GameOS Game Studio foundation (PL-033). Pure read-model projections of the authoritative public contracts (package-system records/gates, runtime-core session results, tool-fabric-runtime job snapshots, avatar-runtime definitions, capability-broker policy/grants) into typed UI view models (E5), a one-owner StudioStore, presentational React components with zero data fetching, and the web mount composition (packages/web/gameos). The runtime-contracts protocol layer is declared directly and deliberately: read models carry its branded primitives, and UI consumes authoritative contracts (module-dependency-matrix game-ui row; recorded in the work order report). Peer-react: the host web app provides React (same convention as the workspace web package). No IO, no timers, no fetch in this package; every datum arrives through ports.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "node --test \"src/**/*.test.ts\"",
+    "harness": "node src/harness.ts",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix --fix-suggestions"
+  },
+  "peerDependencies": {
+    "react": ">=19",
+    "react-dom": ">=19"
+  },
+  "dependencies": {
+    "@playliquid/avatar-runtime": "workspace:*",
+    "@playliquid/capability-broker": "workspace:*",
+    "@playliquid/game-contracts": "workspace:*",
+    "@playliquid/package-system": "workspace:*",
+    "@playliquid/runtime-contracts": "workspace:*",
+    "@playliquid/runtime-core": "workspace:*",
+    "@playliquid/tool-fabric-runtime": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.9",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "^6.0.2"
+  }
+}
