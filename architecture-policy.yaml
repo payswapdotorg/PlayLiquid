@@ -253,6 +253,12 @@ modules:
     requires: [build-contracts, engine-adapter-contract, package-registry, package-system, target-profiles, tool-fabric, tool-fabric-runtime]
     publicEntrypoints: [packages/build-orchestrator/src/index.ts]
     owner: Build
+  - id: engine-playcanvas
+    roots: [packages/engine-playcanvas/src]
+    managed: true
+    requires: [build-contracts, engine-adapter-contract, platform-contracts, target-profiles, tool-fabric, tool-fabric-runtime]
+    publicEntrypoints: [packages/engine-playcanvas/src/index.ts]
+    owner: Tools
 
 global:
   maxFileLines: 400
