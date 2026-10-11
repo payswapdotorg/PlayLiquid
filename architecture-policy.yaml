@@ -259,6 +259,12 @@ modules:
     requires: [build-contracts, engine-adapter-contract, platform-contracts, target-profiles, tool-fabric, tool-fabric-runtime]
     publicEntrypoints: [packages/engine-playcanvas/src/index.ts]
     owner: Tools
+  - id: engine-unreal
+    roots: [packages/engine-unreal/src]
+    managed: true
+    requires: [build-contracts, engine-adapter-contract, platform-contracts, target-profiles, tool-fabric, tool-fabric-runtime]
+    publicEntrypoints: [packages/engine-unreal/src/index.ts]
+    owner: Tools
 
 global:
   maxFileLines: 400
