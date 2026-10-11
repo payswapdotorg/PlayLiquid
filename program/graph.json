@@ -442,7 +442,7 @@
     },
     {
       "id": "PL-021",
-      "status": "BLOCKED",
+      "status": "MERGED",
       "depends": [
         "PL-019",
         "PL-020"
@@ -452,8 +452,8 @@
       ],
       "branch": "work/pl-021",
       "pr": null,
-      "mergedSha": null,
-      "evidence": [],
+      "mergedSha": "805ce89",
+      "evidence": "station gates green (tsc 0, 66/66, oxlint 0-0/20, harness 25/25, arch 4/4/0-new); 22 files +3805; worker head efa759f replayed from 497-op harvest",
       "owner": "worker"
     },
     {
