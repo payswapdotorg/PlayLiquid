@@ -1,0 +1,30 @@
+{
+  "name": "@playliquid/engine-unity",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "PlayLiquid GameOS Unity engine adapter (PL-023). An engine.unity adapter implementing the neutral Adapter seam from @playliquid/engine-adapter-contract, registered into the Tool Fabric runtime (PL-019). Unity-specific behavior lives ONLY here (E4): a fixed, honestly-modeled capability surface drawn from the Tool Fabric provider-neutral operation list and scoped to what a Unity editor/batch-mode workflow actually offers (inspect project/scene/gameobject/component/prefab/asset, gameobject modify, import/export, editor action/script, enter-play-mode run, build-player build target), each modeled as a typed, versioned command payload with total validation — typed kebab-case rejection codes, path-tagged, never any, never silent coercion. Unity's real vocabulary is modeled as-is: scenes/gameobjects/components/prefabs (never levels/actors), compound transform-path gameobject addressing, component addressing by type (Unity's GetComponent semantics), asset GUID (32 lowercase hex) addressing, and build-target platforms (web/WebGL + desktop + mobile per the frozen taxonomy). Unity-side execution stays behind the UnityBridgePort (pure interface): the adapter turns a validated neutral dispatch into a bridge-specific invocation (editor/batch-mode envelope); the in-memory fake bridge is the test host. NO process spawning, no IO, no timers, no globals (E3) — the REAL Unity editor/-batchmode -executeMethod/BuildPlayer invocation is the host's job (E11, deliberate deferral; R13: engines integrate through Tool Fabric only). Every outcome is stamped with an AdapterAuthority produced by the adapter/bridge; client-claimed outcomes are rejected by a total check (mirroring the contract's client-claim refusal pattern). Lifecycle transitions go exclusively through the contract's advanceLifecycle validator; dispatch in a non-active state is a typed refusal. Deterministic (E9): content-derived command ids, injected clock, seeded fakes, no Math.random, no wall clock. The typed UnityEngineBinding composes with the target-profiles engine-binding digest + build-contracts request vocabulary through a TYPED compatibility predicate (typed refusal, never a thrown exception) declaring the target profiles it can serve (web, windows, macos, linux, android, ios). Append-only evidence (E10): each dispatch/outcome pair is recorded as an immutable, content-addressed, digest-pinned exchange record, never edited. Cross-tenant isolation (R20): one tenant per adapter instance, typed tenancy rejections.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "node --test \"src/**/*.test.ts\"",
+    "harness": "node src/harness.ts",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix --fix-suggestions"
+  },
+  "dependencies": {
+    "@playliquid/build-contracts": "workspace:*",
+    "@playliquid/engine-adapter-contract": "workspace:*",
+    "@playliquid/platform-contracts": "workspace:*",
+    "@playliquid/target-profiles": "workspace:*",
+    "@playliquid/tool-fabric": "workspace:*",
+    "@playliquid/tool-fabric-runtime": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.9",
+    "typescript": "^6.0.3"
+  }
+}
