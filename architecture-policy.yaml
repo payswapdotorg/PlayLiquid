@@ -247,6 +247,12 @@ modules:
     requires: [package-system, runtime-core, runtime-contracts, tool-fabric-runtime, avatar-runtime, capability-broker, game-contracts]
     publicEntrypoints: [packages/game-ui/src/index.ts]
     owner: Product
+  - id: build-orchestrator
+    roots: [packages/build-orchestrator/src]
+    managed: true
+    requires: [build-contracts, engine-adapter-contract, package-registry, package-system, target-profiles, tool-fabric, tool-fabric-runtime]
+    publicEntrypoints: [packages/build-orchestrator/src/index.ts]
+    owner: Build
 
 global:
   maxFileLines: 400
@@ -279,3 +285,5 @@ exceptions:
       - packages/platform-multiplayer/src/outcomes.ts
       - packages/platform-multiplayer/src/kernel.test.ts
       - packages/game-ui/src/fixtures/demo.ts
+      - packages/build-orchestrator/src/service.test.ts
+      - packages/build-orchestrator/src/service.ts

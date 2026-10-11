@@ -40,12 +40,12 @@ promotion). Rows for not-yet-implemented work orders remain design intent.
 | tool-blender | @playliquid/tool-blender | Tools | engine-adapter-contract, tool-fabric-runtime, tool-fabric, platform-contracts (PL-025; platform-contracts justified per module.ts — TenantId/SubjectId tenant-isolation vocabulary, platform-economy/lab-simulation precedent, R20 cross-tenant discipline) |
 | game-ui | @playliquid/game-ui | Product | package-system, runtime-core, runtime-contracts, tool-fabric-runtime, avatar-runtime, capability-broker, game-contracts (PL-033; per module.ts — read-model projections of authoritative public contracts only; runtime-contracts/game-contracts declared directly and deliberately: branded primitives + frozen R5 restriction vocabulary, avatar-runtime manifest precedent; peer-react provided by the host web app) |
 | sensory-runtime | @playliquid/sensory-runtime | Runtime | avatar-runtime, game-contracts, game-ir, runtime-contracts, platform-contracts, package-system, capability-broker (PL-027; capability-broker justified per delivery report — harness driver-cycle seam + perception tests, avatar-runtime manifest precedent; platform-contracts/package-system per module.ts — TenantId tenant isolation, canonical JSON envelope keys, community/lab precedent) |
+| build-orchestrator | @playliquid/build-orchestrator | Build | build-contracts, engine-adapter-contract, package-registry, package-system, target-profiles, tool-fabric, tool-fabric-runtime (PL-020; per module.ts — requires mirrors the package manifest's workspace deps exactly; engine-adapter-contract declared for the fake-adapter test seam, module.ts documents it; all pre-registered managed modules) |
 
 ## Design intent (work orders not yet merged)
 
 | Module | Owner | Main dependency |
 |---|---|---|
-| build-orchestrator | Build | build-contracts, tool-fabric-runtime |
 
 Rules:
 - managed modules expose only public contracts;
