@@ -1,0 +1,31 @@
+{
+  "name": "@playliquid/build-orchestrator",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "PlayLiquid GameOS build orchestration service (PL-020). Tenant-scoped single-record build intake over @playliquid/build-contracts' admission oracle (E1: malformed, duplicate-payload and unresolvable requests are typed refusals); the E10 orchestration pipeline — package-closure resolution from the registry with the R19 provenance/licensing gate (unauthorized or unprovenanced inputs fail closed with typed reasons, never silent completion), deterministic seeded build planning (E9: digest-pinned inputs, content-addressed environment, canonical call ids), and stage execution of the frozen phase machine through the Tool Fabric runtime seam with every transition recorded as an append-only authority-stamped event; outputs are content-addressed artifact references plus the typed build manifest, provenance and verification evidence, validated by build-contracts' composition validator and the console vendor-SDK gate (lock rule 24). Missing toolchains are recorded as truthful environment limitations (E11), never faked success. The frozen 11-target taxonomy is consumed as target-profile data (R12); tenant isolation is enforced on every command and read (R20). Domain is pure: persistence, time, the registry and Tool Fabric live behind ports with in-memory fakes; the BuildExecutor port from build-contracts is served from recorded, immutable build truth.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "node --test \"src/**/*.test.ts\"",
+    "harness": "node src/harness.ts",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix --fix-suggestions"
+  },
+  "dependencies": {
+    "@playliquid/build-contracts": "workspace:*",
+    "@playliquid/engine-adapter-contract": "workspace:*",
+    "@playliquid/package-registry": "workspace:*",
+    "@playliquid/package-system": "workspace:*",
+    "@playliquid/target-profiles": "workspace:*",
+    "@playliquid/tool-fabric": "workspace:*",
+    "@playliquid/tool-fabric-runtime": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.9",
+    "typescript": "^6.0.3"
+  }
+}
