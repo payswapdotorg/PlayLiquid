@@ -916,7 +916,7 @@
       ],
       "branch": "work/pl-045",
       "pr": null,
-      "mergedSha": null,
+      "mergedSha": "2d7ae1a",
       "evidence": "TL-executed final release audit: program check PASS 45/45 WOs; mergedSha audit 44/44 pre-audit records contained in main (6 early records backfilled: PL-005 f09b3c5, PL-006 b5b6aa4, PL-007 559e7c9, PL-008 1da7192, PL-009 263eb5c, PL-011 c935bc9); full-repo test sweep 3226/3226/0 (3139 src-suite tests over 62 src roots + 63 web-package tests + 24 perf sibling tests); tsc exit 0 for every PlayLiquid-domain tree (52 packages + 4 examples + 4 qa + services/ops + deployment; the 6 fork-infra composite-build packages documented out-of-scope); architecture full 5/5/0-new + changed 4/4/0-new @ 71 policy modules after waves 1-26; frontier EMPTY at close; evidence index + per-suite numbers + honest boundaries: docs/handoff/RELEASE-AUDIT.md; final state: spec/PROJECT-STATE.md v2.0",
       "owner": "tech-lead"
     }
