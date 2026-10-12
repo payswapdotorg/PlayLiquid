@@ -474,7 +474,7 @@
     },
     {
       "id": "PL-023",
-      "status": "BLOCKED",
+      "status": "MERGED",
       "depends": [
         "PL-019",
         "PL-020"
@@ -484,13 +484,13 @@
       ],
       "branch": "work/pl-023",
       "pr": null,
-      "mergedSha": null,
-      "evidence": [],
+      "mergedSha": "c5b0122",
+      "evidence": "subagent delivery 40177c4, station re-verify green (tsc 0, 75/75, harness 35/35, oxlint 0-0/22, arch 4/4/0-new); 24 files +4260",
       "owner": "worker"
     },
     {
       "id": "PL-024",
-      "status": "BLOCKED",
+      "status": "MERGED",
       "depends": [
         "PL-019",
         "PL-020"
@@ -500,8 +500,8 @@
       ],
       "branch": "work/pl-024",
       "pr": null,
-      "mergedSha": null,
-      "evidence": [],
+      "mergedSha": "ecf0990",
+      "evidence": "subagent delivery 540c720, station re-verify green (tsc 0, 80/80, harness 33/33, oxlint 0-0/22, arch 4/4/0-new); 24 files +4191",
       "owner": "worker"
     },
     {
