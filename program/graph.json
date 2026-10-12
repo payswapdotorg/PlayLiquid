@@ -623,7 +623,7 @@
     },
     {
       "id": "PL-031",
-      "status": "BLOCKED",
+      "status": "MERGED",
       "depends": [
         "PL-007",
         "PL-030"
@@ -633,8 +633,8 @@
       ],
       "branch": "work/pl-031",
       "pr": null,
-      "mergedSha": null,
-      "evidence": [],
+      "mergedSha": "f592db4",
+      "evidence": "subagent continuation delivery 075a205, station re-verify green (tsc 0, 43/43, oxlint 0-0/20, arch 4/4/0-new); 22 files; ACR bridged",
       "owner": "worker"
     },
     {
