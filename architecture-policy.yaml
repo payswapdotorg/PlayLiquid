@@ -289,6 +289,12 @@ modules:
     requires: [lab-contracts, lab-simulation, lab-organization, game-contracts, platform-contracts, package-system]
     publicEntrypoints: [packages/lab-learning/src/index.ts]
     owner: Lab
+  - id: target-builds
+    roots: [packages/target-builds/src]
+    managed: true
+    requires: [build-contracts, build-orchestrator, engine-godot, engine-playcanvas, engine-unity, engine-unreal, game-ir, package-system, runtime-contracts, target-profiles]
+    publicEntrypoints: [packages/target-builds/src/index.ts]
+    owner: Build
 
 global:
   maxFileLines: 400
