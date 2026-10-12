@@ -838,7 +838,7 @@
     },
     {
       "id": "PL-042",
-      "status": "BLOCKED",
+      "status": "MERGED",
       "depends": [
         "PL-014",
         "PL-020",
@@ -852,8 +852,8 @@
       ],
       "branch": "work/pl-042",
       "pr": null,
-      "mergedSha": null,
-      "evidence": [],
+      "mergedSha": "c018b24",
+      "evidence": "worker implementation (dead post-implementation pre-commit) + TL assembly 5e11e4d, station re-verify green twice (runtime-core/perf tsc 0 + 13/13, build-orchestrator/perf tsc 0 + 11/11, qa/performance tsc 0 + 12/12 in ~7.4s, oxlint 0-0/23, arch 4/4/0-new, lock unchanged, max file 232 lines); 30 files: kernel baselines (session scale, command throughput, tick batching, limits overhead), staged-build baselines (target fan-out, resolution throughput, stage pipeline), cross-system suite (simulation, replay, large-world R15 streaming, engine-playcanvas) + committed honest baseline reports (environment headers, workload-shape digests, determinism repeat-digests, budgets 3-10x measured from single budgets.ts); promotion wave 22 qa-performance managed module, post-promotion full arch 5/5/0-new",
       "owner": "worker"
     },
     {

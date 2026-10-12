@@ -343,6 +343,12 @@ modules:
     requires: [arena-integration, arena-integration-runtime, avatar-runtime, capability-broker, community, game-contracts, game-ui, gameos-community, gameos-lab, lab-contracts, lab-learning, lab-organization, lab-simulation, native-game, package-system, platform-contracts, runtime-contracts, runtime-core, tool-fabric-runtime]
     publicEntrypoints: [qa/browser/src/index.ts]
     owner: Product
+  - id: qa-performance
+    roots: [qa/performance/src]
+    managed: true
+    requires: [engine-playcanvas, large-world, replay, simulation]
+    publicEntrypoints: [qa/performance/src/index.ts]
+    owner: Runtime
 
 global:
   maxFileLines: 400
