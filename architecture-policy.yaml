@@ -379,6 +379,18 @@ modules:
     requires: [artifact-store, build-contracts, build-orchestrator, engine-adapter-contract, engine-godot, engine-unity, engine-unreal, game-contracts, game-ir, package-registry, package-system, platform-contracts, runtime-contracts, target-profiles, tool-blender, tool-fabric, tool-fabric-runtime]
     publicEntrypoints: [examples/engine-integration/src/index.ts]
     owner: Build
+  - id: lab-journey
+    roots: [examples/lab-journey/src]
+    managed: true
+    requires: [arena-integration, arena-integration-runtime, community, lab-contracts, lab-learning, lab-organization, lab-simulation, package-system, platform-contracts]
+    publicEntrypoints: [examples/lab-journey/src/index.ts]
+    owner: Product
+  - id: e2e-lab
+    roots: [qa/e2e-lab/src]
+    managed: true
+    requires: [arena-integration, arena-integration-runtime, community, lab-contracts, lab-learning, lab-organization, lab-simulation, package-system, platform-contracts]
+    publicEntrypoints: [qa/e2e-lab/src/index.ts]
+    owner: Product
 
 global:
   maxFileLines: 400

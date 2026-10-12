@@ -798,7 +798,7 @@
     },
     {
       "id": "PL-040",
-      "status": "BLOCKED",
+      "status": "MERGED",
       "depends": [
         "PL-028",
         "PL-029",
@@ -812,8 +812,8 @@
       ],
       "branch": "work/pl-040",
       "pr": null,
-      "mergedSha": null,
-      "evidence": [],
+      "mergedSha": "52ce660",
+      "evidence": "worker 58 examples/lab-journey (dead post-implementation; GREEN tsc 0 + 19/19) + continuation 60 qa/e2e-lab 14 files (dead; 37/42) + continuation 61 the 5 fixture/test fixes (arena case opening — the stale pre-walk gap record hit rung-mismatch; moved-contributor registration — membership-before-ownership admission order; invalid-source message aligned to the real isCapabilityGapRecord guard; ContributionId parsed with the package's own asContributionId; blocked admitted through the real ladder transitions after the honest walk) + module/contract/index/README artifacts + commit 67cd2a4; gates: tsc 0 x2, 19/19 + 42/42 run twice, oxlint 0-0/29, arch 4/4/0-new, max file 347, no lock change; station re-verify EXACT incl. main-merge (lab-journey 19/19, e2e-lab 42/42, engine-integration 15/15 unaffected); 33 files +4593; promotion wave 26 (lab-journey + e2e-lab managed modules, Product owner, requires 9/9 exact both trees)",
       "owner": "worker"
     },
     {
