@@ -877,7 +877,7 @@
     },
     {
       "id": "PL-044",
-      "status": "BLOCKED",
+      "status": "MERGED",
       "depends": [
         "PL-033",
         "PL-034",
@@ -892,8 +892,8 @@
       ],
       "branch": "work/pl-044",
       "pr": null,
-      "mergedSha": null,
-      "evidence": [],
+      "mergedSha": "a33612e",
+      "evidence": "worker 54 services/ops core (dead mid-task-2) + continuation 55 crash-resume fixes F2/F3/F5-F8 + tamper/journal refusals + worker.ts split 395 (dead post-fix) + continuation 56 deployment/ + docs/deployment/ + manifests (dead post-implementation pre-commit) + TL assembly 2f886cc (all 8 gates run by TL: tsc 0 x2, 48/48 + 31/31 run twice, oxlint 0-0/33, arch changed 4/4/0-new, max file 395, no lock change — trees carry no importer); station re-verify EXACT (tsc 0 + 48/48 + tsc 0 + 31/31); 42 files +5981: services/ops the durable worker runtime (E6 — content-addressed work documents, lease/heartbeat/TTL reclaim F7/F8, WAL keyed-duplicate exactly-once F2-F5, crash-anywhere resume F1-F8, append-only work journal E10, injected-clock determinism E9), health/readiness typed UP/DOWN/DEGRADED over REAL doors (E8 typed DOWN, never silent), web host composition (PL-033/034 mount recipe as typed wiring); deployment/ the typed plan model + verifier over REAL doors (PL-011 CAS digests, R19 provenance incl. license + AI disclosure, R20 lattice scopes, unknown-door refusals, E11 honesty-violation refusals, deterministic seal E9, append-only hash-linked journal E10), committed manifest re-verified by test; docs/deployment 6 E11-truth docs; actual write surface services/ops (module id services-ops; the planned services/gameos slot resolved to the ops service tree); promotion wave 24 (services-ops + deployment managed modules, Platform owner), post-promotion full arch 5/5/0-new + changed 4/4/0-new, suites re-verified 48/48 + 31/31",
       "owner": "worker"
     },
     {

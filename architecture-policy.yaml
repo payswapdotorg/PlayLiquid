@@ -361,6 +361,18 @@ modules:
     requires: [platform-contracts, platform-integrity, security-gameos]
     publicEntrypoints: [qa/security/src/index.ts]
     owner: Product
+  - id: services-ops
+    roots: [services/ops/src]
+    managed: true
+    requires: [build-contracts, build-orchestrator, package-registry, package-system, platform-contracts, platform-economy, platform-integrity, security-gameos]
+    publicEntrypoints: [services/ops/src/index.ts]
+    owner: Platform
+  - id: deployment
+    roots: [deployment/src]
+    managed: true
+    requires: [artifact-store, package-registry, package-system, platform-contracts, runtime-contracts, security-gameos, services-ops, target-builds, target-profiles]
+    publicEntrypoints: [deployment/src/index.ts]
+    owner: Platform
 
 global:
   maxFileLines: 400
