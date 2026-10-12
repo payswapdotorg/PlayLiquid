@@ -1,0 +1,30 @@
+{
+  "name": "@playliquid/lab-organization",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "PlayLiquid GameOS Lab organization compiler/search (PL-029). The organization-search stage of the Lab loop (spec/architecture.md §Lab loop): a TOTAL, deterministic compiler that turns lab-contracts organization descriptors into evaluation-ready compiled records — agent slots resolved against avatar-runtime body/capability surfaces (R5 restriction projection consumed, never duplicated), model assignments carried as opaque ZCode seam references, tools/memory topology/budget/scheduling/review structure carried as typed compiled records — with typed kebab-case rejections accumulated in one pass (never throws, never any). A typed, bounded candidate-space model over the architecture's twelve dimensions (agents, roles, bodies, model assignments, tools, capabilities, communication/delegation, memory topology, human participation, budget, scheduling, review structure): explicit enumerations, per-dimension caps and cross-product caps with typed out-of-space refusals — finite per request, no unbounded generation. Seeded deterministic search (E9): a search request (tenant, objective context, dimension bounds, seed) opens a cursorable stream of candidate organizations in a stable content-derived order — the generalist baseline (lock 26) is always candidate zero of the space — with typed non-monotonic cursor refusals. Evaluation wiring: candidates compile into lab-simulation evaluation requests and are scored by the deterministic PL-028 engine; results are immutable labeled estimates (E10/E11) recorded as tenant-scoped evidence, idempotent by content key (re-evaluation replays the recorded outcome). Capability gaps resolve through lab-contracts' frozen gap ladder (typed rungs; blocked is a typed terminal, never an exception) and are recorded as typed findings, never silently skipped. Pure domain: the service instance is the single mutable-state owner; time, body catalogs, tool catalogs, evaluation and persistence live behind ports with deterministic in-memory fakes; no real model assignment (ZCode is a host concern), no Arena escalation runtime, no network.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "node --test \"src/**/*.test.ts\"",
+    "harness": "node src/harness.ts",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix --fix-suggestions"
+  },
+  "dependencies": {
+    "@playliquid/lab-contracts": "workspace:*",
+    "@playliquid/avatar-runtime": "workspace:*",
+    "@playliquid/lab-simulation": "workspace:*",
+    "@playliquid/platform-contracts": "workspace:*",
+    "@playliquid/game-contracts": "workspace:*",
+    "@playliquid/package-system": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.9",
+    "typescript": "^6.0.3"
+  }
+}
