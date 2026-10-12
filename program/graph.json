@@ -818,7 +818,7 @@
     },
     {
       "id": "PL-041",
-      "status": "BLOCKED",
+      "status": "MERGED",
       "depends": [
         "PL-011",
         "PL-026",
@@ -832,8 +832,8 @@
       ],
       "branch": "work/pl-041",
       "pr": null,
-      "mergedSha": null,
-      "evidence": [],
+      "mergedSha": "e6ee8ed",
+      "evidence": "worker domain files (dead session 1) + continuation tests/qa tree (dead session 2) + TL assembly cd88fd1; one test-pollution defect fixed at assembly (restore-never-resurrects used already-decided probes — idempotent E10 receipts grow nothing; switched to novel analytics probes); station re-verify green (package tsc 0 + 87/87 + harness ok, qa/security tsc 0 + 48/48, oxlint 0-0/39, arch 4/4/0-new, lock carries only the security-gameos importer); 36 files: security-gameos the least-privilege rights authority (R20 lattice + R5 restrictions-only-remove + PL-011 admission + R10 entitlements + R11 integrity verdicts + PL-031 escalation + append-only refusal ledger E10 + typed refusals E8) + qa/security E8 negative suite; promotion wave 23 (security-gameos + qa-security managed modules), post-promotion full arch 5/5/0-new",
       "owner": "worker"
     },
     {

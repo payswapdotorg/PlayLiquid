@@ -349,6 +349,18 @@ modules:
     requires: [engine-playcanvas, large-world, replay, simulation]
     publicEntrypoints: [qa/performance/src/index.ts]
     owner: Runtime
+  - id: security-gameos
+    roots: [packages/security-gameos/src]
+    managed: true
+    requires: [arena-integration-runtime, artifact-store, avatar-runtime, capability-broker, game-contracts, package-registry, package-system, platform-contracts, platform-economy, platform-integrity, runtime-contracts]
+    publicEntrypoints: [packages/security-gameos/src/index.ts]
+    owner: Product
+  - id: qa-security
+    roots: [qa/security/src]
+    managed: true
+    requires: [platform-contracts, platform-integrity, security-gameos]
+    publicEntrypoints: [qa/security/src/index.ts]
+    owner: Product
 
 global:
   maxFileLines: 400
