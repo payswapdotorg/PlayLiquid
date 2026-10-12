@@ -1,0 +1,43 @@
+{
+  "suite": "engine",
+  "generatedAt": "2026-10-12T13:15:44.560Z",
+  "environment": {
+    "nodeVersion": "v24.21.0",
+    "platform": "linux x64",
+    "cpus": 2,
+    "cpuModel": "Intel(R) Xeon(R) Processor",
+    "totalMemoryMb": 4042
+  },
+  "workload": {
+    "description": "PL-021 PlayCanvas adapter: 2,000 typed engine-binding constructions and a 2,000-command inspect/modify plan applied through the deterministic fake bridge (E11 test host).",
+    "shapeDigest": "84799eaaa6c87b68054f3989ec50605f9f45a59844c437ae6b8178e44c318791",
+    "determinism": {
+      "repeated": true,
+      "digest": "ef68c9a77ca5bd95872c7aa042c3d2b1e1d07386cbe2797f3cb29dea31d41fe5"
+    }
+  },
+  "metrics": [
+    {
+      "metric": "engine.bindingConstruction",
+      "scale": "2000 typed engine-binding constructions + projections",
+      "count": 2000,
+      "measured": 15.74,
+      "unit": "ms",
+      "budget": 200,
+      "withinBudget": true,
+      "opsPerSecond": 127100,
+      "detail": "content-addressed binding digests derived per construction"
+    },
+    {
+      "metric": "engine.planApplication",
+      "scale": "2000 adapter command dispatches (inspect/modify plan)",
+      "count": 2000,
+      "measured": 112.63,
+      "unit": "ms",
+      "budget": 1500,
+      "withinBudget": true,
+      "opsPerSecond": 17757,
+      "detail": "over the offered capability surface (13 capabilities)"
+    }
+  ]
+}

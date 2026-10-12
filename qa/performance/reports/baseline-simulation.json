@@ -1,0 +1,53 @@
+{
+  "suite": "simulation",
+  "generatedAt": "2026-10-12T13:15:44.552Z",
+  "environment": {
+    "nodeVersion": "v24.21.0",
+    "platform": "linux x64",
+    "cpus": 2,
+    "cpuModel": "Intel(R) Xeon(R) Processor",
+    "totalMemoryMb": 4042
+  },
+  "workload": {
+    "description": "PL-014 Simulation Runtime: 500 sessions x (create + seeded load + 20 steps) + one deep 10,000-tick session, over the demo binding with fixed clocks.",
+    "shapeDigest": "b32dc301a2965985be4ee07b194f6e4ee27a83296aaea3190f1643829665abca",
+    "determinism": {
+      "repeated": true,
+      "digest": "a1e3dea47a4731431ff817d980706bd59d3f53f76650089ad53f9e8e94c03b35"
+    }
+  },
+  "metrics": [
+    {
+      "metric": "simulation.sessionScale",
+      "scale": "500 sessions x (create + seeded load + 20 steps)",
+      "count": 500,
+      "measured": 92.58,
+      "unit": "ms",
+      "budget": 1500,
+      "withinBudget": true,
+      "opsPerSecond": 5401,
+      "detail": "heapUsed delta 3.5MB (informational, no forced GC); 108018 steps/s"
+    },
+    {
+      "metric": "simulation.sessionHeap",
+      "scale": "heapUsed delta across the 500-session workload",
+      "count": 1,
+      "measured": 3.5,
+      "unit": "MB",
+      "budget": 64,
+      "withinBudget": true,
+      "detail": "footprint guard (no forced GC; informational bound)"
+    },
+    {
+      "metric": "simulation.deepSteps",
+      "scale": "one seeded session, 10,000 fixed ticks",
+      "count": 10000,
+      "measured": 88.85,
+      "unit": "ms",
+      "budget": 1200,
+      "withinBudget": true,
+      "opsPerSecond": 112543,
+      "detail": "112543 steps/s"
+    }
+  ]
+}
