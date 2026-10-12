@@ -277,6 +277,12 @@ modules:
     requires: [build-contracts, engine-adapter-contract, platform-contracts, target-profiles, tool-fabric, tool-fabric-runtime]
     publicEntrypoints: [packages/engine-godot/src/index.ts]
     owner: Tools
+  - id: lab-organization
+    roots: [packages/lab-organization/src]
+    managed: true
+    requires: [lab-contracts, avatar-runtime, lab-simulation, game-contracts, platform-contracts, package-system]
+    publicEntrypoints: [packages/lab-organization/src/index.ts]
+    owner: Lab
 
 global:
   maxFileLines: 400
