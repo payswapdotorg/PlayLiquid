@@ -7,7 +7,9 @@
  */
 
 import type { TenantId, SubjectId } from "../../../../platform-contracts/src/index.ts";
-import type { LabTab } from "./lab-view.ts";
+
+/** The Lab workbench's navigation tabs. */
+export type LabTab = "searches" | "evidence" | "learning" | "guidance" | "gaps" | "arena";
 
 /** Who is reading (the read model's tenant scope, R20). */
 export interface LabViewer {

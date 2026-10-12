@@ -18,16 +18,17 @@ import type {
   ContributionRecord,
   ContributionTransitionRecord,
 } from "../../../../community/src/index.ts";
-import type { CommunitySelection, CommunityViewer } from "./community-selection.ts";
+import type {
+  CommunitySelection,
+  CommunityTab,
+  CommunityViewer,
+} from "./community-selection.ts";
 import {
   projectContributions,
   type ContributionsView,
 } from "./contributions-view.ts";
 import { projectProvenance, type ProvenanceView } from "./provenance-view.ts";
 import { projectWorkflow, type WorkflowView } from "./workflow-view.ts";
-
-/** The Community workbench's navigation tabs. */
-export type CommunityTab = "contributions" | "lifecycle" | "provenance";
 
 /**
  * The authoritative Community read models a host hands the workbench.
@@ -54,8 +55,8 @@ export interface CommunityWorkbenchViewModel {
   readonly provenance: ProvenanceView;
 }
 
-/** Re-export the viewer tenancy (defined in community-selection.ts). */
-export type { CommunityViewer };
+/** Re-export the viewer tenancy and the tab vocabulary (defined in community-selection.ts). */
+export type { CommunityViewer, CommunityTab };
 
 /**
  * Project one authoritative data snapshot + UI selection into the whole

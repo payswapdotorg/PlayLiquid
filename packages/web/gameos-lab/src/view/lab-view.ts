@@ -26,7 +26,7 @@ import type {
   LearningCycleRecord,
 } from "../../../../lab-learning/src/index.ts";
 import type { ArenaEscalationCase } from "../../../../arena-integration-runtime/src/index.ts";
-import type { LabSelection, LabViewer } from "./lab-selection.ts";
+import type { LabSelection, LabTab, LabViewer } from "./lab-selection.ts";
 import { projectArenaCases, type ArenaView } from "./arena-view.ts";
 import { projectEvidence, type EvidenceView } from "./evidence-view.ts";
 import { projectGaps, type GapsView } from "./gaps-view.ts";
@@ -36,9 +36,6 @@ import {
 } from "./guidance-view.ts";
 import { projectLearning, type LearningView } from "./learning-view.ts";
 import { projectSearches, type SearchesView } from "./search-view.ts";
-
-/** The Lab workbench's navigation tabs. */
-export type LabTab = "searches" | "evidence" | "learning" | "guidance" | "gaps" | "arena";
 
 /**
  * The authoritative Lab read models a host hands the workbench. Every
@@ -82,8 +79,8 @@ export interface LabWorkbenchViewModel {
   readonly arena: ArenaView;
 }
 
-/** Re-export the viewer tenancy (defined in lab-selection.ts). */
-export type { LabViewer };
+/** Re-export the viewer tenancy and the tab vocabulary (defined in lab-selection.ts). */
+export type { LabViewer, LabTab };
 
 /**
  * Project one authoritative data snapshot + UI selection into the whole

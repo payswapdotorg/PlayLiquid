@@ -8,7 +8,9 @@
  */
 
 import type { TenantId, SubjectId } from "../../../../platform-contracts/src/index.ts";
-import type { CommunityTab } from "./community-view.ts";
+
+/** The Community workbench's navigation tabs. */
+export type CommunityTab = "contributions" | "lifecycle" | "provenance";
 
 /** Who is reading (the read model's tenant scope, R20). */
 export interface CommunityViewer {
