@@ -283,6 +283,12 @@ modules:
     requires: [lab-contracts, avatar-runtime, lab-simulation, game-contracts, platform-contracts, package-system]
     publicEntrypoints: [packages/lab-organization/src/index.ts]
     owner: Lab
+  - id: lab-learning
+    roots: [packages/lab-learning/src]
+    managed: true
+    requires: [lab-contracts, lab-simulation, lab-organization, game-contracts, platform-contracts, package-system]
+    publicEntrypoints: [packages/lab-learning/src/index.ts]
+    owner: Lab
 
 global:
   maxFileLines: 400
