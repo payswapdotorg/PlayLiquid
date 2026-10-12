@@ -295,6 +295,18 @@ modules:
     requires: [build-contracts, build-orchestrator, engine-godot, engine-playcanvas, engine-unity, engine-unreal, game-ir, package-system, runtime-contracts, target-profiles]
     publicEntrypoints: [packages/target-builds/src/index.ts]
     owner: Build
+  - id: runtime-spark
+    roots: [packages/runtime-spark/src]
+    managed: true
+    requires: [runtime-core, runtime-contracts, game-ir, game-contracts, platform-contracts, package-system]
+    publicEntrypoints: [packages/runtime-spark/src/index.ts]
+    owner: Runtime
+  - id: spark
+    roots: [packages/spark/src]
+    managed: true
+    requires: [build-contracts, build-orchestrator, game-contracts, game-ir, package-system, runtime-contracts, runtime-spark, target-profiles]
+    publicEntrypoints: [packages/spark/src/index.ts]
+    owner: Build
 
 global:
   maxFileLines: 400
