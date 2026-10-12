@@ -1,0 +1,30 @@
+{
+  "name": "@playliquid/lab-learning",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "PlayLiquid GameOS Lab learning/calibration (PL-030). The learning layer of the Game Engineering Lab loop (spec/architecture.md §Lab loop: \"observed outcome → calibration → next search\"): tenant-scoped, append-only learning-cycle records that fold one completed Lab cycle's artifacts — the observation ledger with its appended calibration conclusions, the evaluation run records' evidence digests and the search result digests — into immutable, content-addressed records (E10 receipt pattern: identical cycle content derives the same record id; a duplicate intake returns the existing record as a typed idempotent receipt, never a second copy, never an error; there is no update, revise or rewrite operation anywhere). A deterministic pure fold derives typed learning signals (dimension-level outcome affinities: which candidate-dimension values co-occurred with which observed-outcome summaries) and rung-classified recurring capability-gap summaries (R18: existing → alternate → package/platform capability → user/community contribution → Arena → blocked; recorded and typed with recurrence counts — never silently skipped, never auto-escalated). The top-level product is a typed search-guidance object that parameterizes lab-organization's next search request (dimension bounds adjustments, ordering hints, baseline promotion notes, a deterministic seed hint) derived ONLY from the learning state; epistemic discipline is structural (E11, lock 28/29): guidance derived wholly or partly from simulator/counterfactual estimates carries the labeled-estimate marker and is structurally disjoint from observed-evidence-derived guidance — a stripped or forged marker is a typed refusal. This package NEVER mutates any lab-contracts ledger (E10): all inputs are read-only views; the only writes are appends to its own learning-cycle records. Pure domain: the service instance is the single mutable-state owner (E1); time and persistence live behind ports with deterministic in-memory fakes that wire the REAL PL-029 search and PL-028 evaluation engines for tests and the harness; no network, no Arena escalation runtime, no re-implementation of lab-simulation's evaluation or lab-organization's compiler/search.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "node --test \"src/**/*.test.ts\"",
+    "harness": "node src/harness.ts",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix --fix-suggestions"
+  },
+  "dependencies": {
+    "@playliquid/game-contracts": "workspace:*",
+    "@playliquid/lab-contracts": "workspace:*",
+    "@playliquid/lab-organization": "workspace:*",
+    "@playliquid/lab-simulation": "workspace:*",
+    "@playliquid/package-system": "workspace:*",
+    "@playliquid/platform-contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.9",
+    "typescript": "^6.0.3"
+  }
+}
