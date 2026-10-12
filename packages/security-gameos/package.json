@@ -1,0 +1,35 @@
+{
+  "name": "@playliquid/security-gameos",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "PlayLiquid GameOS security/rights authority (PL-041). The least-privilege RIGHTS LATTICE (R20): every right is (tenant, subject, capability) and the effective-right computation composes the real sibling authorities read-only — @playliquid/platform-contracts ScopedCapabilityGrant grants through its own checkLeastPrivilege oracle (codes verbatim), @playliquid/capability-broker grant tables through runtime-contracts' pure resolveActionRequest boundary evaluator (ActionDenialReason codes verbatim), @playliquid/avatar-runtime host restrictions (R5: a host restriction can only ever REMOVE rights — the lattice proves the negative: an undeclared capability is refused under even the most permissive restriction), @playliquid/package-registry + @playliquid/artifact-store admission gates (fail-closed digest/record/artifact verification via fetchRecordFromCas/verifyRecordArtifacts plus package-system's checkReleaseGate release oracle — R19 provenance/licensing gaps surface verbatim), @playliquid/platform-economy entitlement verification (R10 settlement actions gated by declarations and entitlement reads — event-not-declared/unknown-entitlement surface verbatim), @playliquid/platform-integrity verdicts ingested as TYPED probabilistic evidence (R11: suspensions carry the verdict kind, derived confidence band and interval; certainty fields are structurally unrepresentable), and @playliquid/arena-integration-runtime escalation cases minting elevated review rights (ingestion-only reads; the Arena runtime's own caseDigest is the evidence). Every denial is recorded in the append-only refusal ledger (E10) with its typed code and evidence digests; refusals are first-class outputs, never swallowed (E8). Pure domain: the RightsAuthority service instance is the single mutable-state owner (E1); persistence, time, grants, broker/avatar/registry/CAS/economy/integrity/arena reads are injected ports with deterministic in-memory fakes; no IO, no timers, no globals; content-derived identifiers and injected clock throughout (E9).",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "node --test \"src/**/*.test.ts\"",
+    "harness": "node src/harness.ts",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix --fix-suggestions"
+  },
+  "dependencies": {
+    "@playliquid/arena-integration-runtime": "workspace:*",
+    "@playliquid/artifact-store": "workspace:*",
+    "@playliquid/avatar-runtime": "workspace:*",
+    "@playliquid/capability-broker": "workspace:*",
+    "@playliquid/game-contracts": "workspace:*",
+    "@playliquid/package-registry": "workspace:*",
+    "@playliquid/package-system": "workspace:*",
+    "@playliquid/platform-contracts": "workspace:*",
+    "@playliquid/platform-economy": "workspace:*",
+    "@playliquid/platform-integrity": "workspace:*",
+    "@playliquid/runtime-contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.9",
+    "typescript": "^6.0.3"
+  }
+}
