@@ -337,6 +337,12 @@ modules:
     requires: [artifact-store, build-contracts, build-orchestrator, game-contracts, game-ir, package-registry, package-system, replay, runtime-contracts, simulation]
     publicEntrypoints: [examples/large-world/src/index.ts]
     owner: Runtime
+  - id: qa-browser
+    roots: [qa/browser/src]
+    managed: true
+    requires: [arena-integration, arena-integration-runtime, avatar-runtime, capability-broker, community, game-contracts, game-ui, gameos-community, gameos-lab, lab-contracts, lab-learning, lab-organization, lab-simulation, native-game, package-system, platform-contracts, runtime-contracts, runtime-core, tool-fabric-runtime]
+    publicEntrypoints: [qa/browser/src/index.ts]
+    owner: Product
 
 global:
   maxFileLines: 400
@@ -371,3 +377,17 @@ exceptions:
       - packages/game-ui/src/fixtures/demo.ts
       - packages/build-orchestrator/src/service.test.ts
       - packages/build-orchestrator/src/service.ts
+  # PL-043 (browser journeys): the three qa/browser ui-adapters re-export
+  # ONLY symbols the web packages' public entrypoints also export, but they
+  # must reach them through src/ files because game-ui/gameos-lab/
+  # gameos-community index.ts re-exports .tsx components and plain
+  # `node --test` cannot load .tsx (ERR_UNKNOWN_FILE_EXTENSION). The
+  # deep-import targets are the .ts implementation files behind those
+  # entrypoints, never private helpers. Expires when the web packages
+  # split their entrypoints so plain-node hosts can consume them.
+  - rule: deep-import
+    expires: 2026-11-30
+    paths:
+      - qa/browser/src/studio-ui.ts
+      - qa/browser/src/lab-ui.ts
+      - qa/browser/src/community-ui.ts

@@ -858,7 +858,7 @@
     },
     {
       "id": "PL-043",
-      "status": "BLOCKED",
+      "status": "MERGED",
       "depends": [
         "PL-033",
         "PL-034",
@@ -871,8 +871,8 @@
       ],
       "branch": "work/pl-043",
       "pr": null,
-      "mergedSha": null,
-      "evidence": [],
+      "mergedSha": "7e3d708",
+      "evidence": "worker studio slice bfe6a0f + continuation 42e4287 (19 files +2565/-325), station re-verify green (tsc 0, 15/15, oxlint 0-0/15, arch 4/4/0-new); 22 files total: studio/lab/community/native journeys over real stores + view models (E11 node-honesty, E9 run-twice trajectories, E8 verbatim refusals, R20 tenancy negatives, E10 append-only), journey kit, module.ts/contract.ts/index.ts, docs/journeys (5 docs); promotion-surfaced checker defect fixed at station (deep-import rule now honors policy exceptions); 3 ui-adapters carry expiring deep-import exception (web packages entrypoints re-export .tsx which plain node --test cannot load); post-promotion full arch 5/5/0-new",
       "owner": "worker"
     },
     {

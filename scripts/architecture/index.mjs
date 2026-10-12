@@ -272,7 +272,7 @@ export async function checkArchitecture({ cwd = process.cwd(), changedFiles = nu
       if (policy.global.forbidDeepImports && targetModule.publicEntrypoints.length > 0) {
         const targetRelative = posix(path.relative(cwd, target));
         const allowed = publicEntrypointMatches(target, targetModule, cwd);
-        if (!allowed) {
+        if (!allowed && !isException(policy, "deep-import", file, cwd)) {
           violations.push(
             violation({
               rule: "deep-import",
