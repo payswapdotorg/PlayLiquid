@@ -780,7 +780,7 @@
     },
     {
       "id": "PL-039",
-      "status": "BLOCKED",
+      "status": "MERGED",
       "depends": [
         "PL-011",
         "PL-013",
@@ -792,8 +792,8 @@
       ],
       "branch": "work/pl-039",
       "pr": null,
-      "mergedSha": null,
-      "evidence": [],
+      "mergedSha": "1e96ac3",
+      "evidence": "worker + continuation + TL assembly (d634ac4), station re-verify green (tsc 0, 61/61, oxlint 0-0/27, arch 4/4/0-new); 29 files",
       "owner": "worker"
     },
     {
