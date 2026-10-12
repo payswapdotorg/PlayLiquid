@@ -704,7 +704,7 @@
     },
     {
       "id": "PL-035",
-      "status": "BLOCKED",
+      "status": "MERGED",
       "depends": [
         "PL-013",
         "PL-020"
@@ -715,8 +715,8 @@
       ],
       "branch": "work/pl-035",
       "pr": null,
-      "mergedSha": null,
-      "evidence": [],
+      "mergedSha": "3e34153",
+      "evidence": "subagent continuation delivery fc6ff2c, station re-verify green (rt tsc 0 + 55/55, spark tsc 0 + 18/18, arch 4/4/0-new); 35 files +5210",
       "owner": "worker"
     },
     {
