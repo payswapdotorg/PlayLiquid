@@ -1,0 +1,34 @@
+{
+  "name": "@playliquid/target-builds",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "PlayLiquid GameOS multi-target builds (PL-036). The typed multi-target build surface over the merged build family: a tenant-scoped multi-target build REQUEST (content/package pins + requested target set) is resolved TOTALLY against the four engine adapters' typed bindings (PL-021..PL-024) — each requested target either binds the first catalog engine whose compatibility predicate consents, or is refused with a typed reason (unknown-target, sdk-gated for console per lock rule 24, evidence-missing for profile-declared vendor gates without evidence, no-engine-for-target, profile-unavailable/invalid); partial results accumulate typed rejections and never void each other. The resolved set fans out into build-orchestrator documents PER TARGET (one staged BuildOrchestratorService per target+engine pair, PL-020), with a durable, content-addressed fan-out plan (target → per-target request-document digest; E9 determinism: same request + same pinned inputs ⇒ same plan, same digests, same content-derived target enumeration) and a typed aggregation into ONE multi-target build record (per-target build ids, orchestrator document digests, manifest digests, overall verdict, failure isolation — every outcome carried honestly). Provenance evidence (source pins, adapter identity, orchestrator stage digests) and verification evidence (gate results recorded by the build) are aggregated per target with content digests over CAS-shaped artifact references (R19, E7). Resume semantics (E6): the fan-out plan is a durable document idempotent by content key — a re-run skips already-completed targets (typed skip), restores non-terminal targets from their content-addressed build documents and re-drives them with the out-of-band evidence pool. Tenant isolation on every door (R20); console capability is truthful, SDK-gated and never simulated (E11, lock rule 24).",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "node --test \"src/**/*.test.ts\"",
+    "harness": "node src/harness.ts",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix --fix-suggestions"
+  },
+  "dependencies": {
+    "@playliquid/build-contracts": "workspace:*",
+    "@playliquid/build-orchestrator": "workspace:*",
+    "@playliquid/engine-godot": "workspace:*",
+    "@playliquid/engine-playcanvas": "workspace:*",
+    "@playliquid/engine-unity": "workspace:*",
+    "@playliquid/engine-unreal": "workspace:*",
+    "@playliquid/game-ir": "workspace:*",
+    "@playliquid/package-system": "workspace:*",
+    "@playliquid/runtime-contracts": "workspace:*",
+    "@playliquid/target-profiles": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.9",
+    "typescript": "^6.0.3"
+  }
+}
