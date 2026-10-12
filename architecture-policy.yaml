@@ -325,6 +325,12 @@ modules:
     requires: [community, platform-contracts]
     publicEntrypoints: [packages/web/gameos-community/src/index.ts]
     owner: Product
+  - id: native-game
+    roots: [examples/native-game/src]
+    managed: true
+    requires: [artifact-store, build-contracts, build-orchestrator, engine-playcanvas, game-contracts, game-ir, package-registry, package-system, platform-achievements, platform-contracts, platform-economy, platform-identity, platform-integrity, platform-leaderboard, platform-social, replay, runtime-contracts, runtime-core, runtime-spark, spark, target-profiles]
+    publicEntrypoints: [examples/native-game/src/index.ts]
+    owner: Product
 
 global:
   maxFileLines: 400
