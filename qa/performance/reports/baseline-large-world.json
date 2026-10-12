@@ -1,0 +1,54 @@
+{
+  "suite": "large-world",
+  "generatedAt": "2026-10-12T13:15:44.560Z",
+  "environment": {
+    "nodeVersion": "v24.21.0",
+    "platform": "linux x64",
+    "cpus": 2,
+    "cpuModel": "Intel(R) Xeon(R) Processor",
+    "totalMemoryMb": 4042
+  },
+  "workload": {
+    "description": "PL-039 LATTICE: one full world composition (87 packages through registry/CAS), a 240-tick moving-viewpoint streaming schedule, and wanted-set derivation at 4 radii x 289 positions.",
+    "shapeDigest": "34c3253a2af27d05da6c6013ba7b21171274731c71d165fab91de2aa92a89613",
+    "determinism": {
+      "repeated": true,
+      "digest": "85d642716139ca82bb78c4173507e8a3bd09fccf655d9c277367683d134524b4"
+    }
+  },
+  "metrics": [
+    {
+      "metric": "largeWorld.composition",
+      "scale": "one full world composition (87 packages through registry/CAS)",
+      "count": 87,
+      "measured": 52.26,
+      "unit": "ms",
+      "budget": 800,
+      "withinBudget": true,
+      "opsPerSecond": 1665,
+      "detail": "64 chunks; lock sha256:6ad6889d3b9…"
+    },
+    {
+      "metric": "largeWorld.streamingSchedule",
+      "scale": "240-tick deterministic viewpoint tour over 64 chunks",
+      "count": 240,
+      "measured": 30.03,
+      "unit": "ms",
+      "budget": 500,
+      "withinBudget": true,
+      "opsPerSecond": 7991,
+      "detail": "1067 window resolutions (540 loads, 527 unloads, 228 CAS fetches, 312 checkpoint reloads)"
+    },
+    {
+      "metric": "largeWorld.wantedSetScan",
+      "scale": "4 radii (8/24/48/96) x 289 viewpoint positions",
+      "count": 1156,
+      "measured": 6.03,
+      "unit": "ms",
+      "budget": 150,
+      "withinBudget": true,
+      "opsPerSecond": 191819,
+      "detail": "mean wanted-set size per radius: r8=3.4, r24=11.2, r48=27.3, r96=56.5"
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "suite": "replay",
+  "generatedAt": "2026-10-12T13:15:44.557Z",
+  "environment": {
+    "nodeVersion": "v24.21.0",
+    "platform": "linux x64",
+    "cpus": 2,
+    "cpuModel": "Intel(R) Xeon(R) Processor",
+    "totalMemoryMb": 4042
+  },
+  "workload": {
+    "description": "PL-014 replay command streams: 50 artifacts x 200 recorded broker-mediated move commands sealed and verified; 1,000 tampered-digest verifications (typed refusals).",
+    "shapeDigest": "00faf989ebca13bc8747923f8acb0241404659cb780cb8660ed45a40cc6db37f",
+    "determinism": {
+      "repeated": true,
+      "digest": "sha256:07380365bfa9db3a97f7fbe7274c69f9823a1302ef0a6fa83b46241c03e0dcdf"
+    }
+  },
+  "metrics": [
+    {
+      "metric": "replay.sealArtifacts",
+      "scale": "50 artifacts x 200 commands (10,000 commands)",
+      "count": 10000,
+      "measured": 298.25,
+      "unit": "ms",
+      "budget": 2500,
+      "withinBudget": true,
+      "opsPerSecond": 33529,
+      "detail": "33529 commands/s sealed"
+    },
+    {
+      "metric": "replay.verifyArtifacts",
+      "scale": "50 artifacts x 200 commands (10,000 commands)",
+      "count": 10000,
+      "measured": 234.64,
+      "unit": "ms",
+      "budget": 2500,
+      "withinBudget": true,
+      "opsPerSecond": 42618,
+      "detail": "42618 commands/s verified"
+    },
+    {
+      "metric": "replay.tamperedVerify",
+      "scale": "1000 verifications of a tampered artifact digest",
+      "count": 1000,
+      "measured": 438.51,
+      "unit": "ms",
+      "budget": 2000,
+      "withinBudget": true,
+      "opsPerSecond": 2280,
+      "detail": "typed digest-mismatch refusals, counted, never swallowed (E8)"
+    }
+  ]
+}
