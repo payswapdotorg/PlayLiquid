@@ -1,0 +1,31 @@
+{
+  "name": "@playliquid/arena-integration-runtime",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "PlayLiquid GameOS Arena runtime integration (PL-031). The runtime that EXECUTES decided capability-gap escalations through @playliquid/arena-integration's typed provider-neutral contract layer (architecture.md §Arena + §Capability gaps; R18; lock rules 6/32): typed intake of a host-DECIDED escalation (the runtime never auto-escalates — un-decided, tampered-decision and rung-mismatch refusals are typed), resolution into an arena-integration request envelope, and a tenant-scoped (R20), content-addressed, resumable (E6) escalation case whose lifecycle drives arena-integration's own draft→…→ingested|rejected|expired machine through the ArenaTransport port (the deterministic in-memory fake in-repo; real providers are host-side, E11). Responses flow back through arena-integration's INGESTION-ONLY verdicts: typed evidence packages, provenance-marked arena-external, labeled with their epistemic class (external validated result / external estimate / external authorized artifact, E11) — no type, port or function in this package can mutate live PlayLiquid state from an Arena response (lock rules 6/32, structurally negative-tested). This package also resolves the pending PL-007 architecture-change-request seam FROM THE RUNTIME LAYER: ArenaEscalationRequest = lab-contracts' ArenaEscalationRef & arena-integration's ArenaRequestEnvelope, with the request-digest pin checked by a coherence oracle (packages/arena-integration itself is never modified). Pure domain: the service instance is the single mutable-state owner (E1); time, persistence, Lab usage-rule policy and transport live behind ports with deterministic in-memory fakes; no real network, no Arena SDK, no auto-escalation policy, no mutation of live Lab state, no fork of arena-integration's contract vocabulary.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "node --test \"src/**/*.test.ts\"",
+    "harness": "node src/harness.ts",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix --fix-suggestions"
+  },
+  "dependencies": {
+    "@playliquid/arena-integration": "workspace:*",
+    "@playliquid/game-contracts": "workspace:*",
+    "@playliquid/lab-contracts": "workspace:*",
+    "@playliquid/lab-learning": "workspace:*",
+    "@playliquid/lab-organization": "workspace:*",
+    "@playliquid/package-system": "workspace:*",
+    "@playliquid/platform-contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.9",
+    "typescript": "^6.0.3"
+  }
+}
