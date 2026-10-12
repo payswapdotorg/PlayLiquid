@@ -70,7 +70,12 @@ function cycleViolations(edges, policy, modulesByFile) {
   const unique = new Map();
   for (const cycle of cycles) {
     const detail = [...new Set(cycle)].sort().join(" -> ");
-    const file = cycle[0];
+    // Cycle identity must be traversal-order-INDEPENDENT: `cycle[0]` is
+    // whichever file the DFS happens to reach first, so adding an unrelated
+    // managed module could flip the reported file (adapter.ts ↔ exchange.ts)
+    // and break the baseline fingerprint match (PL-038 promotion lesson).
+    // The lexicographically-smallest member is stable for the same cycle.
+    const file = [...new Set(cycle)].sort()[0];
     unique.set(
       detail,
       violation({
@@ -78,7 +83,7 @@ function cycleViolations(edges, policy, modulesByFile) {
         file,
         detail,
         module: modulesByFile.get(file),
-        message: `检测到循环依赖：${cycle.map((item) => posix(item)).join(" -> ")}`,
+        message: `检测到循环依赖：${[...new Set(cycle)].sort().map((item) => posix(item)).join(" -> ")}`,
         global: true,
       }),
     );

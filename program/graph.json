@@ -761,7 +761,7 @@
     },
     {
       "id": "PL-038",
-      "status": "BLOCKED",
+      "status": "MERGED",
       "depends": [
         "PL-020",
         "PL-022",
@@ -774,8 +774,8 @@
       ],
       "branch": "work/pl-038",
       "pr": null,
-      "mergedSha": null,
-      "evidence": [],
+      "mergedSha": "d9e87a0",
+      "evidence": "worker 57 core implementation (dead post-implementation pre-gates) + TL fixes (per-adapter tool namespacing — blender/engines overlap on editor.script/editor.action; computeDigest-on-bytes x2 → plain-value projections; three stale test expectations aligned to contract reality: seal stage order, engine-not-declared precedence, the 5-stage phase machine) + continuation 59 (negative battery 8 tests + README + commit d199fbc); gates: tsc 0, 15/15 run twice, oxlint 0-0/15, arch 4/4/0-new, max file 398, no lock change; station re-verify EXACT (tsc 0 + 15/15); 17 files +2600: the end-to-end engine-native reference — Blender authoring over tool-fabric-runtime, three real engine bindings adjudicating, real build-orchestrator phase machine, registry/CAS resolution with lock verification (R19), append-only journal (E10), E9 determinism, E8 negative battery (out-of-set targets, binding-not-pinned, R20 tenancy across all four adapters, payload validation, inline-bytes/unresolvable artifacts, journal integrity, idempotent re-submission); promotion wave 25 (engine-integration managed module, Build owner), post-promotion gates verified",
       "owner": "worker"
     },
     {
