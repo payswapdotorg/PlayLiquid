@@ -331,6 +331,12 @@ modules:
     requires: [artifact-store, build-contracts, build-orchestrator, engine-playcanvas, game-contracts, game-ir, package-registry, package-system, platform-achievements, platform-contracts, platform-economy, platform-identity, platform-integrity, platform-leaderboard, platform-social, replay, runtime-contracts, runtime-core, runtime-spark, spark, target-profiles]
     publicEntrypoints: [examples/native-game/src/index.ts]
     owner: Product
+  - id: large-world
+    roots: [examples/large-world/src]
+    managed: true
+    requires: [artifact-store, build-contracts, build-orchestrator, game-contracts, game-ir, package-registry, package-system, replay, runtime-contracts, simulation]
+    publicEntrypoints: [examples/large-world/src/index.ts]
+    owner: Runtime
 
 global:
   maxFileLines: 400

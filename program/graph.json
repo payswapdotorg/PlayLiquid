@@ -793,7 +793,7 @@
       "branch": "work/pl-039",
       "pr": null,
       "mergedSha": "1e96ac3",
-      "evidence": "worker + continuation + TL assembly (d634ac4), station re-verify green (tsc 0, 61/61, oxlint 0-0/27, arch 4/4/0-new); 29 files",
+      "evidence": "worker + continuation + TL assembly (d634ac4), station re-verify green (tsc 0, 61/61, oxlint 0-0/27, arch 4/4/0-new); 29 files; promotion-surfaced 486-line streaming.ts split into streaming.ts + streaming-codec.ts (356+158), post-promotion full arch 5/5/0-new",
       "owner": "worker"
     },
     {
