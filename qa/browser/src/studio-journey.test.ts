@@ -20,13 +20,16 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { createStudioStore } from "../../../packages/game-ui/src/studio-store.ts";
-import type { StudioStore } from "../../../packages/game-ui/src/studio-store.ts";
+// game-ui is reached through the Node-surface adapter (see studio-ui.ts:
+// the package entrypoint re-exports .tsx components the Node runner cannot
+// load — E11 browser honesty, no bundler here).
 import {
   ScriptedStudioDataPort,
   StaticStudioDataPort,
-} from "../../../packages/game-ui/src/fakes.ts";
-import { studioSummary } from "../../../packages/game-ui/src/view/studio-view.ts";
+  createStudioStore,
+  studioSummary,
+} from "./studio-ui.ts";
+import type { StudioStore } from "./studio-ui.ts";
 import { assertSameTrajectory, createTrace } from "./journey-kit.ts";
 import type { JourneyTrace } from "./journey-kit.ts";
 import { composeStudioJourneySnapshot } from "./studio-rig.ts";
