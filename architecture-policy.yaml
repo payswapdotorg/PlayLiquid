@@ -265,6 +265,18 @@ modules:
     requires: [build-contracts, engine-adapter-contract, platform-contracts, target-profiles, tool-fabric, tool-fabric-runtime]
     publicEntrypoints: [packages/engine-unreal/src/index.ts]
     owner: Tools
+  - id: engine-unity
+    roots: [packages/engine-unity/src]
+    managed: true
+    requires: [build-contracts, engine-adapter-contract, platform-contracts, target-profiles, tool-fabric, tool-fabric-runtime]
+    publicEntrypoints: [packages/engine-unity/src/index.ts]
+    owner: Tools
+  - id: engine-godot
+    roots: [packages/engine-godot/src]
+    managed: true
+    requires: [build-contracts, engine-adapter-contract, platform-contracts, target-profiles, tool-fabric, tool-fabric-runtime]
+    publicEntrypoints: [packages/engine-godot/src/index.ts]
+    owner: Tools
 
 global:
   maxFileLines: 400
