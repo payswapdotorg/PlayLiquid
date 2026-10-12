@@ -1,0 +1,30 @@
+{
+  "name": "@playliquid/runtime-spark",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "PlayLiquid GameOS Spark runtime (PL-035). A THIN fast-start shell over the merged runtime-core kernel (PL-013, never a fork): the deterministic boot pipeline materializes the MINIMAL first-interaction world state from game-ir content — a typed boot PLAN (what loads now vs what streams later) derived from the FROZEN SparkTargetProfile boot budgets (firstPaintTargetMs/firstInteractionTargetMs as PLANNING inputs under an injected clock and an explicit caller-supplied cost model, E9 — no platform policy numbers are invented here), the 9:16 portrait viewport projection (R6, pure math — PL-033's game-ui owns presentation), and the deferred/streamed remainder as typed digest-pinned descriptors. Boot is TOTAL: invalid content/profile inputs are typed kebab-case refusals accumulated in ONE pass. Progressive streaming (typed, priority-ordered, content-derived schedules; cycle and contradiction refusals) plus aggressive caching (content-addressed, digest-pinned admission model with cache-rule violation refusals). First-interaction discipline: the interaction-ready transition (boot plan applied → first command accepted) is witnessed by an immutable SparkBootRecord (E10) carrying the plan digest, the accepted-first-command digest and the deterministic ordering. Tenancy (R20): runtime instances are tenant-scoped and cross-tenant access is a typed refusal. No real network (E11): the IO seams are pure ports; the in-repo implementations are deterministic fakes. Spark is a TARGET PROFILE, not a second content model (lock rule 16): all content comes from game-ir, all profile data from runtime-contracts' SparkTargetProfile.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "node --test \"src/**/*.test.ts\"",
+    "harness": "node src/harness.ts",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix --fix-suggestions"
+  },
+  "dependencies": {
+    "@playliquid/game-contracts": "workspace:*",
+    "@playliquid/game-ir": "workspace:*",
+    "@playliquid/package-system": "workspace:*",
+    "@playliquid/platform-contracts": "workspace:*",
+    "@playliquid/runtime-contracts": "workspace:*",
+    "@playliquid/runtime-core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.9",
+    "typescript": "^6.0.3"
+  }
+}

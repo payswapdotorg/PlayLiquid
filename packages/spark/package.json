@@ -1,0 +1,32 @@
+{
+  "name": "@playliquid/spark",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "PlayLiquid GameOS Spark build surface (PL-035). Build-contracts-shaped build documents for the spark target driving build-orchestrator stages (intake -> resolve -> plan -> emit -> verify -> package -> succeeded), producing typed build results with content digests over the boot plan + stream schedule + cache manifest composed from @playliquid/runtime-spark's pure planners over the SAME game-ir content (E9: same inputs -> same digests, always). Spark is a TARGET PROFILE, not a second content model (lock rule 16): the game-ir document is the only content source, the frozen spark profile record vocabulary comes from @playliquid/target-profiles, and the build request vocabulary from @playliquid/build-contracts — nothing is re-declared here. Composition is TOTAL (E8): a non-spark profile record, a structurally invalid profile, an engine binding that does not declare the spark target or is not accepted by the profile, and refused boot planning (budget inversion, oversized critical boot, invalid game-ir) are all typed kebab-case refusals with aggregated reasons. Driving is tenant-scoped (R20) through build-orchestrator's own doors — cross-tenant access is a typed refusal, negative-tested. Missing toolchains surface as truthful E11 build failures (never simulated success). No IO, no clocks, no randomness: every effect lives behind the orchestrator's injected ports.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "node --test \"src/**/*.test.ts\"",
+    "harness": "node src/harness.ts",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix --fix-suggestions"
+  },
+  "dependencies": {
+    "@playliquid/build-contracts": "workspace:*",
+    "@playliquid/build-orchestrator": "workspace:*",
+    "@playliquid/game-contracts": "workspace:*",
+    "@playliquid/game-ir": "workspace:*",
+    "@playliquid/package-system": "workspace:*",
+    "@playliquid/runtime-contracts": "workspace:*",
+    "@playliquid/runtime-spark": "workspace:*",
+    "@playliquid/target-profiles": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.9",
+    "typescript": "^6.0.3"
+  }
+}
