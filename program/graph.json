@@ -699,7 +699,7 @@
       "branch": "work/pl-034",
       "pr": null,
       "mergedSha": "1f5b96d",
-      "evidence": "subagent continuation delivery e4b3840, station re-verify green (lab tsc 0 + 36/36, community tsc 0 + 27/27, oxlint 0-0 both, arch 4/4/0-new); 59 files",
+      "evidence": "subagent continuation delivery e4b3840, station re-verify green (lab tsc 0 + 36/36, community tsc 0 + 27/27, oxlint 0-0 both, arch 4/4/0-new); 59 files; promotion-surfaced view<->selection cycles fixed at station (f03e77a), post-promotion full arch 5/5/0-new",
       "owner": "worker"
     },
     {

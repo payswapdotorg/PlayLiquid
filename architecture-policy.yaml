@@ -313,6 +313,18 @@ modules:
     requires: [arena-integration, lab-learning, lab-contracts, lab-organization, game-contracts, platform-contracts, package-system]
     publicEntrypoints: [packages/arena-integration-runtime/src/index.ts]
     owner: Lab
+  - id: gameos-lab
+    roots: [packages/web/gameos-lab/src]
+    managed: true
+    requires: [lab-contracts, lab-simulation, lab-organization, lab-learning, arena-integration, arena-integration-runtime, platform-contracts]
+    publicEntrypoints: [packages/web/gameos-lab/src/index.ts]
+    owner: Lab
+  - id: gameos-community
+    roots: [packages/web/gameos-community/src]
+    managed: true
+    requires: [community, platform-contracts]
+    publicEntrypoints: [packages/web/gameos-community/src/index.ts]
+    owner: Product
 
 global:
   maxFileLines: 400
