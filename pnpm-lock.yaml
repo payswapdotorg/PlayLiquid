@@ -619,6 +619,37 @@ importers:
         specifier: ^6.0.3
         version: 6.0.3
 
+  packages/arena-integration-runtime:
+    dependencies:
+      '@playliquid/arena-integration':
+        specifier: workspace:*
+        version: link:../arena-integration
+      '@playliquid/game-contracts':
+        specifier: workspace:*
+        version: link:../game-contracts
+      '@playliquid/lab-contracts':
+        specifier: workspace:*
+        version: link:../lab-contracts
+      '@playliquid/lab-learning':
+        specifier: workspace:*
+        version: link:../lab-learning
+      '@playliquid/lab-organization':
+        specifier: workspace:*
+        version: link:../lab-organization
+      '@playliquid/package-system':
+        specifier: workspace:*
+        version: link:../package-system
+      '@playliquid/platform-contracts':
+        specifier: workspace:*
+        version: link:../platform-contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^25.9.9
+        version: 25.9.9
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+
   packages/artifact-store:
     dependencies:
       '@playliquid/package-system':

@@ -307,6 +307,12 @@ modules:
     requires: [build-contracts, build-orchestrator, game-contracts, game-ir, package-system, runtime-contracts, runtime-spark, target-profiles]
     publicEntrypoints: [packages/spark/src/index.ts]
     owner: Build
+  - id: arena-integration-runtime
+    roots: [packages/arena-integration-runtime/src]
+    managed: true
+    requires: [arena-integration, lab-learning, lab-contracts, lab-organization, game-contracts, platform-contracts, package-system]
+    publicEntrypoints: [packages/arena-integration-runtime/src/index.ts]
+    owner: Lab
 
 global:
   maxFileLines: 400
