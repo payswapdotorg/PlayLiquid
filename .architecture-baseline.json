@@ -6,17 +6,17 @@
       "file": "packages/platform-multiplayer/src/outcomes.ts",
       "module": "platform-multiplayer",
       "detail": "packages/platform-multiplayer/src/outcomes.ts -> packages/platform-multiplayer/src/ports.ts",
-      "message": "检测到循环依赖：packages/platform-multiplayer/src/outcomes.ts -> packages/platform-multiplayer/src/ports.ts -> packages/platform-multiplayer/src/outcomes.ts",
+      "message": "检测到循环依赖：packages/platform-multiplayer/src/outcomes.ts -> packages/platform-multiplayer/src/ports.ts",
       "fingerprint": "2c054b98ebc98a65",
       "global": true
     },
     {
       "rule": "cycle",
-      "file": "packages/platform-economy/src/settlement.ts",
+      "file": "packages/platform-economy/src/records.ts",
       "module": "platform-economy",
       "detail": "packages/platform-economy/src/records.ts -> packages/platform-economy/src/settlement.ts",
-      "message": "检测到循环依赖：packages/platform-economy/src/settlement.ts -> packages/platform-economy/src/records.ts -> packages/platform-economy/src/settlement.ts",
-      "fingerprint": "3d7cb6c2ee839d40",
+      "message": "检测到循环依赖：packages/platform-economy/src/records.ts -> packages/platform-economy/src/settlement.ts",
+      "fingerprint": "3d03bc50c711c463",
       "global": true
     },
     {
@@ -24,7 +24,7 @@
       "file": "packages/runtime-core/src/construction.ts",
       "module": "runtime-core",
       "detail": "packages/runtime-core/src/construction.ts -> packages/runtime-core/src/kernel.ts",
-      "message": "检测到循环依赖：packages/runtime-core/src/construction.ts -> packages/runtime-core/src/kernel.ts -> packages/runtime-core/src/construction.ts",
+      "message": "检测到循环依赖：packages/runtime-core/src/construction.ts -> packages/runtime-core/src/kernel.ts",
       "fingerprint": "6838b33cae076702",
       "global": true
     },
@@ -33,7 +33,7 @@
       "file": "packages/engine-adapter-contract/src/adapter.ts",
       "module": "engine-adapter-contract",
       "detail": "packages/engine-adapter-contract/src/adapter.ts -> packages/engine-adapter-contract/src/exchange.ts",
-      "message": "检测到循环依赖：packages/engine-adapter-contract/src/adapter.ts -> packages/engine-adapter-contract/src/exchange.ts -> packages/engine-adapter-contract/src/adapter.ts",
+      "message": "检测到循环依赖：packages/engine-adapter-contract/src/adapter.ts -> packages/engine-adapter-contract/src/exchange.ts",
       "fingerprint": "9cb2dbd53e520920",
       "global": true
     },

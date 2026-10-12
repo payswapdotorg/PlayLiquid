@@ -373,6 +373,12 @@ modules:
     requires: [artifact-store, package-registry, package-system, platform-contracts, runtime-contracts, security-gameos, services-ops, target-builds, target-profiles]
     publicEntrypoints: [deployment/src/index.ts]
     owner: Platform
+  - id: engine-integration
+    roots: [examples/engine-integration/src]
+    managed: true
+    requires: [artifact-store, build-contracts, build-orchestrator, engine-adapter-contract, engine-godot, engine-unity, engine-unreal, game-contracts, game-ir, package-registry, package-system, platform-contracts, runtime-contracts, target-profiles, tool-blender, tool-fabric, tool-fabric-runtime]
+    publicEntrypoints: [examples/engine-integration/src/index.ts]
+    owner: Build
 
 global:
   maxFileLines: 400
