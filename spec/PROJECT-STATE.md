@@ -52,3 +52,20 @@ Hardware-specific claims require hardware evidence.
 Arena is optional for ordinary autonomous paths.
 The deployment surface (services/ops + deployment) is an in-process typed model with
 deterministic verification — no real infrastructure is claimed or exercised (E11).
+
+
+## Fork-infrastructure integration record (post-program, 2026-10-13)
+
+`feat/ui-plugin` (UI plugins + Gen UI; fork-upstream feature by wuweiqi, 2026-09-29)
+landed on main via PR #5 (merge 3c980b8) after the TL gate battery: program
+check PASS / frontier EMPTY unchanged; architecture full 5/5/0-new + changed
+4/4/0-new (exact main parity); tsc sweep green on every domain tree; node --test
+gate set 3202/3202/0 over 60 suites — exact main parity (the PL-045 audit's
+aggregate 3226 includes a 24-test bookkeeping artifact; the reproduction command
+form `node --test "src/**/*.test.ts"` yields 3202 at both main and the merge);
+branch vitest feature suites 117/117 (ui 71, shared 24, services 19, client 1,
+desktop 2); oxlint 0 errors; frozen lockfile green after regeneration. The 8 new
+managed fork sub-modules (gen-ui-protocol, gen-ui-service, gen-ui, mcp-apps-protocol,
+mcp-ui, plugin-ui-bridge, plugin-sandbox, plugin-ui) are recorded in
+spec/module-dependency-matrix.md under the fork-infra regime. Fork composite
+`tsc -b` builds remain outside the gate set (pre-existing §E11 boundary).
