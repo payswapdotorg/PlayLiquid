@@ -137,3 +137,11 @@ See `spec/architecture.md` for the canonical architecture and `spec/architecture
 ## Research basis
 
 Architecture decisions are recorded with research and implementation references in `docs/research/ARCHITECTURE-RESEARCH.md`, including generative agents, lifelong embodied agents, game balancing/bot-detection work, OpenUSD/glTF composition and delivery, and current engine packaging constraints.
+
+## UI Plugins
+
+### UI Plugin development
+
+See the [UI Plugin guide](UI_PLUGIN.en.md) for the Excalidraw workflow, supported APIs, plugin installation and updates, and host debugging.
+
+**Plugin PRs in `zcode-plugins` must declare whether they affect a UI Plugin and list the plugin names in the PR template.** See the [required plugin-type declaration](UI_PLUGIN.en.md#declare-the-plugin-type-in-pull-requests).
