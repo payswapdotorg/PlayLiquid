@@ -76,3 +76,20 @@ Rules:
 - app orchestrates through ports;
 - adapters own IO/tool/engine details;
 - UI never imports implementation modules.
+
+## Fork-infrastructure sub-modules (feat/ui-plugin, 2026-10-13)
+
+Managed modules declared inside the fork-infra packages (hosted trees, not
+workspace packages of their own — the §E11 fork-infra regime, governed by
+architecture:check, outside the program write surface):
+
+| Module | Host tree | Owner | requires (architecture-policy) |
+|---|---|---|---|
+| gen-ui-protocol | packages/shared/src/gen-ui | ZCode fork (conversation) | (pure) |
+| gen-ui-service | packages/services/src/gen-ui | ZCode fork (conversation) | services, shared, rpc, gen-ui-protocol, mcp-apps-protocol |
+| gen-ui | packages/ui/src/gen-ui | ZCode fork (conversation) | ui, services, gen-ui-service, gen-ui-protocol, mcp-apps-protocol, plugin-ui |
+| mcp-apps-protocol | packages/shared/src/mcp-apps | ZCode fork (conversation) | (pure) |
+| mcp-ui | apps/zcode-cli/.../zcode-protocol/mcp-ui | ZCode fork (conversation) | zcode-cli, shared, mcp-apps-protocol |
+| plugin-ui-bridge | packages/services/src/plugin-ui-bridge | ZCode fork (conversation) | services, shared, mcp-apps-protocol |
+| plugin-sandbox | packages/desktop/src/renderer/src/plugin-sandbox | ZCode fork (conversation) | desktop, shared, mcp-apps-protocol, gen-ui-protocol |
+| plugin-ui | packages/ui/src/plugin-ui | ZCode fork (conversation) | ui, shared, mcp-apps-protocol, plugin-ui-bridge, plugin-sandbox |
