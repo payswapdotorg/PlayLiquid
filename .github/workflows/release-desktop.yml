@@ -1,0 +1,89 @@
+name: PlayLiquid Desktop Release
+
+# RW-004 (TL-owned): build the PlayLiquid GameOS desktop artifacts for
+# Linux (Ubuntu-targeted AppImage + .deb) reproducibly from an approved,
+# pinned commit, and attach them to a GitHub Release.
+#
+# Draft status: workflow_dispatch-only until Worker B's identity/packaging
+# configuration lands (artifact names, identity env) — the TL finalizes the
+# tag trigger and release publication steps at integration time.
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_ref:
+        description: "Commit SHA / branch / tag to build (defaults to the ref this run was dispatched on)"
+        required: false
+        default: ""
+
+concurrency:
+  group: desktop-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  linux-desktop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Determine build ref
+        id: ref
+        run: |
+          REF="${{ github.event.inputs.build_ref }}"
+          if [ -z "$REF" ]; then REF="${{ github.sha }}"; fi
+          echo "ref=$REF" >> "$GITHUB_OUTPUT"
+          echo "building $REF"
+
+      - name: Check out pinned commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.ref.outputs.ref }}
+          fetch-depth: 0
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.14.0
+          cache: pnpm
+
+      - name: Install dependencies (frozen lockfile)
+        run: pnpm install --frozen-lockfile
+
+      - name: Build desktop package
+        run: pnpm --filter @zcode/desktop run build
+
+      - name: Bundle Linux artifacts (AppImage + deb)
+        run: pnpm --filter @zcode/desktop exec pnpm run bundle -- --os linux --arch x64
+        env:
+          ZCODE_ENV: production
+
+      - name: Collect artifacts
+        run: |
+          mkdir -p release-out
+          ls -la packages/desktop/dist/ || true
+          # AppImage + deb are the Ubuntu-supported artifacts (RW-002)
+          cp packages/desktop/dist/*.AppImage release-out/ 2>/dev/null || true
+          cp packages/desktop/dist/*.deb release-out/ 2>/dev/null || true
+          if ! ls release-out/*.AppImage >/dev/null 2>&1; then
+            echo "ERROR: no AppImage produced"; exit 1
+          fi
+          if ! ls release-out/*.deb >/dev/null 2>&1; then
+            echo "ERROR: no .deb produced"; exit 1
+          fi
+
+      - name: Generate SHA256SUMS
+        run: |
+          cd release-out
+          sha256sum *.AppImage *.deb > SHA256SUMS
+          cat SHA256SUMS
+
+      - name: Upload artifacts (workflow run)
+        uses: actions/upload-artifact@v4
+        with:
+          name: playliquid-gameos-linux-amd64
+          path: release-out/
+          if-no-files-found: error
