@@ -50,6 +50,14 @@ jobs:
           node-version: 24.14.0
           cache: pnpm
 
+      - name: Install Linux packaging tools
+        run: |
+          sudo apt-get update
+          # bsdtar (libarchive-tools) is required by electron-builder's fpm
+          # for the pacman target (live-caught 2026-10-14: exit 127 on run
+          # 38623571228 — ubuntu-latest runners ship without it)
+          sudo apt-get install -y libarchive-tools rpm
+
       - name: Install dependencies (frozen lockfile)
         run: pnpm install --frozen-lockfile
 
