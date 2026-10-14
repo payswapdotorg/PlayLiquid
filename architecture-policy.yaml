@@ -391,6 +391,19 @@ modules:
     requires: [arena-integration, arena-integration-runtime, community, lab-contracts, lab-learning, lab-organization, lab-simulation, package-system, platform-contracts]
     publicEntrypoints: [qa/e2e-lab/src/index.ts]
     owner: Product
+  - id: gameos-product-shell
+    roots: [packages/desktop/src/renderer/src/gameos]
+    managed: true
+    requires: [game-ui, gameos-lab, gameos-community, lab-contracts, lab-simulation, lab-organization, lab-learning, community, arena-integration, arena-integration-runtime, platform-contracts, game-contracts, package-system, package-registry, runtime-contracts, runtime-core, capability-broker, tool-fabric-runtime, avatar-runtime]
+    publicEntrypoints: [packages/desktop/src/renderer/src/gameos/index.ts]
+    owner: Product
+  - id: qa-desktop-release
+    roots: [qa/desktop-release/src]
+    managed: true
+    requires: [platform-contracts]
+    publicEntrypoints: [qa/desktop-release/src/index.ts]
+    owner: Product
+
 
   - id: gen-ui-protocol
     roots: [packages/shared/src/gen-ui]
