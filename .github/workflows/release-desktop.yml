@@ -263,6 +263,9 @@ jobs:
           gh release download "$TAG" --repo "$GITHUB_REPOSITORY" \
             --pattern "$APPIMAGE" --pattern "$DEB" --pattern "SHA256SUMS"
           sha256sum -c SHA256SUMS
+          # The documented user flow (release notes): a downloaded AppImage
+          # needs chmod +x before it runs — the harness also self-heals this.
+          chmod +x "$APPIMAGE"
           # launch the downloaded AppImage under Xvfb through the RW-003
           # harness (clean profile, window-level evidence)
           bash ../qa/desktop-release/scripts/run-ubuntu.sh "$(pwd)/$APPIMAGE" "$(pwd)/$DEB"

@@ -73,10 +73,21 @@ export async function launchApp(options) {
   const argv = [...args];
   let mode = "direct";
   if (isAppImage(artifact)) {
+    // A DOWNLOADED AppImage typically arrives without the executable bit
+    // (observed live: release run 38675144166's post-publication verify —
+    // `gh release download` wrote mode 644, spawn hit EACCES). The product's
+    // own release notes tell users to `chmod +x` — the harness does exactly
+    // that when needed, and records it.
+    try {
+      fs.accessSync(artifact, fs.constants.X_OK);
+    } catch {
+      fs.chmodSync(artifact, 0o755);
+      mode = "appimage-chmod-plus-x";
+    }
     if (fs.existsSync("/dev/fuse")) {
-      mode = "appimage-fuse";
+      mode = mode === "appimage-chmod-plus-x" ? "appimage-chmod-plus-x+fuse" : "appimage-fuse";
     } else {
-      mode = "appimage-extract-and-run";
+      mode = mode === "appimage-chmod-plus-x" ? "appimage-chmod-plus-x+extract-and-run" : "appimage-extract-and-run";
       argv.unshift("--appimage-extract-and-run");
     }
   }
