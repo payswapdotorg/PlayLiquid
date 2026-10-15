@@ -18,6 +18,7 @@ import { cleanupPackagedSourcemaps } from "./scripts/packaged-sourcemap-cleanup.
 import { getTargetPlatform } from "./scripts/target-platform.mjs";
 import {
   resolveDesktopArtifactSuffix,
+  resolveDesktopLinuxArtifactBaseName,
   resolveDesktopProductIdentity,
 } from "./scripts/desktop-product-identity.mjs";
 import { verifyStagedKoffi } from "./scripts/koffi-package-assets.mjs";
@@ -208,6 +209,11 @@ function resolveElectronDownloadMirror(env = process.env) {
 const commandStdoutMaxBuffer = 64 * 1024 * 1024;
 // 产物后缀只标记后端环境（_TEST）；身份靠 productName 区分，生产后端的 Preview 包没有后缀。
 const desktopArtifactEnvSuffix = resolveDesktopArtifactSuffix(process.env);
+// Linux 产物文件名基名与 identity 解析同源（ZCODE_ENV 与 electron-builder 配置读取保持一致）。
+const desktopLinuxArtifactBaseName = resolveDesktopLinuxArtifactBaseName({
+  ...process.env,
+  ZCODE_ENV: builtinProviderConfig.environment,
+});
 
 // Preview 是内部签名测试包。CI 明确打开 macOS 签名时若没有身份，必须在生成未签名包前失败，
 // 避免“产物存在”被误认为已经走完和生产版相同的签名链路。
@@ -217,7 +223,7 @@ if (
   !macSigningIdentity
 ) {
   throw new Error(
-    "ZCode Preview macOS packaging requires APPLE_SIGNING_IDENTITY or CSC_NAME when ZCODE_ENABLE_MAC_SIGN=1",
+    `${desktopProductIdentity.productName} Preview macOS packaging requires APPLE_SIGNING_IDENTITY or CSC_NAME when ZCODE_ENABLE_MAC_SIGN=1`,
   );
 }
 
@@ -238,7 +244,11 @@ const PACKAGING_PRUNE_PATTERNS = [
 
 function buildDesktopArtifactName(platformName, extension = "${ext}") {
   // 测试环境产物必须和正式安装包文件名区分，避免上传、下载或人工验收时混用。
-  return `\${productName}-\${version}-${platformName}-\${arch}${desktopArtifactEnvSuffix}.${extension}`;
+  // Linux 产物基名来自 identity（PlayLiquid-GameOS，无空格，见 desktop-product-identity.mjs），
+  // 避免 productName 里的空格进入下载链接 / sha256sum / shell 工具链；mac/win 沿用 productName 占位。
+  const artifactBaseName =
+    platformName === "linux" ? desktopLinuxArtifactBaseName : "${productName}";
+  return `${artifactBaseName}-\${version}-${platformName}-\${arch}${desktopArtifactEnvSuffix}.${extension}`;
 }
 
 function runAsarCommand(args) {
@@ -281,7 +291,7 @@ async function runTimedAsync(label, fn) {
 
 function resolveAppAsarPath(context) {
   if (context.electronPlatformName === "darwin") {
-    const appName = `${context.packager?.appInfo?.productFilename ?? "ZCode"}.app`;
+    const appName = `${context.packager?.appInfo?.productFilename ?? desktopProductIdentity.productName}.app`;
     return resolve(context.appOutDir, appName, "Contents", "Resources", "app.asar");
   }
 
@@ -290,7 +300,7 @@ function resolveAppAsarPath(context) {
 
 function resolvePackagedResourcesDir(context) {
   if (context.electronPlatformName === "darwin") {
-    const appName = `${context.packager?.appInfo?.productFilename ?? "ZCode"}.app`;
+    const appName = `${context.packager?.appInfo?.productFilename ?? desktopProductIdentity.productName}.app`;
     return resolve(context.appOutDir, appName, "Contents", "Resources");
   }
 
@@ -459,10 +469,12 @@ export default {
   extraMetadata: {
     version: buildMetadata.appVersion,
     zcodeProductFlavor: desktopProductIdentity.flavor,
-    homepage: "https://zcode.z.ai",
+    // deb（fpm）会校验 package metadata 中的 homepage、author.email、maintainer；
+    // PlayLiquid 安装身份统一指向本仓库，author/maintainer 值由 RW-002 身份表派生。
+    homepage: "https://github.com/payswapdotorg/playliquid",
     author: {
-      name: "ZCode",
-      email: "dev@zcode.z.ai",
+      name: "PlayLiquid",
+      email: "noreply@playliquid.org",
     },
   },
   // macOS 签名阶段会对 Electron Framework 下每个语言包逐个 codesign。
@@ -648,13 +660,14 @@ export default {
   // postinstall 会先优先复用 node-pty 自带的 Windows 预编译产物，其他平台再按需 electron-rebuild。
   // 打包阶段统一复用安装时准备好的原生文件，避免 electron-builder 再触发一轮不受控的本地编译。
   npmRebuild: false,
-  // OAuth deep link 协议注册（macOS 打包后需要 Info.plist 中声明 CFBundleURLTypes）
+  // OAuth deep link 协议注册（macOS 打包后需要 Info.plist 中声明 CFBundleURLTypes）。
+  // RW-002 隔离：PlayLiquid 只注册自己的 scheme（playliquid / playliquid-preview），
+  // 绝不注册 zcode —— 已安装的 ZCode 继续保持自己的协议处理器，两个产品互不抢占。
+  // 共享后端 OAuth 的 zcode:// 回跳由 Host 轮询兜底完成授权，不依赖协议回调。
   protocols: [
     {
-      // 协议处理器的展示名之前使用小写 scheme，打包产物里的协议描述无法体现产品名。
-      // 展示名跟随安装包身份；scheme 仍保持 zcode，因此两个应用中最后注册者会成为默认 handler。
       name: desktopProductIdentity.productName,
-      schemes: ["zcode"],
+      schemes: [desktopProductIdentity.deepLinkScheme],
     },
   ],
   mac: {
@@ -699,11 +712,13 @@ export default {
     artifactName: buildDesktopArtifactName("linux"),
     // desktop 包名是 scoped package（@zcode/desktop），electron-builder 默认会把
     // Linux executable/Icon 推成 @zcodedesktop。部分桌面环境无法按这个 icon name 命中
-    // hicolor 图标，最终回退成系统齿轮。这里固定成稳定的小写名称，让 Icon=zcode
-    // 与 /usr/share/icons/hicolor/*/apps/zcode.png 保持一致。
+    // hicolor 图标，最终回退成系统齿轮。这里固定成稳定的小写名称，让 Icon=playliquid-gameos
+    // 与 /usr/share/icons/hicolor/*/apps/playliquid-gameos.png 保持一致；
+    // 同时也是 deb/rpm/pacman 的安装路径与 ZCode（zcode）完全隔离的可执行名。
     executableName: desktopProductIdentity.linuxExecutableName,
-    category: "Development",
-    maintainer: "ZCode <dev@zcode.z.ai>",
+    // GameOS 面向游戏工程：桌面菜单同时出现在 Development 与 Game 分区。
+    category: "Development;Game",
+    maintainer: "PlayLiquid <noreply@playliquid.org>",
   },
   deb: {
     // 生产版与 Preview 必须是两个 dpkg package；只改可执行名仍会让安装器把另一版本当成升级替换。

@@ -1,5 +1,7 @@
 import { copyFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { ZCODE_PRODUCT_FLAVOR } from "@zcode/shared";
+import { desktopProductIdentities } from "../../scripts/desktop-product-identity.mjs";
 import {
   runXdgCommand,
   XDG_COMMAND_TIMEOUT_MS,
@@ -10,7 +12,10 @@ import {
 // 从 desktopLinuxDeepLinkRegistration 拆出的 AppImage 用户级图标安装逻辑：
 // 图标集成是可选的桌面增强，与 deep link 协议注册分属不同关注点，独立成模块便于各自演进。
 
-const LINUX_APP_ICON_NAME = "zcode";
+// RW-002：hicolor 图标名 = electron-builder linux.executableName（Icon=playliquid-gameos），
+// 与 ZCode 的 zcode.png 图标名隔离。运行期身份用编译期 flavor，与打包身份同源。
+const desktopProductIdentity = desktopProductIdentities[ZCODE_PRODUCT_FLAVOR];
+const LINUX_APP_ICON_NAME = desktopProductIdentity.linuxExecutableName;
 const LINUX_APP_ICON_SIZE = "512x512";
 
 function resolveLinuxUserIconFilePath(dataDir: string): string {
@@ -57,7 +62,7 @@ function installLinuxAppImageDesktopIcon(params: {
 
   mkdirSync(dirname(iconFilePath), { recursive: true });
   const changed = copyFileIfChanged(params.iconSourcePath, iconFilePath);
-  // AppImage 直跑不会像 deb 安装包一样把 Icon=zcode 写入 hicolor 图标主题。
+  // AppImage 直跑不会像 deb 安装包一样把 Icon=playliquid-gameos 写入 hicolor 图标主题。
   // 这里在用户级 hicolor 目录补齐同名图标，让任务栏/Dock 有机会按 desktop entry 命中真实图标。
   if (!changed) {
     return { iconFilePath, installed: true, changed };

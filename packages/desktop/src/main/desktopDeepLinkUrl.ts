@@ -1,5 +1,15 @@
-const DEEP_LINK_SCHEME = "zcode";
-const DEEP_LINK_RE = /\bzcode:(?:\/\/|\/)?[^\s"'<>]+/i;
+import { desktopDeepLinkSchemes } from "../../scripts/desktop-product-identity.mjs";
+
+// RW-002：只解析白名单 scheme（本产品 playliquid / playliquid-preview + fork 上游兼容 zcode），
+// 注册（成为默认 handler）只发生在 registerDeepLinkProtocol —— 本模块不做注册。
+const ACCEPTED_DEEP_LINK_PROTOCOLS = new Set(desktopDeepLinkSchemes.map((s) => `${s}:`));
+const DEEP_LINK_RE = new RegExp(
+  `\\b(?:${desktopDeepLinkSchemes.join("|")}):(?:\\/\\/|\\/)?[^\\s"'<>]+`,
+  "i",
+);
+function isAcceptedDeepLinkProtocol(protocol: string): boolean {
+  return ACCEPTED_DEEP_LINK_PROTOCOLS.has(protocol);
+}
 const OAUTH_CALLBACK_HOSTS = new Set(["oauth"]);
 const PAYMENT_CALLBACK_HOST = "payment";
 const WORKSPACE_OPEN_HOST = "workspace";
@@ -15,7 +25,7 @@ function normalizeOAuthCallbackPath(pathname: string): string {
 }
 
 export function isOAuthCallbackUrl(parsedUrl: URL): boolean {
-  if (parsedUrl.protocol !== `${DEEP_LINK_SCHEME}:`) {
+  if (!isAcceptedDeepLinkProtocol(parsedUrl.protocol)) {
     return false;
   }
 
@@ -35,7 +45,7 @@ export function isOAuthCallbackUrl(parsedUrl: URL): boolean {
 }
 
 export function isPaymentCallbackUrl(parsedUrl: URL): boolean {
-  if (parsedUrl.protocol !== `${DEEP_LINK_SCHEME}:`) {
+  if (!isAcceptedDeepLinkProtocol(parsedUrl.protocol)) {
     return false;
   }
 
@@ -53,7 +63,7 @@ export function isPaymentCallbackUrl(parsedUrl: URL): boolean {
 }
 
 export function isWorkspaceOpenUrl(parsedUrl: URL): boolean {
-  if (parsedUrl.protocol !== `${DEEP_LINK_SCHEME}:`) {
+  if (!isAcceptedDeepLinkProtocol(parsedUrl.protocol)) {
     return false;
   }
 
@@ -81,7 +91,7 @@ export function extractWorkspaceOpenPath(parsedUrl: URL): string | null {
 
 export function isShareImportUrl(parsedUrl: URL): boolean {
   return (
-    parsedUrl.protocol === `${DEEP_LINK_SCHEME}:` &&
+    isAcceptedDeepLinkProtocol(parsedUrl.protocol) &&
     parsedUrl.hostname === SHARE_IMPORT_HOST &&
     normalizeOAuthCallbackPath(parsedUrl.pathname) === "/import"
   );
@@ -192,7 +202,7 @@ export function extractDeepLinkUrlFromArgs(args: readonly string[]): string | nu
       if (match) {
         // Debian/xdg 的协议回调可能被浏览器或桌面门户多次编码，
         // 也可能把 query 片段拆成相邻 argv。这里先生成有限候选再多轮解码，
-        // 避免浏览器确认“打开 ZCode”后主进程拿不到完整回调 URL。
+        // 避免浏览器确认“打开 PlayLiquid GameOS”后主进程拿不到完整回调 URL。
         if (isCompleteDeepLinkUrl(match)) {
           return match;
         }

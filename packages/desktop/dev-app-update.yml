@@ -1,6 +1,8 @@
 # 修复原因：显式开启开发态自动更新时 electron-updater 会读取 dev-app-update.yml 初始化下载缓存。
 # 服务端 manifest provider 仍负责返回真实安装包 URL；这里的 generic url 只作为本地配置占位。
+# RW-002：开发态更新缓存目录与 ZCode fork（zcode-dev-updater）隔离，镜像
+# desktop-product-identity.mjs 的 updaterCacheDirName 命名（playliquid-gameos-dev-updater）。
 provider: generic
 url: http://localhost:8081
 useMultipleRangeRequest: false
-updaterCacheDirName: zcode-dev-updater
+updaterCacheDirName: playliquid-gameos-dev-updater
