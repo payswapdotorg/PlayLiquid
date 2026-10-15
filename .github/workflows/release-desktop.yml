@@ -74,7 +74,11 @@ jobs:
           # 38623571228 — ubuntu-latest runners ship without it)
           # xvfb is required by the RW-003 smoke harness (window-level
           # evidence: the packaged app runs under a real display server).
-          sudo apt-get install -y libarchive-tools rpm xvfb
+          # libfuse2: real Ubuntu desktops ship FUSE2 so AppImages run in
+          # their normal FUSE mode; the runner mirrors that (live-caught:
+          # run 38678556303 — /dev/fuse present but libfuse2 absent made the
+          # AppImage fall back to --appimage-extract-and-run).
+          sudo apt-get install -y libarchive-tools rpm xvfb libfuse2
 
       - name: Install dependencies (frozen lockfile)
         run: pnpm install --frozen-lockfile
@@ -120,6 +124,7 @@ jobs:
           bash qa/desktop-release/scripts/run-ubuntu.sh "$APPIMAGE" "$DEB"
 
       - name: Collect smoke evidence
+        if: ${{ always() }}
         run: |
           EVID_DIR="$(ls -dt qa/desktop-release/evidence/ubuntu-* | head -1)"
           echo "evidence dir: $EVID_DIR"
@@ -131,13 +136,15 @@ jobs:
           cp release-out/SHA256SUMS smoke-evidence/
 
       - name: Upload smoke evidence (workflow run)
+        if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
           name: playliquid-gameos-smoke-evidence
           path: smoke-evidence/
-          if-no-files-found: error
+          if-no-files-found: warn
 
       - name: Upload artifacts (workflow run)
+        if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
           name: playliquid-gameos-linux-amd64

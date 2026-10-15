@@ -100,7 +100,23 @@ async function runAppRun(context, label, cdpPort, extraArgs = []) {
     const render = await waitForRender(page, DEFAULTS.renderSettleTimeoutMs, log);
     return { proc, appLog, mode, startedAt, page, browser, target, targets, consoleEntries, render, profileDirs, before, cdpPort };
   } catch (error) {
-    return { proc, appLog, mode, startedAt, profileDirs, before, cdpPort, error: String(error?.message ?? error) };
+    return {
+      proc,
+      appLog,
+      mode,
+      startedAt,
+      profileDirs,
+      before,
+      cdpPort,
+      error: String(error?.message ?? error),
+      // Startup forensics (live-caught: the ubuntu-latest runner killed the
+      // extracted app SILENTLY — zero electron output after the AppImage
+      // extraction listing). The exit code / signal / liveness at failure
+      // time disambiguates sandbox kills, instant exits and port hangs.
+      procExitCode: proc.exitCode,
+      procSignalCode: proc.signalCode,
+      procStillRunning: proc.exitCode === null && proc.signalCode === null,
+    };
   }
 }
 
@@ -229,6 +245,8 @@ export async function main(argv) {
     tracked.push({ pid: run.proc.pid, pgid: run.proc.pid, name: "app-main" });
     if (run.error) {
       report.check("startup", "packaged application starts under Xvfb", "fail", run.error, [
+        `app process at failure: exitCode=${run.procExitCode} signal=${run.procSignalCode} stillRunning=${run.procStillRunning}`,
+        `launch mode: ${run.mode}`,
         `app log tail: ${tail(run.appLog, 30)}`,
       ]);
       report.check("clean-shutdown", "application closes cleanly", "skip", "app never started");
