@@ -235,7 +235,7 @@ export async function main(argv) {
     "launch discipline: the packaged app is always launched with a clean profile (fresh HOME/XDG/TMPDIR) and a NEUTRAL cwd (the clean profile HOME, like a real desktop user), never from inside a repository checkout — the current artifact's agent resolver is cwd-sensitive (findUpward from process.cwd() can bind a repo dev agent when launched from inside a checkout, which breaks its first-run storage preparation); observed and recorded honestly, harness avoids it by construction",
   );
 
-  await checksumCheck(report, options.artifact, options.sums);
+  await checksumCheck(report, options.artifact, options.sums, options.deb);
 
   const xvfb = await startXvfb(options.display, DEFAULTS.displayCandidates, DEFAULTS.xvfbScreen, log);
   const context = { report, options, outDir, tmpRoot, xvfb, log };

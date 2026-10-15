@@ -114,14 +114,37 @@ jobs:
       # ------------------------------------------------------------------
       # RW-003 smoke harness on ubuntu-latest — the true-Ubuntu launch
       # evidence (station runs are Debian 13, honestly labeled as such).
-      # Run WITHOUT --baseline-expectations: on an integrated (post-A+B)
-      # artifact every check must pass; any failure fails the release.
+      # Two REAL user flows, both gated (any unexpected check fails the
+      # release):
+      #   1. the .deb INSTALL path (recommended on Ubuntu 24.04: the postinst
+      #      installs the app's AppArmor profile and the SUID fallback —
+      #      live-caught on run 38681143022: stock 24.04 restricts
+      #      unprivileged user namespaces and the AppImage's FUSE mount
+      #      cannot be SUID, so Chromium aborts with SIGTRAP);
+      #   2. the AppImage with the userns sysctl relaxed — the documented
+      #      power-user path on 24.04 (the AppImage runs fully sandboxed
+      #      wherever unprivileged userns are allowed, e.g. Debian and
+      #      Ubuntu <= 23.10).
       # ------------------------------------------------------------------
       - name: Run packaged-app smoke harness (Ubuntu)
         run: |
+          set -euo pipefail
           APPIMAGE="$(ls release-out/*.AppImage)"
           DEB="$(ls release-out/*.deb)"
-          bash qa/desktop-release/scripts/run-ubuntu.sh "$APPIMAGE" "$DEB"
+
+          # --- Flow 1: the .deb install path (the recommended Ubuntu flow) ---
+          sudo apt-get install -y "./$DEB"
+          INSTALLED="$(command -v playliquid-gameos)"
+          echo "installed binary: $INSTALLED"
+          bash qa/desktop-release/scripts/run-ubuntu.sh "$INSTALLED" "$PWD/$DEB"
+
+          # --- Flow 2: the AppImage with the documented 24.04 sysctl ---
+          if sysctl kernel.apparmor_restrict_unprivileged_userns >/dev/null 2>&1; then
+            sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          else
+            echo "NOTE: kernel.apparmor_restrict_unprivileged_userns not present on this kernel — running the AppImage as-is"
+          fi
+          bash qa/desktop-release/scripts/run-ubuntu.sh "$PWD/$APPIMAGE" "$PWD/$DEB"
 
       - name: Collect smoke evidence
         if: ${{ always() }}
@@ -132,7 +155,7 @@ jobs:
           # keep the harness evidence out of the release assets but upload
           # it as a workflow artifact for the release notes / verification
           mkdir -p smoke-evidence
-          cp -r "$EVID_DIR" smoke-evidence/
+          cp -r qa/desktop-release/evidence/ubuntu-* smoke-evidence/
           cp release-out/SHA256SUMS smoke-evidence/
 
       - name: Upload smoke evidence (workflow run)
@@ -205,17 +228,23 @@ jobs:
 
           ## Install
 
-          AppImage (no installation):
+          .deb (recommended on Ubuntu 24.04 — the package postinst installs the
+          app's AppArmor profile and the sandbox fallback the OS requires):
+
+          \`\`\`bash
+          sudo apt-get install -y ./${DEB}
+          \`\`\`
+
+          AppImage (no installation; runs as-is on Debian, Ubuntu <= 23.10 and
+          other distributions that allow unprivileged user namespaces. On
+          Ubuntu 24.04's default restriction, either prefer the .deb above or
+          enable the namespace path once):
 
           \`\`\`bash
           chmod +x ${APPIMAGE}
           ./${APPIMAGE}
-          \`\`\`
-
-          .deb (Ubuntu):
-
-          \`\`\`bash
-          sudo apt-get install -y ./${DEB}
+          # Ubuntu 24.04 AppImage path (one-time, then launch normally):
+          # sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
           \`\`\`
 
           System requirements (observed on ubuntu-latest / Ubuntu 24.04):
@@ -270,9 +299,10 @@ jobs:
           gh release download "$TAG" --repo "$GITHUB_REPOSITORY" \
             --pattern "$APPIMAGE" --pattern "$DEB" --pattern "SHA256SUMS"
           sha256sum -c SHA256SUMS
-          # The documented user flow (release notes): a downloaded AppImage
-          # needs chmod +x before it runs — the harness also self-heals this.
-          chmod +x "$APPIMAGE"
-          # launch the downloaded AppImage under Xvfb through the RW-003
-          # harness (clean profile, window-level evidence)
-          bash ../qa/desktop-release/scripts/run-ubuntu.sh "$(pwd)/$APPIMAGE" "$(pwd)/$DEB"
+          # The PUBLISHED .deb install path (recommended Ubuntu flow — the
+          # postinst AppArmor profile / SUID fallback makes it work on stock
+          # 24.04 where the AppImage needs the userns sysctl):
+          sudo apt-get install -y "./$DEB"
+          INSTALLED="$(command -v playliquid-gameos)"
+          echo "published-installed binary: $INSTALLED"
+          bash ../qa/desktop-release/scripts/run-ubuntu.sh "$INSTALLED" "$(pwd)/$DEB"

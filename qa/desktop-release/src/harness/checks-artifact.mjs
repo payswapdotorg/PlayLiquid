@@ -12,7 +12,7 @@ import { PRODUCT_MARKERS } from "./config.mjs";
 
 const execFileAsync = promisify(execFile);
 
-export async function checksumCheck(report, artifact, sumsFile) {
+export async function checksumCheck(report, artifact, sumsFile, debFile) {
   const basename = path.basename(artifact);
   if (!sumsFile || !fs.existsSync(sumsFile)) {
     report.check(
@@ -24,7 +24,22 @@ export async function checksumCheck(report, artifact, sumsFile) {
     return null;
   }
   const lines = fs.readFileSync(sumsFile, "utf8").split(/\r?\n/).filter(Boolean);
-  const entry = lines.find((line) => line.trim().endsWith(basename));
+  let entry = lines.find((line) => line.trim().endsWith(basename));
+  let checksumTarget = artifact;
+  let checksumTargetName = basename;
+  if (!entry && debFile && fs.existsSync(debFile)) {
+    // The .deb INSTALL path: the launched artifact is the installed
+    // executable (/usr/bin/<name>), which has no SHA256SUMS entry under its
+    // own name — verify the PACKAGE it was installed from instead (the
+    // .deb IS a release asset) and state both facts honestly.
+    const debBasename = path.basename(debFile);
+    const debEntry = lines.find((line) => line.trim().endsWith(debBasename));
+    if (debEntry) {
+      entry = debEntry;
+      checksumTarget = debFile;
+      checksumTargetName = `${basename} (via its source package ${debBasename})`;
+    }
+  }
   if (!entry) {
     report.check(
       "artifact-checksum",
@@ -35,14 +50,14 @@ export async function checksumCheck(report, artifact, sumsFile) {
     return null;
   }
   const expected = entry.trim().split(/\s+/)[0];
-  const actual = await sha256(artifact);
+  const actual = await sha256(checksumTarget);
   report.check(
     "artifact-checksum",
     "artifact sha256 verified against the release SHA256SUMS",
     expected === actual ? "pass" : "fail",
     expected === actual
-      ? `${basename}: ${actual} matches ${sumsFile}`
-      : `checksum mismatch for ${basename}: expected ${expected}, computed ${actual}`,
+      ? `${checksumTargetName}: ${actual} matches ${sumsFile}`
+      : `checksum mismatch for ${checksumTargetName}: expected ${expected}, computed ${actual}`,
   );
   return actual;
 }
