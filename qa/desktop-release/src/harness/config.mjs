@@ -10,6 +10,8 @@
  * by the TL on the re-branded artifact without code changes (see README).
  */
 
+import { resolve } from "node:path";
+
 /** Markers rendered by the REAL product modules (packages/game-ui,
  * packages/web/gameos-lab, packages/web/gameos-community). Worker A's product
  * shell composes those modules, so these strings are the stable contract. */
@@ -145,10 +147,21 @@ export function parseArgs(argv) {
   if (!out.help && !out.artifact) {
     throw new Error("no artifact given: pass --artifact <path> or set QA_RELEASE_ARTIFACT");
   }
-  if (!out.sums && out.artifact) {
-    // Auto-detect a sibling SHA256SUMS next to the artifact (convention of
-    // the release workflow); absence is recorded, never fatal.
-    out.sums = `${out.artifact.replace(/\/[^/]*$/, "")}/SHA256SUMS`;
+  if (!out.help && out.artifact) {
+    // The launcher spawns the app from a NEUTRAL cwd (the clean-profile
+    // home, like a real desktop user), so relative --artifact/--deb/--sums/
+    // --out paths would not resolve at spawn time (observed live: release
+    // run 38673153333, spawn ENOENT on a relative release-out/... path).
+    // Resolve every path ONCE, here, before any consumer sees it.
+    out.artifact = resolve(out.artifact);
+    if (!out.sums) {
+      // Auto-detect a sibling SHA256SUMS next to the artifact (convention of
+      // the release workflow); absence is recorded, never fatal.
+      out.sums = `${out.artifact.replace(/\/[^/]*$/, "")}/SHA256SUMS`;
+    }
+    out.deb = out.deb === null ? null : resolve(out.deb);
+    out.sums = resolve(out.sums);
+    out.out = out.out === null ? null : resolve(out.out);
   }
   return out;
 }
