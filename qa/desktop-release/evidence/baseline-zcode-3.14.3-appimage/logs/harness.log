@@ -1,0 +1,20 @@
+[2026-10-15T00:59:27.046Z] environment: Debian GNU/Linux 13 (trixie) (kernel 5.10.134-013.15.kangaroo.al8.x86_64), node v24.21.0, fuse=false
+[2026-10-15T00:59:27.723Z] xvfb: started on :89 (pid 30071, screen 1920x1080x24)
+[2026-10-15T00:59:27.724Z] memory gate: 1560 MB available (>= 600 MB required) — proceeding
+[2026-10-15T00:59:27.729Z] launch[main]: pid 30074 mode=appimage-extract-and-run cwd=/tmp/rw003-smoke-ZyA8f8/profile-main/home argv=["--appimage-extract-and-run","--remote-debugging-port=9333"]
+[2026-10-15T00:59:32.797Z] cdp: endpoint up — browser Chrome/146.0.7680.80
+[2026-10-15T00:59:33.809Z] cdp: page target ready — file:///tmp/rw003-smoke-ZyA8f8/profile-main/tmp/appimage_extracted_00ab3b2a60d51aabf3f463d594bc85f0/resources/app.asar/out/renderer/index.html?restoreSession=true&supportsSettings=true&initialWorkspacePath=%2Ftmp%2Frw003-smoke-ZyA8f8%2Fprofile-main%2Fhome%2F.zcode%2Fworkspace%2Fdefault&initialWorkspacePurpose=conversation&zcodeLaunchMarks=%7B%22createdAt%22%3A1792025970010%2C%22mainStart%22%3A1792025971578%2C%22appReady%22%3A1792025972322%2C%22loadUrl%22%3A1792025973107%7D
+[2026-10-15T00:59:35.370Z] render: first pass after 1505 ms (305 nodes) — waiting for DOM to stabilize
+[2026-10-15T00:59:42.888Z] render: settled after 9023 ms (320 nodes, stable)
+[2026-10-15T01:00:02.466Z] shutdown[profile-main pid 30074]: method=cdp-browser-close code=0
+[2026-10-15T01:00:02.467Z] port 9333 is free again
+[2026-10-15T01:00:02.469Z] memory gate: 1547 MB available (>= 600 MB required) — proceeding
+[2026-10-15T01:00:02.472Z] launch[offline]: pid 30380 mode=appimage-extract-and-run cwd=/tmp/rw003-smoke-ZyA8f8/profile-offline/home argv=["--appimage-extract-and-run","--remote-debugging-port=9334","--proxy-server=http://127.0.0.1:9","--proxy-bypass-list=<-loopback>"]
+[2026-10-15T01:00:07.495Z] cdp: endpoint up — browser Chrome/146.0.7680.80
+[2026-10-15T01:00:08.512Z] cdp: page target ready — file:///tmp/rw003-smoke-ZyA8f8/profile-offline/tmp/appimage_extracted_00ab3b2a60d51aabf3f463d594bc85f0/resources/app.asar/out/renderer/index.html?restoreSession=true&supportsSettings=true&initialWorkspacePath=%2Ftmp%2Frw003-smoke-ZyA8f8%2Fprofile-offline%2Fhome%2F.zcode%2Fworkspace%2Fdefault&initialWorkspacePurpose=conversation&zcodeLaunchMarks=%7B%22createdAt%22%3A1792026004680%2C%22mainStart%22%3A1792026006296%2C%22appReady%22%3A1792026007319%2C%22loadUrl%22%3A1792026007825%7D
+[2026-10-15T01:00:10.053Z] render: first pass after 1529 ms (305 nodes) — waiting for DOM to stabilize
+[2026-10-15T01:00:17.566Z] render: settled after 9042 ms (320 nodes, stable)
+[2026-10-15T01:00:47.830Z] offline scenario: alive=true responsive=true
+[2026-10-15T01:00:47.916Z] shutdown[profile-offline pid 30380]: method=cdp-browser-close code=0
+[2026-10-15T01:00:47.916Z] port 9334 is free again
+[2026-10-15T01:00:51.927Z] cleanup: all processes started by this run have exited

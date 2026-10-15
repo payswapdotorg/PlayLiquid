@@ -1,9 +1,8 @@
 /**
- * qa-desktop-release public entrypoint (RW-003 baseline, see
- * spec/release/work-items.md). TL baseline placeholder: the packaged-app
- * release QA surface (Xvfb + CDP smoke tests of the BUILT Linux
- * application) lands via the release/wc-smoke-evidence work order. This
- * baseline exports only the module manifest so the tree compiles and the
- * architecture gates hold at the frozen base.
+ * qa-desktop-release public entrypoint (RW-003, see
+ * spec/release/work-items.md). Exports the module manifest; the packaged-app
+ * release QA harness itself lives in src/harness/ and is executed through
+ * scripts/run-smoke.mjs (zero-dependency Node >= 22, Xvfb + CDP window-level
+ * evidence — see README.md for run instructions and honest scope).
  */
 export { qa_desktopReleaseModule } from "./module.ts";
