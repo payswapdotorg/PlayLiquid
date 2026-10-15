@@ -2,11 +2,11 @@ name: PlayLiquid Desktop Release
 
 # RW-004 (TL-owned): build the PlayLiquid GameOS desktop artifacts for
 # Linux (Ubuntu-targeted AppImage + .deb) reproducibly from an approved,
-# pinned commit, and attach them to a GitHub Release.
-#
-# Draft status: workflow_dispatch-only until Worker B's identity/packaging
-# configuration lands (artifact names, identity env) — the TL finalizes the
-# tag trigger and release publication steps at integration time.
+# pinned commit, run the RW-003 packaged-app smoke harness on ubuntu-latest
+# (true Ubuntu launch evidence), and — when publish_release is set — publish
+# the GitHub Release (tag pinned to the built SHA, AppImage + .deb +
+# SHA256SUMS + smoke evidence) and re-verify the published asset by
+# download + checksum + launch.
 
 on:
   workflow_dispatch:
@@ -15,6 +15,22 @@ on:
         description: "Commit SHA / branch / tag to build (defaults to the ref this run was dispatched on)"
         required: false
         default: ""
+      publish_release:
+        description: "Publish a GitHub Release from the built artifacts"
+        type: boolean
+        required: false
+        default: false
+      tag_name:
+        description: "Release tag (created at the built SHA), e.g. playliquid-gameos-v3.14.3"
+        required: false
+        default: ""
+      release_name:
+        description: "Release title, e.g. PlayLiquid GameOS 3.14.3 (Linux)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
 
 concurrency:
   group: desktop-release-${{ github.ref }}
@@ -23,7 +39,7 @@ concurrency:
 jobs:
   linux-desktop:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 90
     steps:
       - name: Determine build ref
         id: ref
@@ -56,7 +72,9 @@ jobs:
           # bsdtar (libarchive-tools) is required by electron-builder's fpm
           # for the pacman target (live-caught 2026-10-14: exit 127 on run
           # 38623571228 — ubuntu-latest runners ship without it)
-          sudo apt-get install -y libarchive-tools rpm
+          # xvfb is required by the RW-003 smoke harness (window-level
+          # evidence: the packaged app runs under a real display server).
+          sudo apt-get install -y libarchive-tools rpm xvfb
 
       - name: Install dependencies (frozen lockfile)
         run: pnpm install --frozen-lockfile
@@ -89,9 +107,162 @@ jobs:
           sha256sum *.AppImage *.deb > SHA256SUMS
           cat SHA256SUMS
 
+      # ------------------------------------------------------------------
+      # RW-003 smoke harness on ubuntu-latest — the true-Ubuntu launch
+      # evidence (station runs are Debian 13, honestly labeled as such).
+      # Run WITHOUT --baseline-expectations: on an integrated (post-A+B)
+      # artifact every check must pass; any failure fails the release.
+      # ------------------------------------------------------------------
+      - name: Run packaged-app smoke harness (Ubuntu)
+        run: |
+          APPIMAGE="$(ls release-out/*.AppImage)"
+          DEB="$(ls release-out/*.deb)"
+          bash qa/desktop-release/scripts/run-ubuntu.sh "$APPIMAGE" "$DEB"
+
+      - name: Collect smoke evidence
+        run: |
+          EVID_DIR="$(ls -dt qa/desktop-release/evidence/ubuntu-* | head -1)"
+          echo "evidence dir: $EVID_DIR"
+          cat "$EVID_DIR"/report.json || true
+          # keep the harness evidence out of the release assets but upload
+          # it as a workflow artifact for the release notes / verification
+          mkdir -p smoke-evidence
+          cp -r "$EVID_DIR" smoke-evidence/
+          cp release-out/SHA256SUMS smoke-evidence/
+
+      - name: Upload smoke evidence (workflow run)
+        uses: actions/upload-artifact@v4
+        with:
+          name: playliquid-gameos-smoke-evidence
+          path: smoke-evidence/
+          if-no-files-found: error
+
       - name: Upload artifacts (workflow run)
         uses: actions/upload-artifact@v4
         with:
           name: playliquid-gameos-linux-amd64
           path: release-out/
           if-no-files-found: error
+
+      - name: Compute release metadata
+        id: meta
+        run: |
+          APPIMAGE="$(cd release-out && ls *.AppImage)"
+          DEB="$(cd release-out && ls *.deb)"
+          SHA_APPIMAGE="$(cd release-out && sha256sum "$APPIMAGE" | cut -d' ' -f1)"
+          SHA_DEB="$(cd release-out && sha256sum "$DEB" | cut -d' ' -f1)"
+          VERSION="$(echo "$APPIMAGE" | sed -E 's/.*-([0-9][^-]*)-linux-.*/\1/')"
+          TAG="${{ github.event.inputs.tag_name }}"
+          if [ -z "$TAG" ]; then TAG="playliquid-gameos-v${VERSION}"; fi
+          NAME="${{ github.event.inputs.release_name }}"
+          if [ -z "$NAME" ]; then NAME="PlayLiquid GameOS ${VERSION} (Linux)"; fi
+          {
+            echo "appimage=$APPIMAGE"
+            echo "deb=$DEB"
+            echo "sha_appimage=$SHA_APPIMAGE"
+            echo "sha_deb=$SHA_DEB"
+            echo "version=$VERSION"
+            echo "tag=$TAG"
+            echo "name=$NAME"
+          } >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG name=$NAME appimage=$APPIMAGE deb=$DEB"
+
+      # ------------------------------------------------------------------
+      # Publication: tag pinned to the built SHA + Release with honest
+      # notes, assets, checksums. Skipped unless publish_release is set.
+      # ------------------------------------------------------------------
+      - name: Publish GitHub Release
+        if: ${{ github.event.inputs.publish_release == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REF: ${{ steps.ref.outputs.ref }}
+        run: |
+          set -euo pipefail
+          TAG="${{ steps.meta.outputs.tag }}"
+          NAME="${{ steps.meta.outputs.name }}"
+          APPIMAGE="${{ steps.meta.outputs.appimage }}"
+          DEB="${{ steps.meta.outputs.deb }}"
+          SHA_APPIMAGE="${{ steps.meta.outputs.sha_appimage }}"
+          SHA_DEB="${{ steps.meta.outputs.sha_deb }}"
+          BUILD_SHA="$(git rev-parse HEAD)"
+
+          cat > release-notes.md <<NOTES
+          # ${NAME}
+
+          PlayLiquid GameOS desktop application for Ubuntu Linux (x64).
+
+          - **Built from:** \`${BUILD_SHA}\` (tag: \`${TAG}\`)
+          - **Assets:** \`${APPIMAGE}\`, \`${DEB}\`, \`SHA256SUMS\`
+          - **SHA-256 (AppImage):** \`${SHA_APPIMAGE}\`
+          - **SHA-256 (deb):** \`${SHA_DEB}\`
+
+          ## Install
+
+          AppImage (no installation):
+
+          \`\`\`bash
+          chmod +x ${APPIMAGE}
+          ./${APPIMAGE}
+          \`\`\`
+
+          .deb (Ubuntu):
+
+          \`\`\`bash
+          sudo apt-get install -y ./${DEB}
+          \`\`\`
+
+          System requirements (observed on ubuntu-latest / Ubuntu 24.04):
+          libgtk-3-0, libnotify4, libnss3, libxss1, libxtst6, xdg-utils,
+          libatspi2.0-0, libuuid1, libsecret-1-0.
+
+          ## Verify
+
+          \`\`\`bash
+          sha256sum --ignore-missing -c SHA256SUMS
+          \`\`\`
+
+          ## Evidence
+
+          The packaged application was smoke-tested on ubuntu-latest
+          (startup, clean shutdown, PlayLiquid product shell rendering,
+          Studio/Lab/Community navigation, product identity, first-run
+          states, dual viewports 390x844 + 1280x800, offline error
+          handling) — see the linked workflow run for the full harness
+          transcript, screenshots and logs.
+          NOTES
+
+          # Create (or reuse) the release — the tag is created at the built SHA.
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "release $TAG already exists — assets will be overwritten"
+          else
+            gh release create "$TAG" \
+              --target "$BUILD_SHA" \
+              --title "$NAME" \
+              --notes-file release-notes.md
+          fi
+          gh release upload "$TAG" \
+            "release-out/${APPIMAGE}" "release-out/${DEB}" "release-out/SHA256SUMS" \
+            --clobber
+          gh release view "$TAG"
+
+      # ------------------------------------------------------------------
+      # Post-publication verification: download the PUBLISHED asset by its
+      # release URL, checksum it, and launch it (DoD: the published file —
+      # not the local build — boots as PlayLiquid GameOS).
+      # ------------------------------------------------------------------
+      - name: Verify published asset (download + checksum + launch)
+        if: ${{ github.event.inputs.publish_release == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          TAG="${{ steps.meta.outputs.tag }}"
+          APPIMAGE="${{ steps.meta.outputs.appimage }}"
+          DEB="${{ steps.meta.outputs.deb }}"
+          mkdir -p verify && cd verify
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" \
+            --pattern "$APPIMAGE" --pattern "$DEB" --pattern "SHA256SUMS"
+          sha256sum -c SHA256SUMS
+          # launch the downloaded AppImage under Xvfb through the RW-003
+          # harness (clean profile, window-level evidence)
+          bash ../qa/desktop-release/scripts/run-ubuntu.sh "$(pwd)/$APPIMAGE" "$(pwd)/$DEB"
