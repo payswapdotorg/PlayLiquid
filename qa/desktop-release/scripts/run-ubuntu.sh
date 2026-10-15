@@ -30,4 +30,4 @@ if [ -n "$DEB" ]; then
   fi
 fi
 
-exec node "$(dirname "$0")/run-smoke.mjs" "${args[@]}" "$@"
+exec node "$(dirname "$0")/run-smoke.mjs" "${args[@]}"
