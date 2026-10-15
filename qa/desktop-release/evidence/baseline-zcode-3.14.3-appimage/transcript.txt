@@ -1,0 +1,77 @@
+PlayLiquid GameOS — RW-003 packaged-app smoke run
+started: 2026-10-15T00:59:27.037Z  finished: 2026-10-15T01:00:51.939Z
+artifact: /home/z/station/release/ZCode-3.14.3-linux-x86_64.AppImage
+mode: baseline (expected pre-integration failures annotated)
+environment: {"distro":"Debian GNU/Linux 13 (trixie)","kernel":"5.10.134-013.15.kangaroo.al8.x86_64","arch":"x64","node":"v24.21.0","memoryTotalMb":4041,"memoryAtStartMb":1636,"fuseAvailable":false,"xvfb":"present (this host's Xvfb does not support -version)","displayServer":"Xvfb (virtual framebuffer, no GPU)","cdpPort":9333,"stationNote":"honest scope: reference station is Debian 13, not Ubuntu; Ubuntu-latest execution of this same harness is the TL integration step (README section 'Run on any Ubuntu machine')","cdpPorts":{"main":9333,"offline":9334}}
+
+[PASS] artifact-checksum — artifact sha256 verified against the release SHA256SUMS
+    ZCode-3.14.3-linux-x86_64.AppImage: b765a0defcdeb583a4fbd656e678930861b146f5b7f95f12447a3fc016413e7b matches /home/z/station/release/SHA256SUMS
+[PASS] startup — packaged application starts under Xvfb (CDP endpoint + main window page target + settled DOM)
+    CDP up and main window rendered in 15s (launch mode: appimage-extract-and-run); DOM settled at 320 nodes
+    · page target url: file:///tmp/rw003-smoke-ZyA8f8/profile-main/tmp/appimage_extracted_00ab3b2a60d51aabf3f463d594bc85f0/resources/app.asar/out/renderer/index.html?restoreSession=true&supportsSettings=true&initialWorkspacePath=%2Ftmp%2Frw003-smoke-ZyA8f8%2Fprofile-main%2Fhome%2F.zcode%2Fworkspace%2Fdefault&initialWorkspacePurpose=conversation&zcodeLaunchMarks=%7B%22createdAt%22%3A1792025970010%2C%22mainStart%22%3A1792025971578%2C%22appReady%22%3A1792025972322%2C%22loadUrl%22%3A1792025973107%7D
+    · all targets: page:file:///tmp/rw003-smoke-ZyA8f8/profile-main/tmp/appimage_extracted_00ab3b2a60d51
+[PASS] packaged-independence — no dev-server / repo-relative / dev-env dependence (packaged file:// load)
+    main window loads the packaged file:// renderer; the child environment contained no ELECTRON_RENDERER_URL / VITE_* / ZCODE_* variables
+    · page url: file:///tmp/rw003-smoke-ZyA8f8/profile-main/tmp/appimage_extracted_00ab3b2a60d51aabf3f463d594bc85f0/resources/app.asar/out/renderer/index.html?restoreSession=true&supportsSettings=true&initialWorkspacePath=%2Ftmp%2Frw003-smoke-ZyA8f8%2Fprofile-main%2Fhome%2F.zcode%2Fworkspace%2Fdefault&initialWorkspacePurpose=conversation&zcodeLaunchMarks=%7B%22createdAt%22%3A1792025970010%2C%22mainStart%22%3A1792025971578%2C%22appReady%22%3A1792025972322%2C%22loadUrl%22%3A1792025973107%7D
+    · child env keys: DISPLAY, HOME, LANG, PATH, TERM, TMPDIR, XDG_CACHE_HOME, XDG_CONFIG_HOME, XDG_DATA_HOME, XDG_RUNTIME_DIR
+[PASS] window-title-captured — window title captured from the packaged run
+    document.title = "ZCode"
+    · url: file:///tmp/rw003-smoke-ZyA8f8/profile-main/tmp/appimage_extracted_00ab3b2a60d51aabf3f463d594bc85f0/resources/app.asar/out/renderer/index.html?restoreSession=true&supportsSettings=true&initialWorkspacePath=%2Ftmp%2Frw003-smoke-ZyA8f8%2Fprofile-main%2Fhome%2F.zcode%2Fworkspace%2Fdefault&initialWorkspacePurpose=conversation&zcodeLaunchMarks=%7B%22createdAt%22%3A1792025970010%2C%22mainStart%22%3A1792025971578%2C%22appReady%22%3A1792025972322%2C%22loadUrl%22%3A1792025973107%7D
+[FAIL] [EXPECTED BASELINE FAILURE] product-identity-title — window title carries the PlayLiquid GameOS product identity
+    expected title to match /playliquid/i (default expectation: "PlayLiquid GameOS"); observed document.title = "ZCode"
+[FAIL] [EXPECTED BASELINE FAILURE] no-zcode-primary-branding — ZCode is not the primary UI identity of the product window
+    primary surfaces are ZCode-branded: {"title":"ZCode","h1s":["Welcome to ZCode"],"headers":["Welcome to ZCodeConnect your account to start using ZCode"]}
+[FAIL] [EXPECTED BASELINE FAILURE] product-shell-renders — the PlayLiquid product shell (Studio/Lab/Community) renders as the default surface
+    no PlayLiquid product-shell markers found in the rendered window; observed primary content: {"title":"ZCode","h1s":["Welcome to ZCode"],"textHead":"Welcome to ZCode\n\nConnect your account to start using ZCode\n\nConnect to Z.ai\nGlobal\nConnect to BigModel\nCN\nUse API key"}
+[FAIL] [EXPECTED BASELINE FAILURE] studio-surface — Game Studio surface renders (heading + surface tabs)
+    studio heading "PlayLiquid · Game Studio" not found (text head: "Welcome to ZCode\n\nConnect your account to start using ZCode\n\nConnect to Z.ai\nGlobal\nConnect to BigModel\nCN\nUse API key")
+[FAIL] [EXPECTED BASELINE FAILURE] lab-surface — Game Engineering Lab surface renders
+    lab heading "PlayLiquid · Game Engineering Lab" not found
+[FAIL] [EXPECTED BASELINE FAILURE] community-surface — Community surface renders
+    community heading "PlayLiquid · Community Contributions" not found
+[FAIL] [EXPECTED BASELINE FAILURE] first-run-empty-state — clean profile shows the first-run / no-data state in the product shell
+    no first-run empty-state marker found (product shell markers absent on this artifact)
+[FAIL] [EXPECTED BASELINE FAILURE] studio-real-operation — representative real operation reaches its authoritative module through production-wired ports
+    Studio surface not present, so the "Refresh snapshot" operation cannot run on this artifact
+[FAIL] [EXPECTED BASELINE FAILURE] product-navigation — Studio / Lab / Community navigation switches to the corresponding product surface
+    navigation did not reach every product surface: [{"label":"Studio","clicked":false,"reached":false},{"label":"Lab","clicked":false,"reached":false},{"label":"Community","clicked":false,"reached":false}]
+    · Studio: nav control not found, surface not rendered
+    · Lab: nav control not found, surface not rendered
+    · Community: nav control not found, surface not rendered
+[PASS] clean-profile-startup — startup from a clean profile (empty HOME + XDG directories)
+    app created its first-run state in the empty profile: ZCode
+    · XDG_CONFIG_HOME listing after boot: ZCode
+[PASS] viewports-evidence — window-level evidence captured at both mandated viewports (390x844 and 1280x800)
+    1280x800 real OS window: resizeTo requested, window.outer = [1280,800] (inner [1280,800]); window resize achieved; screenshot 1280x800; 390x844: real window attempt returned outer = [480,844] (clamped by the product minimum width 480px — recorded, not hidden); captured via CDP device-metrics emulation; screenshots 480x844 (clamp attempt) + 390x844 (emulated viewport)
+    · viewport-1280x800-window.png — 1280x800, 409029 bytes
+    · viewport-1280x800-emulated.png — 1280x800, 409029 bytes
+    · viewport-390x844-clamp-attempt.png — 480x844, 196961 bytes
+    · viewport-390x844-emulated.png — 390x844, 142821 bytes
+[FAIL] [EXPECTED BASELINE FAILURE] packaging-identity — packaging identity (desktop entry / deb package) serves PlayLiquid GameOS
+    deb desktop entry observed: Name="ZCode" Exec="/opt/ZCode/zcode %U" Icon="zcode"; expectation: Name matches /playliquid/i and Exec/Icon are not ZCode-branded (PlayLiquid GameOS)
+    · dpkg-deb -f /home/z/station/release/ZCode-3.14.3-linux-amd64.deb Package Version -> Package: zcode / Version: 3.14.3
+    · deb ./usr/share/applications/zcode.desktop: Name=ZCode Exec=/opt/ZCode/zcode %U Icon=zcode
+[PASS] console-evidence-recorded — renderer console evidence captured from the packaged run (informational)
+    0 console entries captured (0 error-level)
+[PASS] clean-shutdown — application terminates in a bounded, controlled way when asked to close (no hang, no forced kill)
+    exit code 0 via cdp-browser-close after 35s of uptime
+    · exit code: 0
+    · shutdown method: cdp-browser-close
+    · uptime: 35s
+[PASS] error-handling-offline-render — packaged app renders its UI with all renderer network egress failing (dead proxy)
+    window rendered under a dead proxy: title="ZCode", primary content ["Welcome to ZCode"]
+    · observed text head: "Welcome to ZCode\n\nConnect your account to start using ZCode\n\nConnect to Z.ai\nGlobal\nConnect to BigModel\nCN\nUse API key"
+[PASS] error-handling-offline-stability — app stays alive and responsive while its services are unavailable
+    observed for 30s after render: process alive=true, renderer responsive=true
+    · stability samples: [{"secondsIn":5,"alive":true,"responsive":true},{"secondsIn":10,"alive":true,"responsive":true},{"secondsIn":15,"alive":true,"responsive":true},{"secondsIn":20,"alive":true,"responsive":true},{"secondsIn":25,"alive":true,"responsive":true},{"secondsIn":30,"alive":true,"responsive":true}]
+    · screenshot: offline-dead-proxy-window.png (1200x800, 383459 bytes)
+[PASS] clean-shutdown-offline — offline-scenario application instance also terminates in a bounded, controlled way
+    exit code 0 via cdp-browser-close after 45s of uptime
+    · exit code: 0
+    · shutdown method: cdp-browser-close
+    · uptime: 45s
+
+NOTE: launch discipline: the packaged app is always launched with a clean profile (fresh HOME/XDG/TMPDIR) and a NEUTRAL cwd (the clean profile HOME, like a real desktop user), never from inside a repository checkout — the current artifact's agent resolver is cwd-sensitive (findUpward from process.cwd() can bind a repo dev agent when launched from inside a checkout, which breaks its first-run storage preparation); observed and recorded honestly, harness avoids it by construction
+NOTE: offline scenario: renderer network egress forced through a dead proxy (127.0.0.1:9) via the standard Chromium --proxy-server switch — an unavailable external service simulated without app cooperation
+
+counts: {"pass":11,"fail":10,"skip":0,"expectedFailure":10,"unexpectedFailure":0}  exit code: 0

@@ -1,0 +1,11 @@
+[
+  {
+    "description": "",
+    "devtoolsFrontendUrl": "https://chrome-devtools-frontend.appspot.com/serve_rev/@f08938029c887ea624da7a1717059788ed95034d/inspector.html?ws=127.0.0.1:9333/devtools/page/D6E897660928D4A84691DC7685A45F77",
+    "id": "D6E897660928D4A84691DC7685A45F77",
+    "title": "ZCode",
+    "type": "page",
+    "url": "file:///tmp/rw003-smoke-ZyA8f8/profile-main/tmp/appimage_extracted_00ab3b2a60d51aabf3f463d594bc85f0/resources/app.asar/out/renderer/index.html?restoreSession=true&supportsSettings=true&initialWorkspacePath=%2Ftmp%2Frw003-smoke-ZyA8f8%2Fprofile-main%2Fhome%2F.zcode%2Fworkspace%2Fdefault&initialWorkspacePurpose=conversation&zcodeLaunchMarks=%7B%22createdAt%22%3A1792025970010%2C%22mainStart%22%3A1792025971578%2C%22appReady%22%3A1792025972322%2C%22loadUrl%22%3A1792025973107%7D",
+    "webSocketDebuggerUrl": "ws://127.0.0.1:9333/devtools/page/D6E897660928D4A84691DC7685A45F77"
+  }
+]
