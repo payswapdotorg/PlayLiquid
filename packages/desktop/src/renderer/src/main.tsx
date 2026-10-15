@@ -332,11 +332,16 @@ function initializeBusinessRoot(port: MessagePort): void {
   // RW-001 product-first routing: the PlayLiquid GameOS product shell is the
   // DEFAULT first-window experience. The ZCode workbench stays fully reachable:
   // explicitly (the shell's workbench navigation navigates with the workbench
-  // flag) or when this window was opened FOR a code workspace (deep-link /
-  // initial-workspace windows are workbench sessions by definition).
+  // flag) or when this window was opened FOR a user project workspace. NOTE:
+  // the main process ALWAYS injects an initialWorkspacePath — for the default
+  // window it is the app-managed conversation backing workspace (purpose
+  // "conversation", a background agent-runtime fact, NOT a user intent), so
+  // the discriminator is purpose "project" (a real user workspace open,
+  // e.g. a deep-link workspace/open window) or an unavailable-workspace
+  // error window (workbench surfaces).
   const workbenchRequested =
     new URLSearchParams(window.location.search).get(WORKBENCH_QUERY_FLAG) === "1" ||
-    initialWorkspaceAbsPath !== undefined ||
+    (initialWorkspaceAbsPath !== undefined && initialWorkspacePurpose === "project") ||
     unavailableWorkspacePath !== undefined;
   if (!workbenchRequested && appRoot !== null) {
     mountProductShell(appRoot, { platform: desktopPlatform, isMacDesktop });
