@@ -18,7 +18,17 @@ if (process.argv.includes("--help") || process.argv.includes("-h")) {
   process.exit(0);
 }
 
-main(process.argv.slice(2)).catch((error) => {
-  console.error(`harness fatal: ${error?.stack ?? error}`);
-  process.exit(3);
-});
+main(process.argv.slice(2))
+  .then((exitCode) => {
+    // main() RETURNS the report's exit code (0 = all checks passed / only
+    // expected baseline failures; 1 = unexpected failures). It MUST reach the
+    // process exit — a resolved promise discards it silently, which let the
+    // release workflow's smoke gate pass a failing report (live-caught:
+    // run 38675144166's Ubuntu smoke printed exit code 1 yet the step went
+    // green; the station pipes had also been masking it behind `| tail`).
+    process.exit(exitCode ?? 0);
+  })
+  .catch((error) => {
+    console.error(`harness fatal: ${error?.stack ?? error}`);
+    process.exit(3);
+  });

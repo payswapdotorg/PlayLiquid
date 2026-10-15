@@ -91,6 +91,31 @@ export async function launchApp(options) {
       argv.unshift("--appimage-extract-and-run");
     }
   }
+  const spawned = spawnOnce(artifact, argv, { env, cwd, logFile });
+  let { proc, argv: finalArgv } = spawned;
+
+  // FUSE-failure fallback (live-caught: run 38675144166 on ubuntu-latest —
+  // the runner ships /dev/fuse but NOT libfuse2, so the AppImage died with
+  // `dlopen(): error loading libfuse.so.2` before any UI existed). A healthy
+  // launch keeps running past this window; an early exit under FUSE mode
+  // with the libfuse marker in the log is retried ONCE with
+  // --appimage-extract-and-run (works everywhere; needs TMPDIR disk).
+  if (mode.includes("fuse") && !mode.includes("extract")) {
+    const diedEarly = await earlyExitWithin(proc, 2500);
+    if (diedEarly && /libfuse|dlopen\(\)/i.test(readTail(logFile, 4096))) {
+      mode = "appimage-fuse-failed-retry-extract-and-run";
+      const retryArgv = [`--appimage-extract-and-run`, ...args];
+      const retry = spawnOnce(artifact, retryArgv, { env, cwd, logFile });
+      proc = retry.proc;
+      finalArgv = retry.argv;
+    }
+  }
+  return { proc, mode, argv: finalArgv };
+}
+
+/** Spawn the app process once (shared by the initial launch and the
+ *  extract-and-run retry); returns the process and the effective argv. */
+function spawnOnce(artifact, argv, { env, cwd, logFile }) {
   const out = fs.openSync(logFile, "a");
   const proc = spawn(artifact, argv, {
     env,
@@ -99,7 +124,41 @@ export async function launchApp(options) {
     detached: true, // own process group → exact tree kill via pgid
   });
   fs.closeSync(out);
-  return { proc, mode, argv };
+  return { proc, argv };
+}
+
+/** Resolves true when the process exits within `ms` (a startup crash);
+ *  false when it keeps running (healthy launch or slow start). */
+function earlyExitWithin(proc, ms) {
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => {
+      proc.removeAllListeners("exit");
+      resolve(false);
+    }, ms);
+    proc.once("exit", () => {
+      clearTimeout(timer);
+      resolve(true);
+    });
+    proc.once("error", () => {
+      clearTimeout(timer);
+      resolve(true);
+    });
+  });
+}
+
+/** Reads the last `bytes` of a file (best-effort; "" on any failure). */
+function readTail(file, bytes) {
+  try {
+    const stat = fs.statSync(file);
+    const start = Math.max(0, stat.size - bytes);
+    const fh = fs.openSync(file, "r");
+    const buffer = Buffer.alloc(stat.size - start);
+    fs.readSync(fh, buffer, 0, buffer.length, start);
+    fs.closeSync(fh);
+    return buffer.toString("utf8");
+  } catch {
+    return "";
+  }
 }
 
 /** Poll the CDP HTTP endpoint until it answers (or timeout). */

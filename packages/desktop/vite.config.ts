@@ -183,6 +183,26 @@ export default defineConfig(({ mode }) => {
         // 里可能残留 d3-shape/node_modules/d3-path@1.x，Vite 预构建会优先命中旧包并报 Missing export。
         // 这里把 d3-path 固定到根部 3.x 入口，确保桌面端依赖优化和运行时解析一致。
         "d3-path": resolve(__dirname, "../../node_modules/d3-path/src/index.js"),
+        // RW-001: the PlayLiquid domain packages hash at their own seams with
+        // `createHash("sha256")` from `node:crypto`, and tool-fabric-runtime's
+        // entrypoint binds `spawn` from `node:child_process`. The renderer is a
+        // sandboxed Chromium context (nodeIntegration: false) — Vite would stub
+        // both builtins with empty modules and the renderer bundle would crash
+        // at module-evaluation time ((0, S.createHash) is not a function —
+        // live-caught by the RW-003 harness on the published 3.14.3 artifact).
+        // Both are aliased to the REAL renderer adapters:
+        // - node:crypto → a true FIPS 180-4 sha256 implementation;
+        // - node:child_process → a loud import-binding shim (process execution
+        //   is honestly unavailable in the sandboxed renderer; nothing in the
+        //   desktop host registers a process-executing tool today).
+        "node:crypto": resolve(
+          __dirname,
+          "src/renderer/src/gameos/host/renderer-crypto.ts",
+        ),
+        "node:child_process": resolve(
+          __dirname,
+          "src/renderer/src/gameos/host/node-child-process.ts",
+        ),
       },
       dedupe: ["react", "react-dom", "lucide-react"],
     },
