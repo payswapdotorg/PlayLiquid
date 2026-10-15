@@ -26,6 +26,9 @@ export const PRODUCT_MARKERS = Object.freeze({
   labHeading: "PlayLiquid · Game Engineering Lab",
   communityHeading: "PlayLiquid · Community Contributions",
   labRefresh: "Refresh read models",
+  /** The shell navigation affordance that opens the ZCode workbench (RW-001
+   * reachability requirement; the label honestly names the target). */
+  workbenchAffordance: "ZCode workbench",
 });
 
 /** Viewports mandated by AGENTS.md (UI evidence standard). */

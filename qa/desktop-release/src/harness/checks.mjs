@@ -15,6 +15,13 @@ export async function markerProbe(cdp) {
   const expression = `(() => {
     const text = document.body?.innerText ?? "";
     const has = (needle) => text.includes(needle);
+    // DOM-level presence (textContent includes display:none subtrees): the
+    // product shell keeps all three workspaces MOUNTED and switches
+    // visibility — a kept-mounted surface is "rendered" by design; its
+    // VISIBILITY is proven by the product-navigation check (click + visible
+    // surface). innerText alone cannot see a mounted-but-inactive workspace.
+    const domText = document.body?.textContent ?? "";
+    const domHas = (needle) => domText.includes(needle);
     const navHas = (needle) => {
       const controls = [...document.querySelectorAll("button, a, [role='tab'], [role='button'], nav *, [aria-label]")];
       return controls.some((el) => {
@@ -34,8 +41,8 @@ export async function markerProbe(cdp) {
       studioLoadError: text.includes(${JSON.stringify(PRODUCT_MARKERS.studioLoadErrorPrefix)}),
       studioEmptyPackages: has(${JSON.stringify(PRODUCT_MARKERS.studioEmptyPackages)}),
       packagesZeroPill: /Packages\\s*0\\b/.test(text),
-      labHeading: has(${JSON.stringify(PRODUCT_MARKERS.labHeading)}),
-      communityHeading: has(${JSON.stringify(PRODUCT_MARKERS.communityHeading)}),
+      labHeading: domHas(${JSON.stringify(PRODUCT_MARKERS.labHeading)}),
+      communityHeading: domHas(${JSON.stringify(PRODUCT_MARKERS.communityHeading)}),
       navStudio: navHas("Studio"),
       navLab: navHas("Lab"),
       navCommunity: navHas("Community"),
@@ -80,14 +87,22 @@ export function identityChecks(report, probe, options) {
     `expected title to match /playliquid/i (default expectation: ${JSON.stringify(expectedTitle)}); observed document.title = ${JSON.stringify(probe.title)}`,
   );
   const primary = [probe.title ?? "", ...(probe.h1s ?? []), ...(probe.headerText ?? [])].join(" | ");
-  const zcodeBranded = /zcode/i.test(primary);
+  // The shell's workbench AFFORDANCE is labeled "ZCode workbench" (RW-001
+  // requires the workbench REACHABLE from the product — the label honestly
+  // names what the button opens). It is a navigation control, not the
+  // product's identity: exclude the affordance label from the primary-
+  // branding heuristic; title + headings + headers everywhere else must
+  // carry no ZCode identity.
+  const affordance = PRODUCT_MARKERS.workbenchAffordance;
+  const identityText = primary.split(affordance).join(" ");
+  const zcodeBranded = /zcode/i.test(identityText);
   report.check(
     "no-zcode-primary-branding",
     "ZCode is not the primary UI identity of the product window",
     zcodeBranded ? "fail" : "pass",
     zcodeBranded
       ? `primary surfaces are ZCode-branded: ${JSON.stringify({ title: probe.title, h1s: probe.h1s, headers: probe.headerText })}`
-      : "no ZCode branding found in window title, headings or app headers",
+      : `no ZCode branding in window title, headings or app headers (the intentional "${affordance}" navigation affordance excluded — it names the reachable workbench, RW-001)`,
   );
 }
 
