@@ -34,6 +34,12 @@ import { createDesktopPlatform } from "./desktopPlatform.js";
 import { startPerformanceTimelineCleanup } from "./performanceTimelineCleanup.js";
 import { initializeDesktopUserActionTrace } from "./userActionTraceBootstrap.js";
 import { buildRemoteWorkspaceSessionServices } from "./remoteWorkspaceSessionServices.js";
+// RW-001: the PlayLiquid GameOS product shell (the DEFAULT first-window
+// surface) and its workbench routing flag.
+import {
+  mountProductShell,
+  WORKBENCH_QUERY_FLAG,
+} from "./gameos/index.ts";
 import {
   notifyRemoteWorkspaceServicePortReady,
   parseRemoteWorkspaceServicePortMessage,
@@ -322,6 +328,20 @@ function initializeBusinessRoot(port: MessagePort): void {
   // 必须在 createRoot 之前注入 reporter：根级 AppErrorBoundary 的职责正是兜住 Root 自身
   // 渲染崩溃，若依赖 Root 的 effect 注入，则 Root 首帧就崩时上报会丢失。
   setReactErrorArmsReporter(desktopPlatform);
+
+  // RW-001 product-first routing: the PlayLiquid GameOS product shell is the
+  // DEFAULT first-window experience. The ZCode workbench stays fully reachable:
+  // explicitly (the shell's workbench navigation navigates with the workbench
+  // flag) or when this window was opened FOR a code workspace (deep-link /
+  // initial-workspace windows are workbench sessions by definition).
+  const workbenchRequested =
+    new URLSearchParams(window.location.search).get(WORKBENCH_QUERY_FLAG) === "1" ||
+    initialWorkspaceAbsPath !== undefined ||
+    unavailableWorkspacePath !== undefined;
+  if (!workbenchRequested && appRoot !== null) {
+    mountProductShell(appRoot, { platform: desktopPlatform, isMacDesktop });
+    return;
+  }
 
   appRoot?.render(
     <AppErrorBoundary isDesktop isMacDesktop={isMacDesktop} isWindowsDesktop={isWindowsDesktop}>

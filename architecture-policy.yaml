@@ -566,6 +566,16 @@ exceptions:
       - qa/browser/src/studio-ui.ts
       - qa/browser/src/lab-ui.ts
       - qa/browser/src/community-ui.ts
+  # RW-001 (desktop product shell): the desktop host adapter test mounts the
+  # three module stores (the PL-033 mount recipe) in plain `node --test`;
+  # same .tsx-entrypoint constraint as PL-043 — the deep-import targets are
+  # the .ts implementation files behind the public entrypoints, never
+  # private helpers. TL-authorized (RW-004 surface). Expires when the web
+  # packages split their entrypoints so plain-node hosts can consume them.
+  - rule: deep-import
+    expires: 2026-11-30
+    paths:
+      - packages/desktop/src/renderer/src/gameos/host/desktop-host.test.ts
   - id: gen-ui-tweak-runtime-size
     rule: max-file-lines
     paths: [packages/desktop/src/renderer/src/plugin-sandbox/genUiTweakRuntime.js]
