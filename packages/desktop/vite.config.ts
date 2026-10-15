@@ -191,6 +191,9 @@ export default defineConfig(({ mode }) => {
       __ZCODE_ENDPOINT_ENV__: JSON.stringify(pickProductEndpointEnv(env)),
       __ZCODE_VERSION__: JSON.stringify(buildMetadata.appVersion),
       __ZCODE_COMMIT__: JSON.stringify(buildMetadata.buildCommitId),
+      // RW-001: the build commit the PlayLiquid GameOS product shell pins its
+      // local project identity to (gameos/identity.ts localProjectIdentity).
+      __PLAYLIQUID_GAMEOS_COMMIT__: JSON.stringify(buildMetadata.buildCommitId),
       __ZCODE_BUILD_TIME__: JSON.stringify(buildMetadata.buildTime),
       __ZCODE_ENV__: JSON.stringify(zcodeEnv),
       __ZCODE_PRODUCT_FLAVOR__: JSON.stringify(zcodeProductFlavor),
