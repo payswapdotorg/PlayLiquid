@@ -8,6 +8,7 @@ import {
   type OAuthProviderId,
   type OAuthStateRegistration,
   PlatformChannels,
+  ZCODE_PRODUCT_FLAVOR,
 } from "@zcode/shared";
 import {
   extractWorkspaceOpenPath,
@@ -17,6 +18,7 @@ import {
   isWorkspaceOpenUrl,
   isShareImportUrl,
 } from "./desktopDeepLinkUrl.js";
+import { desktopProductIdentities } from "../../scripts/desktop-product-identity.mjs";
 import { registerLinuxDeepLinkProtocol } from "./desktopLinuxDeepLinkRegistration.js";
 
 interface DeepLinkWorkspaceGateOptions {
@@ -144,16 +146,16 @@ export function resolveExternalWorkspaceOpenDialogCopy(
   if (locale === "zh-CN") {
     return {
       buttons: ["打开文件夹", "取消"],
-      title: "打开外部 ZCode 链接？",
-      message: "是否在 ZCode 中打开此文件夹？",
+      title: "打开外部 PlayLiquid GameOS 链接？",
+      message: "是否在 PlayLiquid GameOS 中打开此文件夹？",
       detail: (path) => `${path}\n\n只打开你信任来源的文件夹。项目设置可能影响 agent runtime。`,
     };
   }
 
   return {
     buttons: ["Open folder", "Cancel"],
-    title: "Open external ZCode link?",
-    message: "Open this folder in ZCode?",
+    title: "Open external PlayLiquid GameOS link?",
+    message: "Open this folder in PlayLiquid GameOS?",
     detail: (path) =>
       `${path}\n\nOnly open folders from sources you trust. Project settings may affect the agent runtime.`,
   };
@@ -278,8 +280,8 @@ export function handleDeepLink(
     const targetWindow = options.resolveApplicationWindow
       ? options.resolveApplicationWindow()
       : (BrowserWindow.getFocusedWindow() ?? BrowserWindow.getAllWindows()[0] ?? null);
-    // zcode://workspace/open 来自浏览器/IM 等外部应用，不能等同于用户在
-    // ZCode 内部选择目录；确认必须发生在 statSync 之前，避免项目配置被静默信任。
+    // zcode://workspace/open 与 playliquid://workspace/open 一样来自浏览器/IM 等外部应用，不能等同于用户在
+    // PlayLiquid GameOS 内部选择目录；确认必须发生在 statSync 之前，避免项目配置被静默信任。
     if (
       !confirmExternalWorkspaceOpen(workspacePath, logger, targetWindow, options.confirmationCopy)
     ) {
@@ -402,7 +404,11 @@ export function registerDeepLinkProtocol(
   },
   options: { iconPath?: string } = {},
 ) {
-  const scheme = "zcode";
+  // RW-002：只注册本产品 scheme（playliquid / playliquid-preview），绝不注册 zcode ——
+  // 已安装的 ZCode 保持自己的协议处理器；共享后端 OAuth 的 zcode:// 回跳由 Host 轮询兜底完成授权。
+  // 身份必须取编译期 flavor（ZCODE_PRODUCT_FLAVOR）：用户机器上没有 ZCODE_ENV，
+  // 运行时 resolveDesktopProductIdentity() 会把正式包解析成 Preview 身份。
+  const scheme = desktopProductIdentities[ZCODE_PRODUCT_FLAVOR].deepLinkScheme;
 
   if (process.defaultApp && process.argv.length >= 2) {
     const entry = resolve(process.argv[1]!);

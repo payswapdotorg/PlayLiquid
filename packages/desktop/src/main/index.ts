@@ -129,7 +129,10 @@ import {
   updateZCodeStdioTapDevMenuState,
 } from "./desktopApplicationMenu.js";
 import { applyAppIcon } from "./desktopWindowChrome.js";
-import { resolveWindowsAppUserModelIdForFlavor } from "../../scripts/desktop-product-identity.mjs";
+import {
+  desktopProductIdentities,
+  resolveWindowsAppUserModelIdForFlavor,
+} from "../../scripts/desktop-product-identity.mjs";
 import type { DesktopWindowSize } from "./desktopWindowSize.js";
 import { maybeWarnArchitectureMismatch } from "./desktopArchitectureGuard.js";
 import { maybeBlockStartupForForceUpdate } from "./forceUpdateGuard.js";
@@ -2040,8 +2043,13 @@ app.whenReady().then(async () => {
   // 启动自动更新检查（后台执行，不阻塞主界面）
   // Preview 身份无论连接哪个后端都不自动更新：stable feed 上只分发正式 ZCode 安装包，
   // 不向 Preview 渠道提供更新。
+  // RW-002 更新通道隔离：当前唯一的远端更新 manifest 服务是 fork 上游的 ZCode/Z.AI 后端，
+  // 它只会把 PlayLiquid 安装静默替换成 ZCode。identity.remoteUpdateFeedEnabled 在
+  // PlayLiquid 专属更新源存在之前恒为 false（prod/preview 都关闭），开启条件必须
+  // 与打包身份同源（编译期 flavor），不受用户机器环境变量影响。
+  const desktopRuntimeProductIdentity = desktopProductIdentities[ZCODE_PRODUCT_FLAVOR];
   void initAutoUpdater({
-    enabled: ZCODE_PRODUCT_FLAVOR === "production",
+    enabled: ZCODE_PRODUCT_FLAVOR === "production" && desktopRuntimeProductIdentity.remoteUpdateFeedEnabled,
     onBeforeQuitAndInstall: async () => {
       notifyStabilityLifecycle("update_install");
       await prepareAppQuit("auto-update quitAndInstall", "update-install");
@@ -2283,8 +2291,13 @@ app.whenReady().then(async () => {
   // 是面向打包发布客户端的安全门，对未打包 dev 运行时无意义。打包版 app.isPackaged === true，
   // gate 照常生效，对真实用户零影响。
   const skipForceUpdateForLocalDevRuntime = !app.isPackaged;
+  // RW-002 更新通道隔离：远端强更 gate 与自动更新共用同一个 ZCode/Z.AI 发布源，
+  // PlayLiquid 关闭远端更新（remoteUpdateFeedEnabled=false）时同步跳过，
+  // 避免“必须升级”提示把用户引向 ZCode 安装包。
   const forceUpdateGuardResult =
-    ZCODE_PRODUCT_FLAVOR === "production" && !skipForceUpdateForLocalDevRuntime
+    ZCODE_PRODUCT_FLAVOR === "production" &&
+    desktopRuntimeProductIdentity.remoteUpdateFeedEnabled &&
+    !skipForceUpdateForLocalDevRuntime
       ? await maybeBlockStartupForForceUpdate({
           locale: currentApplicationLocale,
           logger,
@@ -2298,6 +2311,10 @@ app.whenReady().then(async () => {
     logger.info("[force-update] Preview 跳过远端强制升级检查");
   } else if (skipForceUpdateForLocalDevRuntime) {
     logger.info("[force-update] 本地 dev 构建（未打包）跳过远端强制升级检查");
+  } else if (!desktopRuntimeProductIdentity.remoteUpdateFeedEnabled) {
+    logger.info(
+      "[force-update] PlayLiquid GameOS 无专属更新源，跳过远端强制升级检查（RW-002 更新通道隔离）",
+    );
   }
   if (forceUpdateGuardResult.blocked) {
     return;

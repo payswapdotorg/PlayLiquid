@@ -26,6 +26,8 @@ import {
   type ZCodeRuntimeEnv,
 } from "@zcode/shared";
 import { resolvePlatformKeyForPackagedApp } from "../../scripts/target-platform.mjs";
+import { desktopApplicationNames } from "../../scripts/desktop-product-identity.mjs";
+import { resolveDesktopProductDataRootDir } from "./desktopDataBaseDirBootstrap.js";
 import {
   getAppConfigDir,
   getDataBaseDir,
@@ -55,15 +57,29 @@ function isTruthyRuntimeEnvOverride(name: string): boolean {
   return value === "1" || value === "true" || value === "yes" || value === "on";
 }
 
-// e2e 运行的是生产构建，默认会和本机正式版 ZCode 共用 app name / userData，
+// e2e 运行的是生产构建，默认会和本机正式版共用 app name / userData，
 // 触发 Electron 单实例锁后只激活已有窗口，Chromedriver 无法接管测试进程。
 // 这里允许测试显式隔离运行时身份，正常桌面/远控路径保持原来的默认值。
+// RW-002：打包身份来自 desktop-product-identity.mjs（PlayLiquid GameOS），
+// app.name 决定默认窗口标题、菜单首项、~/.config/<name> userData 与单实例锁归属。
 export const runtimeApplicationName =
   readRuntimeEnvOverride("ZCODE_DESKTOP_APPLICATION_NAME") ??
-  (isLocalDevelopmentRuntime ? "ZCode Dev" : isPreviewPackagedRuntime ? "ZCode Preview" : "ZCode");
+  (isLocalDevelopmentRuntime
+    ? desktopApplicationNames.development
+    : isPreviewPackagedRuntime
+      ? desktopApplicationNames.preview
+      : desktopApplicationNames.production);
 // Electron 的 app.getPath("home") 不一定跟随测试进程里的 HOME 覆盖。
 // e2e 默认工作区依赖 home 路径，因此提供显式覆盖，避免测试写到开发者真实 ~/ZCodeProject。
-export const runtimeHomePath = readRuntimeEnvOverride("ZCODE_DESKTOP_HOME_DIR");
+// RW-002 注意：desktopDataBaseDirBootstrap 会把 ZCODE_DESKTOP_HOME_DIR 注入为产品数据根
+// （~/.playliquid-gameos，仅用于 settings 目录隔离）；那不是用户/e2e 的 home 覆盖，
+// 不能迁移 Electron app home —— XDG 桌面条目/图标注册、Finder Service 都依赖真实用户 home。
+// 因此这里只把「非产品注入」的值当作 home 覆盖。
+const explicitHomeOverride = readRuntimeEnvOverride("ZCODE_DESKTOP_HOME_DIR");
+export const runtimeHomePath =
+  explicitHomeOverride && explicitHomeOverride !== resolveDesktopProductDataRootDir()
+    ? explicitHomeOverride
+    : undefined;
 // Chromedriver 管理 Electron 时会注入临时 userData；e2e 默认路径模式下导入期不能提前读取 appData。
 export const shouldUseElectronDefaultUserDataPath = isTruthyRuntimeEnvOverride(
   "ZCODE_DESKTOP_USE_ELECTRON_DEFAULT_USER_DATA",
