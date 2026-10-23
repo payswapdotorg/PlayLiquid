@@ -17,6 +17,9 @@ import {
   LOCAL_TENANT,
   PRODUCT_NAME,
   PRODUCT_TAGLINE,
+  PRODUCT_WORDMARK,
+  WORKBENCH_NAV_HINT,
+  WORKBENCH_NAV_LABEL,
   WORKBENCH_QUERY_FLAG,
   buildCommitSha,
   localProjectIdentity,
@@ -37,6 +40,29 @@ function stubWindowLocation(search: string, pathname = "/index.html"): void {
 test("the product identity vocabulary is the PlayLiquid GameOS product", () => {
   assert.equal(PRODUCT_NAME, "PlayLiquid GameOS");
   assert.equal(PRODUCT_TAGLINE, "The game engineering operating system");
+});
+
+test("the compact wordmark is the product's own first word", () => {
+  assert.equal(PRODUCT_WORDMARK, "PlayLiquid");
+  assert.ok(
+    PRODUCT_NAME.startsWith(`${PRODUCT_WORDMARK} `),
+    "the wordmark must stay derived from the product name",
+  );
+});
+
+test("the agent-workspace escape hatch carries the frozen UX-001 vocabulary", () => {
+  // The frozen cross-workstream contract (spec/ux/work-items.md): the
+  // button label is EXACTLY "AI & Agents" — replacing the inherited
+  // workbench label ("ZCode workbench") which named the upstream product
+  // instead of the capability.
+  assert.equal(WORKBENCH_NAV_LABEL, "AI & Agents");
+  // The hint stays honest about what the button opens — no fabrication.
+  assert.ok(WORKBENCH_NAV_HINT.startsWith("Open the agent workspace"));
+  for (const word of ["models", "agents", "provider capabilities"]) {
+    assert.ok(WORKBENCH_NAV_HINT.includes(word), `hint mentions ${word}`);
+  }
+  assert.ok(!WORKBENCH_NAV_HINT.includes("ZCode"), "no inherited branding in the hint");
+  assert.ok(!WORKBENCH_NAV_LABEL.includes("ZCode"), "no inherited branding in the label");
 });
 
 test("the local tenancy facts are valid domain ids of the local operator", () => {

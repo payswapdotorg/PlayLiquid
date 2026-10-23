@@ -15,7 +15,7 @@
  * either the product's own identity or an honestly-declared host catalog.
  */
 
-import type { GameIdentity } from "../../../../../game-contracts/src/index.ts";
+import type { CommitSha, GameIdentity } from "../../../../../game-contracts/src/index.ts";
 import { asCommitSha, asGameId } from "../../../../../game-contracts/src/index.ts";
 import { asAgentRoleId, asZCodeModelRouteId } from "../../../../../lab-contracts/src/index.ts";
 import { asSubjectId, asTenantId } from "../../../../../platform-contracts/src/index.ts";
@@ -28,6 +28,11 @@ export const PRODUCT_NAME = "PlayLiquid GameOS" as const;
 
 /** The product tagline (startup screen + shell subtitle). */
 export const PRODUCT_TAGLINE = "The game engineering operating system" as const;
+
+/** The compact wordmark shown where the full name cannot fit (the
+ * responsive top bar's compact/minimal densities; the first word of
+ * PRODUCT_NAME — pinned by test so the two never drift). */
+export const PRODUCT_WORDMARK = "PlayLiquid" as const;
 
 /** The local operator tenancy of the desktop product (R20 viewer scope). */
 export const LOCAL_TENANT = asTenantId("tenant-playliquid-local")!;
@@ -52,12 +57,13 @@ export const LOCAL_ROLE_VOCABULARY = [
   asAgentRoleId("implementer")!,
 ] as const;
 
-/** The resolved build commit (40-hex) or undefined when unavailable. */
-export function buildCommitSha(): string | undefined {
+/** The resolved build commit (40-hex, validated) or undefined when
+ * unavailable — the branded domain type, never an unvalidated string. */
+export function buildCommitSha(): CommitSha | undefined {
   const declared =
     typeof __PLAYLIQUID_GAMEOS_COMMIT__ === "undefined" ? undefined : __PLAYLIQUID_GAMEOS_COMMIT__;
   if (declared === undefined || declared === "") return undefined;
-  return asCommitSha(declared) === undefined ? undefined : declared;
+  return asCommitSha(declared);
 }
 
 /**
@@ -82,14 +88,33 @@ export function localProjectIdentity(): GameIdentity | undefined {
   };
 }
 
-/** The workbench query flag that routes the entry to the ZCode workbench. */
+/** The workbench query flag that routes the entry to the inherited
+ * ZCode-built agent workspace (same routing contract as the fork entry). */
 export const WORKBENCH_QUERY_FLAG = "workbench" as const;
 
 /**
- * The URL that opens the ZCode workbench from the product shell: the
- * CURRENT window location plus the workbench flag (all existing query
- * parameters are preserved). The workbench stays fully reachable — it is
- * just not the default product surface (RW-001).
+ * The frozen UX-001 label of the shell's agent-workspace escape hatch:
+ * PlayLiquid-first vocabulary REPLACING the inherited fork label (which
+ * named the upstream product instead of the capability). The capability
+ * itself is unchanged — the button keeps the exact same navigation
+ * behavior (workbenchHref below), only the product vocabulary changed.
+ */
+export const WORKBENCH_NAV_LABEL = "AI & Agents" as const;
+
+/**
+ * The honest hint of what the escape hatch opens (the button's title
+ * tooltip at every bar density): models, agents and provider capabilities
+ * — the real contents of the inherited workbench, no fabrication.
+ */
+export const WORKBENCH_NAV_HINT =
+  "Open the agent workspace — models, agents and provider capabilities" as const;
+
+/**
+ * The URL that opens the inherited agent workspace (the fork's workbench
+ * entry) from the product shell: the CURRENT window location plus the
+ * workbench flag (all existing query parameters are preserved). The
+ * workspace stays fully reachable — it is just not the default product
+ * surface (RW-001); the shell's "AI & Agents" escape hatch navigates here.
  */
 export function workbenchHref(): string {
   const params = new URLSearchParams(window.location.search);
@@ -99,9 +124,9 @@ export function workbenchHref(): string {
 }
 
 /**
- * The URL that returns from the workbench to the PlayLiquid GameOS
- * product surface: the current location with the workbench flag removed
- * (all other query parameters preserved).
+ * The URL that returns from the inherited workbench to the PlayLiquid
+ * GameOS product surface: the current location with the workbench flag
+ * removed (all other query parameters preserved).
  */
 export function productHref(): string {
   const params = new URLSearchParams(window.location.search);
