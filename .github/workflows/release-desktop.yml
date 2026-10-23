@@ -267,9 +267,23 @@ jobs:
           transcript, screenshots and logs.
           NOTES
 
+          # Tag-collision policy (issue #9): a release tag may only ever
+          # point at the exact commit its artifacts were built and tested
+          # from. If the tag already exists at a DIFFERENT commit, refuse —
+          # never silently overwrite a release built from another SHA.
+          # (Same-SHA re-runs remain idempotent: re-upload + checksum verify.)
+          if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null 2>&1; then
+            EXISTING_SHA="$(git rev-parse "$TAG^{commit}")"
+            if [ "$EXISTING_SHA" != "$BUILD_SHA" ]; then
+              echo "ERROR: tag $TAG already exists at $EXISTING_SHA, but this run built and tested $BUILD_SHA — refusing to overwrite a release built from another SHA"
+              exit 1
+            fi
+            echo "tag $TAG already exists at the built SHA ($BUILD_SHA) — refreshing its assets"
+          fi
+
           # Create (or reuse) the release — the tag is created at the built SHA.
           if gh release view "$TAG" >/dev/null 2>&1; then
-            echo "release $TAG already exists — assets will be overwritten"
+            echo "release $TAG already exists (tag verified at the built SHA above) — assets will be refreshed"
           else
             gh release create "$TAG" \
               --target "$BUILD_SHA" \

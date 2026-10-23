@@ -26,7 +26,7 @@ export function Panel({
   return (
     <section style={STYLE.panel}>
       <header style={STYLE.panelHeader}>
-        <h3 style={STYLE.panelTitle}>{title}</h3>
+        <h2 style={STYLE.panelTitle}>{title}</h2>
         {summary === undefined ? null : <p style={STYLE.panelSummary}>{summary}</p>}
       </header>
       <div style={STYLE.panelBody}>{children}</div>

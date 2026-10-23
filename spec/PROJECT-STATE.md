@@ -69,3 +69,18 @@ managed fork sub-modules (gen-ui-protocol, gen-ui-service, gen-ui, mcp-apps-prot
 mcp-ui, plugin-ui-bridge, plugin-sandbox, plugin-ui) are recorded in
 spec/module-dependency-matrix.md under the fork-infra regime. Fork composite
 `tsc -b` builds remain outside the gate set (pre-existing §E11 boundary).
+
+## UX workstream integration record (post-release, 2026-10-23)
+
+Issue #9 designated the PlayLiquid-native UX workstream (UX-001/002/003
+workers + TL UX-004; ledger `spec/ux/work-items.md`). All three worker
+branches rebase-merged linear onto main (98cc6e8 UX-001 product shell
+design system + responsive navigation + `AI & Agents` vocabulary; 162997d
+UX-002 journey map + first-run empty states with real next steps; bb2939b
+UX-003 enforceable packaged UX QA battery — 34 checks incl. geometry at the
+480px minimum window and 390x844, accessibility, journey smoke, honest
+3.14.3 baseline evidence). TL integration adds the heading-hierarchy fix
+(h3→h2 Panel titles), version 3.15.0, README download/install sections and
+the release-workflow tag-collision refusal. The frozen architecture is
+unchanged (no ACR; all work inside existing managed modules), and the
+program ledger (program/graph.json) stays closed at PL-045.

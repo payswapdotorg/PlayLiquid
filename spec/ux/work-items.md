@@ -227,3 +227,22 @@ pinned through build, smoke and publication; publish exactly the artifacts
 tested by the same run; generate and verify checksums; REFUSE a tag collision
 when the existing tag points to a different commit (replace the current
 `--clobber` overwrite path with an explicit consistency check).
+
+## Status (TL integration record)
+
+- UX-001 (Worker A): DELIVERED — PR #11 rebase-merged as `98cc6e8`
+  (design system, density ladder full/compact/minimal, `AI & Agents`
+  vocabulary, WCAG AA focus/contrast, reduced motion; 33 shell/identity
+  tests, module trees green, arch 4/4/0-new).
+- UX-002 (Worker B): DELIVERED — PR #10 rebase-merged as `162997d`
+  (journey map `docs/ux/JOURNEY-MAP.md`, 14 empty-state surfaces with the
+  frozen markers + real next steps; 44/48/38 tests across the three module
+  trees; oxlint 0/0; arch unchanged).
+- UX-003 (Worker C): DELIVERED — PR #12 rebase-merged as `bb2939b`
+  (34-check battery: geometry ×3, a11y ×4, journey smoke ×4, first-run and
+  escape-hatch contracts; honest 3.14.3 baseline 26 pass / 8
+  expectedFailure / 0 unexpected, evidence committed in-repo).
+- UX-004 (TL): integration commit (heading-hierarchy fix h3→h2 on the three
+  module Panel primitives, root version 3.15.0, README download/install
+  sections, release-workflow tag-collision refusal) + gate battery on
+  integrated main + publication `playliquid-gameos-v3.15.0` + verification.

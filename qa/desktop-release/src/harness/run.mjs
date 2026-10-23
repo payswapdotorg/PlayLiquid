@@ -34,55 +34,21 @@ import { Report } from "./report.mjs";
 import { checksumCheck, packagingIdentityCheck } from "./checks-artifact.mjs";
 import {
   cleanProfileCheck,
-  emptyStateContractCheck,
   identityChecks,
   markerProbe,
   navigationCheck,
   realOperationCheck,
   shellChecks,
   viewportChecks,
-  workbenchEscapeCheck,
 } from "./checks.mjs";
+import { emptyStateContractCheck, workbenchEscapeCheck } from "./checks-contract.mjs";
 import { geometryChecks } from "./checks-geometry.mjs";
-import {
-  accessibleNamesCheck,
-  headingHierarchyCheck,
-  keyboardNavigationCheck,
-  visibleFocusCheck,
-} from "./checks-a11y.mjs";
+import { accessibleNamesCheck, headingHierarchyCheck, keyboardNavigationCheck, visibleFocusCheck } from "./checks-a11y.mjs";
 import { journeyChecks } from "./checks-journey.mjs";
 import { offlineScenario } from "./checks-offline.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-
-function distroName() {
-  try {
-    const text = fs.readFileSync("/etc/os-release", "utf8");
-    return /^PRETTY_NAME="?([^"\n]+)"?/m.exec(text)?.[1] ?? "unknown";
-  } catch {
-    return "unknown";
-  }
-}
-
-async function waitForExit(child, timeoutMs) {
-  if (child.exitCode !== null) return child.exitCode;
-  return new Promise((resolve) => {
-    const timer = setTimeout(() => resolve(null), timeoutMs);
-    child.once("exit", (code) => {
-      clearTimeout(timer);
-      resolve(code);
-    });
-  });
-}
-
-function tail(file, lines) {
-  try {
-    const content = fs.readFileSync(file, "utf8").trim().split(/\r?\n/);
-    return content.slice(-lines).join("\n").slice(0, 3000);
-  } catch {
-    return "(no log)";
-  }
-}
+import { distroName, tail, waitForExit } from "./run-helpers.mjs";
 
 /** One packaged launch up to "render settled" (or its honest error). */
 async function runAppRun(context, label, cdpPort, extraArgs = []) {

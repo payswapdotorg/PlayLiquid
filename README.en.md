@@ -4,6 +4,89 @@
 
 The repository started from **ZCode 3.14.3**. ZCode remains the underlying AI workspace, agent runtime, desktop/web/CLI foundation, and provider/model infrastructure. PlayLiquid adds the canonical GameOS semantic kernel and lifecycle on top of it.
 
+## Download PlayLiquid GameOS for Ubuntu
+
+You do **not** need to clone or build this repository to use the desktop app.
+Ready-to-run Linux x64 packages are published on the
+[GitHub Releases](https://github.com/payswapdotorg/PlayLiquid/releases/latest) page:
+
+| asset | what it is |
+| --- | --- |
+| `PlayLiquid-GameOS-<version>-linux-amd64.deb` | Debian/Ubuntu package (**recommended on Ubuntu 24.04**) |
+| `PlayLiquid-GameOS-<version>-linux-x86_64.AppImage` | single-file portable app, no installation |
+| `SHA256SUMS` | checksums for the above assets |
+
+Direct links always point at the **latest** release (stay version-agnostic):
+
+- Latest release page: <https://github.com/payswapdotorg/PlayLiquid/releases/latest>
+- `.deb`: <https://github.com/payswapdotorg/PlayLiquid/releases/latest/download/PlayLiquid-GameOS-3.15.0-linux-amd64.deb>
+- AppImage: <https://github.com/payswapdotorg/PlayLiquid/releases/latest/download/PlayLiquid-GameOS-3.15.0-linux-x86_64.AppImage>
+- `SHA256SUMS`: <https://github.com/payswapdotorg/PlayLiquid/releases/latest/download/SHA256SUMS>
+
+*(Per-version assets use the same names with that release's version; find them
+on the release page if you need a specific one.)*
+
+### Requirements
+
+- Linux x64 (built and smoke-tested on Ubuntu 24.04; also runs on Debian and
+  other distributions with unprivileged user namespaces)
+- Common desktop libraries already present on stock Ubuntu:
+  `libgtk-3-0`, `libnotify4`, `libnss3`, `libxss1`, `libxtst6`, `xdg-utils`,
+  `libatspi2.0-0`, `libuuid1`, `libsecret-1-0`
+
+### Install (Ubuntu, recommended: the .deb)
+
+```bash
+# 1. download (or use the links above)
+wget https://github.com/payswapdotorg/PlayLiquid/releases/latest/download/PlayLiquid-GameOS-3.15.0-linux-amd64.deb
+
+# 2. verify the checksum (recommended)
+wget https://github.com/payswapdotorg/PlayLiquid/releases/latest/download/SHA256SUMS
+sha256sum --ignore-missing -c SHA256SUMS
+
+# 3. install and launch
+sudo apt-get install -y ./PlayLiquid-GameOS-3.15.0-linux-amd64.deb
+playliquid-gameos
+```
+
+The `.deb` is recommended on Ubuntu 24.04: its install step registers the
+app's AppArmor profile and sandbox fallback that stock 24.04 requires.
+
+### Run the AppImage (no installation)
+
+```bash
+wget https://github.com/payswapdotorg/PlayLiquid/releases/latest/download/PlayLiquid-GameOS-3.15.0-linux-x86_64.AppImage
+chmod +x PlayLiquid-GameOS-3.15.0-linux-x86_64.AppImage
+./PlayLiquid-GameOS-3.15.0-linux-x86_64.AppImage
+```
+
+On Ubuntu 24.04's default namespace restriction the AppImage needs the
+one-time documented workaround
+(`sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0`) — or simply
+prefer the `.deb` above. We do **not** recommend changing system security
+settings as a default path; the `.deb` avoids it entirely.
+
+### Troubleshooting
+
+- **AppImage fails to start on Ubuntu 24.04** — use the `.deb` (see above), or
+  apply the one-time sysctl workaround documented in the release notes.
+- **Missing libraries** — install the requirements list above
+  (`sudo apt-get install -y libgtk-3-0 libnotify4 libnss3 libxss1 libxtst6 xdg-utils libatspi2.0-0 libuuid1 libsecret-1-0`).
+- **Checksum mismatch** — do not run the file; re-download from the release
+  page and verify against `SHA256SUMS`.
+- **Where are release notes / source / license?** — every release page carries
+  the notes, the exact source commit SHA, and build evidence; the source is
+  this repository (`Apache-2.0`, see `LICENSE`).
+
+### Updates
+
+PlayLiquid GameOS does not auto-update: the product's own update channel is
+deliberately disabled (the inherited ZCode feed could replace PlayLiquid with
+a ZCode build). Download a new release from the
+[releases page](https://github.com/payswapdotorg/PlayLiquid/releases/latest)
+to update; a PlayLiquid-owned verified feed may arrive later.
+
+
 ## Repository source of truth
 
 A fresh Tech Lead must read, in order:
