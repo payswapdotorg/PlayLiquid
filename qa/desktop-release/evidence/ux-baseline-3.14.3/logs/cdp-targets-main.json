@@ -1,0 +1,11 @@
+[
+  {
+    "description": "",
+    "devtoolsFrontendUrl": "https://chrome-devtools-frontend.appspot.com/serve_rev/@f08938029c887ea624da7a1717059788ed95034d/inspector.html?ws=127.0.0.1:9333/devtools/page/0CE4142A91A8C12FEFA8AE1A6E8C7BC0",
+    "id": "0CE4142A91A8C12FEFA8AE1A6E8C7BC0",
+    "title": "index.html?restoreSession=true&amp;supportsSettings=true&amp;initialWorkspacePath=%2Fhome%2Fz%2Fstation%2Ftmp%2Frw003-smoke-FZYP0r%2Fprofile-main%2Fhome%2F.playliquid-gameos%2F.zcode%2Fworkspace%2Fdefault&amp;initialWorkspacePurpose=conversation&amp;zcodeLaunchMarks=%7B&quot;createdAt&quot;%3A1792794165480%2C&quot;mainStart&quot;%3A1792794166946%2C&quot;appReady&quot;%3A1792794168028%2C&quot;loadUrl&quot;%3A1792794168401%7D",
+    "type": "page",
+    "url": "file:///home/z/station/tmp/rw003-smoke-FZYP0r/profile-main/tmp/appimage_extracted_e6dd8b1ea1fc521e8030cffd3ecce22e/resources/app.asar/out/renderer/index.html?restoreSession=true&supportsSettings=true&initialWorkspacePath=%2Fhome%2Fz%2Fstation%2Ftmp%2Frw003-smoke-FZYP0r%2Fprofile-main%2Fhome%2F.playliquid-gameos%2F.zcode%2Fworkspace%2Fdefault&initialWorkspacePurpose=conversation&zcodeLaunchMarks=%7B%22createdAt%22%3A1792794165480%2C%22mainStart%22%3A1792794166946%2C%22appReady%22%3A1792794168028%2C%22loadUrl%22%3A1792794168401%7D",
+    "webSocketDebuggerUrl": "ws://127.0.0.1:9333/devtools/page/0CE4142A91A8C12FEFA8AE1A6E8C7BC0"
+  }
+]

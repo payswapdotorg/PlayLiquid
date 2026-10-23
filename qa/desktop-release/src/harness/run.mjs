@@ -34,13 +34,23 @@ import { Report } from "./report.mjs";
 import { checksumCheck, packagingIdentityCheck } from "./checks-artifact.mjs";
 import {
   cleanProfileCheck,
+  emptyStateContractCheck,
   identityChecks,
   markerProbe,
   navigationCheck,
   realOperationCheck,
   shellChecks,
   viewportChecks,
+  workbenchEscapeCheck,
 } from "./checks.mjs";
+import { geometryChecks } from "./checks-geometry.mjs";
+import {
+  accessibleNamesCheck,
+  headingHierarchyCheck,
+  keyboardNavigationCheck,
+  visibleFocusCheck,
+} from "./checks-a11y.mjs";
+import { journeyChecks } from "./checks-journey.mjs";
 import { offlineScenario } from "./checks-offline.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -278,8 +288,16 @@ export async function main(argv) {
       const probe = await markerProbe(run.page);
       identityChecks(report, probe, options);
       shellChecks(report, probe);
+      // UX-003: the frozen shell + first-run contracts, asserted on the
+      // DEFAULT surface before any navigation moves it.
+      await workbenchEscapeCheck(report, run.page);
+      await emptyStateContractCheck(report, run.page);
       await realOperationCheck(report, run.page);
       await navigationCheck(report, run.page);
+      // UX-003: journey smoke through the production-wired ports (Lab +
+      // Community real read-model operations, typed-outcome and honest-
+      // limitation states).
+      await journeyChecks(report, run.page);
       cleanProfileCheck(report, run.profileDirs, run.before, fs.readdirSync(run.profileDirs.xdgConfig));
       try {
         await viewportChecks(report, run.page, outDir);
@@ -291,6 +309,21 @@ export async function main(argv) {
           `viewport capture failed: ${String(error?.message ?? error)}`,
         );
       }
+      // UX-003: geometry enforcement at the three mandated widths (the real
+      // 1280x800 window, the actual 480px minimum OS window, the 390x844
+      // emulated viewport) — leaves the window restored at 1280x800.
+      await geometryChecks(report, {
+        browser: run.browser,
+        page: run.page,
+        targetId: run.target?.id,
+        outDir,
+      });
+      // UX-003: accessibility battery (keyboard navigation + activation,
+      // visible focus, accessible names, heading hierarchy).
+      await keyboardNavigationCheck(report, run.page);
+      await visibleFocusCheck(report, run.page);
+      await accessibleNamesCheck(report, run.page);
+      await headingHierarchyCheck(report, run.page);
       await packagingIdentityCheck(report, options, run.proc.pid);
       report.check(
         "console-evidence-recorded",
