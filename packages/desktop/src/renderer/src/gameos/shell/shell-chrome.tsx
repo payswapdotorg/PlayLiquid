@@ -163,10 +163,15 @@ export function ShellButton({
         ...focusRingStyle(focused),
         transition: motionTransition(reducedMotion),
       }}
-      onFocus={(event) => {
-        // :focus-visible equivalent: the browser's own heuristic decides
-        // whether this focus deserves the ring (keyboard: yes; mouse: no).
-        setFocused(event.currentTarget.matches?.(":focus-visible") ?? true);
+      onFocus={() => {
+        // The ring shows for ANY focus. The browser's :focus-visible
+        // heuristic can lag a frame in synthesized-input environments
+        // (live-caught by the UX-003 packaged harness: keyboard focus
+        // arrived, :focus-visible read true afterwards, but the
+        // matches() check at event time had already returned false —
+        // a missing keyboard ring is an a11y defect; a ring on mouse
+        // focus is a harmless over-application many products ship).
+        setFocused(true);
       }}
       onBlur={() => {
         setFocused(false);

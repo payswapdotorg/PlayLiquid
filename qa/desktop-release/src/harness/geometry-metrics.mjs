@@ -6,6 +6,23 @@
  */
 
 /** One combined measurement of every bar element (single round trip). */
+import { SHELL_MARKERS } from "./config.mjs";
+
+/** Tolerances (CSS px) for sub-pixel rounding in box math. */
+const PX = 0.5;
+/** Minimum overlap area (px^2) that counts as a real overlap. */
+const OVERLAP_AREA = 1.0;
+
+/** The bar elements whose geometry the check asserts (required set). */
+const REQUIRED = [
+  { key: "brand", label: `brand cluster [${SHELL_MARKERS.brand}]` },
+  { key: "navStudio", label: `Game Studio nav [${SHELL_MARKERS.navStudio}]` },
+  { key: "navLab", label: `Lab nav [${SHELL_MARKERS.navLab}]` },
+  { key: "navCommunity", label: `Community nav [${SHELL_MARKERS.navCommunity}]` },
+  { key: "workbench", label: `AI & Agents escape hatch [${SHELL_MARKERS.navWorkbench}]` },
+];
+
+
 export function barGeometryExpression() {
   const measure = `((el) => {
       if (!el) return { found: false };

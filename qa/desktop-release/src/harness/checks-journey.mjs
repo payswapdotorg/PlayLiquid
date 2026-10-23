@@ -168,7 +168,7 @@ export async function journeyChecks(report, page) {
   await sleep(1400);
   const gate = await page.evaluateValue(`(() => {
     const sections = [...document.querySelectorAll("section")];
-    const panel = sections.find((section) => /lifecycle/i.test(section.querySelector("h3")?.textContent ?? ""));
+    const panel = sections.find((section) => /lifecycle/i.test(section.querySelector("h2, h3")?.textContent ?? ""));
     if (!panel) return { found: false };
     const visible = (el) => {
       const cs = getComputedStyle(el);
@@ -210,7 +210,7 @@ export async function journeyChecks(report, page) {
     if (triage) {
       await page.evaluateValue(`(() => {
         const sections = [...document.querySelectorAll("section")];
-        const panel = sections.find((section) => /lifecycle/i.test(section.querySelector("h3")?.textContent ?? ""));
+        const panel = sections.find((section) => /lifecycle/i.test(section.querySelector("h2, h3")?.textContent ?? ""));
         const button = [...(panel?.querySelectorAll("button") ?? [])].find((el) => /triage/i.test((el.textContent ?? "").trim()));
         button?.click();
         return Boolean(button);

@@ -16,7 +16,7 @@ export async function workbenchEscapeCheck(report, cdp) {
     const cs = getComputedStyle(el);
     return {
       found: true,
-      label: (el.innerText ?? el.textContent ?? "").replace(/\s+/g, " ").trim(),
+      label: (el.innerText ?? el.textContent ?? "").replace(/\\s+/g, " ").trim(),
       title: el.getAttribute("title"),
       ariaCurrent: el.getAttribute("aria-current"),
       visible: cs.display !== "none" && cs.visibility !== "hidden" && r.width > 0 && r.height > 0,
@@ -74,7 +74,10 @@ export async function emptyStateContractCheck(report, cdp) {
       return cs.display !== "none" && cs.visibility !== "hidden" && parseFloat(cs.opacity) !== 0 && r.width > 0 && r.height > 0;
     };
     const containers = [...document.querySelectorAll('[data-testid="${SHELL_MARKERS.emptyState}"]')];
-    const interactive = (el) => el.querySelector("button:not([disabled]), a[href], [role='button']:not([disabled]), input:not([disabled])");
+    const interactive = (el) => {
+      const selector = "button:not([disabled]), a[href], [role='button']:not([disabled]), input:not([disabled])";
+      return el.matches(selector) ? el : el.querySelector(selector);
+    }
     return containers.map((container) => {
       const steps = [...container.querySelectorAll('[data-testid="${SHELL_MARKERS.emptyNextStep}"]')];
       return {

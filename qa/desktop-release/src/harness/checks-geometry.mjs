@@ -36,20 +36,6 @@ import {
   elementVisible,
 } from "./geometry-metrics.mjs";
 
-/** Tolerances (CSS px) for sub-pixel rounding in box math. */
-const PX = 0.5;
-/** Minimum overlap area (px^2) that counts as a real overlap. */
-const OVERLAP_AREA = 1.0;
-
-/** The bar elements whose geometry the check asserts (required set). */
-const REQUIRED = [
-  { key: "brand", label: `brand cluster [${SHELL_MARKERS.brand}]` },
-  { key: "navStudio", label: `Game Studio nav [${SHELL_MARKERS.navStudio}]` },
-  { key: "navLab", label: `Lab nav [${SHELL_MARKERS.navLab}]` },
-  { key: "navCommunity", label: `Community nav [${SHELL_MARKERS.navCommunity}]` },
-  { key: "workbench", label: `AI & Agents escape hatch [${SHELL_MARKERS.navWorkbench}]` },
-];
-
 /** Click the frozen overflow control (if rendered) so collapsed navigation
  * becomes measurable — the frozen contract allows compact/collapsed forms. */
 async function openOverflowIfPresent(page) {
