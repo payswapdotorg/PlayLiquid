@@ -21,6 +21,7 @@ import type {
 } from "../view/community-view.ts";
 import { communitySummary } from "../view/community-view.ts";
 import type { CommunitySelectionRefusal } from "../view/community-selection.ts";
+import { commandLogNextHint, refreshFailureNextStep } from "../view/onboarding.ts";
 import { commandReceiptStatus, refusalStatus } from "../view/status.ts";
 import { ContributionsPanel } from "./contributions-panel.tsx";
 import { ProvenancePanel } from "./provenance-panel.tsx";
@@ -80,6 +81,7 @@ function CommunitySurface({
   onDispatchCommand,
   onSelectContribution,
   onSelectKind,
+  onRefresh,
 }: {
   readonly view: CommunityWorkbenchViewModel;
   readonly viewer: CommunityViewer;
@@ -87,6 +89,8 @@ function CommunitySurface({
   readonly onDispatchCommand: (intent: CommunityCommandIntent) => void;
   readonly onSelectContribution: (contributionId: string) => void;
   readonly onSelectKind: (kind: string | null) => void;
+  /** The REAL next step of a no-data surface: one data-port pull. */
+  readonly onRefresh?: () => void;
 }): ReactNode {
   switch (tab) {
     case "contributions":
@@ -100,9 +104,16 @@ function CommunitySurface({
         />
       );
     case "lifecycle":
-      return <WorkflowPanel view={view.workflow} viewer={viewer} onDispatchCommand={onDispatchCommand} />;
+      return (
+        <WorkflowPanel
+          view={view.workflow}
+          viewer={viewer}
+          onDispatchCommand={onDispatchCommand}
+          onRefresh={onRefresh}
+        />
+      );
     case "provenance":
-      return <ProvenancePanel view={view.provenance} />;
+      return <ProvenancePanel view={view.provenance} onRefresh={onRefresh} />;
   }
 }
 
@@ -160,7 +171,12 @@ export function CommunityShell({
         <h1 style={{ margin: 0, fontSize: 17, letterSpacing: "0.01em" }}>PlayLiquid · Community Contributions</h1>
         <p style={{ ...STYLE.muted, margin: "6px 0 10px", fontSize: 12.5 }}>{communitySummary(view)}</p>
         {loadError === null ? null : (
-          <Banner tone="error">Community read-model load failed (E11): {loadError}</Banner>
+          <>
+            <Banner tone="error">Community read-model load failed (E11): {loadError}</Banner>
+            <p style={{ ...STYLE.muted, margin: "6px 0 0", fontSize: 12.5 }}>
+              {refreshFailureNextStep(loadError)}
+            </p>
+          </>
         )}
         {selectionRefusal === null ? null : (
           <Banner tone="error">
@@ -215,6 +231,7 @@ export function CommunityShell({
           onDispatchCommand={onDispatchCommand}
           onSelectContribution={onSelectContribution}
           onSelectKind={onSelectKind}
+          onRefresh={onRefresh}
         />
         <Panel
           title="Command log (append-only)"
@@ -225,21 +242,26 @@ export function CommunityShell({
               no command intents dispatched yet
             </p>
           ) : (
-            <table style={STYLE.table}>
-              <thead>
-                <tr>
-                  <th key="kind" scope="col" style={STYLE.th}>Intent</th>
-                  <th key="detail" scope="col" style={STYLE.th}>Detail</th>
-                  <th key="outcome" scope="col" style={STYLE.th}>Outcome</th>
-                  <th key="code" scope="col" style={STYLE.th}>Code</th>
-                </tr>
-              </thead>
-              <tbody>
-                {commandLog.map((entry, index) => (
-                  <CommandLogRow key={String(index)} entry={entry} />
-                ))}
-              </tbody>
-            </table>
+            <>
+              <table style={STYLE.table}>
+                <thead>
+                  <tr>
+                    <th key="kind" scope="col" style={STYLE.th}>Intent</th>
+                    <th key="detail" scope="col" style={STYLE.th}>Detail</th>
+                    <th key="outcome" scope="col" style={STYLE.th}>Outcome</th>
+                    <th key="code" scope="col" style={STYLE.th}>Code</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {commandLog.map((entry, index) => (
+                    <CommandLogRow key={String(index)} entry={entry} />
+                  ))}
+                </tbody>
+              </table>
+              <p style={{ ...STYLE.muted, margin: 0, fontSize: 12 }}>
+                {commandLogNextHint(commandLog)}
+              </p>
+            </>
           )}
         </Panel>
       </main>

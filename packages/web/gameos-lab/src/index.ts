@@ -80,17 +80,30 @@ export {
   searchProgressStatus,
 } from "./view/status.ts";
 
+// Onboarding copy + contextual next-step hints (pure; UX-002).
+export type { EmptySurfaceCopy, LabEmptySurfaceId } from "./view/onboarding.ts";
+export {
+  LAB_EMPTY_STATE_COPY,
+  commandLogNextHint,
+  refreshFailureNextStep,
+} from "./view/onboarding.ts";
+
 // Presentational components (zero data fetching).
 export { LabShell } from "./components/lab-shell.tsx";
 export type { LabShellProps } from "./components/lab-shell.tsx";
 export { SearchesPanel } from "./components/searches-panel.tsx";
 export type { SearchesPanelProps } from "./components/searches-panel.tsx";
 export { EvidencePanel } from "./components/evidence-panel.tsx";
+export type { EvidencePanelProps } from "./components/evidence-panel.tsx";
 export { LearningPanel } from "./components/learning-panel.tsx";
+export type { LearningPanelProps } from "./components/learning-panel.tsx";
 export { GuidancePanel } from "./components/guidance-panel.tsx";
 export { GapsPanel } from "./components/gaps-panel.tsx";
 export type { GapsPanelProps } from "./components/gaps-panel.tsx";
 export { ArenaPanel } from "./components/arena-panel.tsx";
+export type { ArenaPanelProps } from "./components/arena-panel.tsx";
+export { EmptySurface } from "./components/empty-surface.tsx";
+export type { EmptySurfaceProps } from "./components/empty-surface.tsx";
 export { CountPill, StatusChip } from "./components/status-chip.tsx";
 export type { StatusChipProps } from "./components/status-chip.tsx";
 export { Banner, ChipList, DataTable, EmptyState, KeyValue, Mono, Panel } from "./components/primitives.tsx";

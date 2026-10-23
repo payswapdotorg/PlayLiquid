@@ -23,8 +23,10 @@ import type {
   ObservedGuidanceView,
 } from "../view/guidance-view.ts";
 import { guidanceSummary } from "../view/guidance-view.ts";
+import { LAB_EMPTY_STATE_COPY } from "../view/onboarding.ts";
 import { estimateMethodStatus, observedEvidenceStatus } from "../view/status.ts";
 import { Banner, DataTable, EmptyState, KeyValue, Mono, Panel } from "./primitives.tsx";
+import { EmptySurface } from "./empty-surface.tsx";
 import { StatusChip } from "./status-chip.tsx";
 import { STYLE } from "./tokens.ts";
 
@@ -95,27 +97,40 @@ function EstimateGuidanceCard({ guidance }: { readonly guidance: EstimateGuidanc
 }
 
 /** The Guidance surface: the two epistemic classes, visually disjoint. */
-export function GuidancePanel({ view }: { readonly view: GuidanceSetView }): ReactNode {
+export function GuidancePanel({
+  view,
+  onRefresh,
+}: {
+  readonly view: GuidanceSetView;
+  /** The REAL next step of the first-run empty state: one port pull. */
+  readonly onRefresh?: () => void;
+}): ReactNode {
   return (
     <Panel title="Search guidance (next search)" summary={guidanceSummary(view)}>
       <Banner tone="info">
         Epistemic classes are structurally disjoint (E11): observed-evidence guidance and
         labeled-estimate guidance render in separate sections with distinct chips — never conflated.
       </Banner>
-      <Panel title="Observed-evidence guidance" summary="green class — observed content only">
-        {view.observed.length === 0 ? (
-          <EmptyState label="no observed-evidence guidance derived" />
-        ) : (
-          view.observed.map((guidance) => <ObservedGuidanceCard key={guidance.digest} guidance={guidance} />)
-        )}
-      </Panel>
-      <Panel title="Labeled-estimate guidance" summary="teal class — carries method, basis and estimate support">
-        {view.estimates.length === 0 ? (
-          <EmptyState label="no labeled-estimate guidance derived" />
-        ) : (
-          view.estimates.map((guidance) => <EstimateGuidanceCard key={guidance.digest} guidance={guidance} />)
-        )}
-      </Panel>
+      {view.observed.length === 0 && view.estimates.length === 0 ? (
+        <EmptySurface copy={LAB_EMPTY_STATE_COPY.guidance} onNextStep={onRefresh} />
+      ) : (
+        <>
+          <Panel title="Observed-evidence guidance" summary="green class — observed content only">
+            {view.observed.length === 0 ? (
+              <EmptyState label="no observed-evidence guidance derived" />
+            ) : (
+              view.observed.map((guidance) => <ObservedGuidanceCard key={guidance.digest} guidance={guidance} />)
+            )}
+          </Panel>
+          <Panel title="Labeled-estimate guidance" summary="teal class — carries method, basis and estimate support">
+            {view.estimates.length === 0 ? (
+              <EmptyState label="no labeled-estimate guidance derived" />
+            ) : (
+              view.estimates.map((guidance) => <EstimateGuidanceCard key={guidance.digest} guidance={guidance} />)
+            )}
+          </Panel>
+        </>
+      )}
       {view.refusals.map((refusal) => (
         <Banner key={refusal.detail} tone="error">
           guidance refused ({refusal.code}): {refusal.detail}

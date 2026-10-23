@@ -9,36 +9,48 @@
 import type { ReactNode } from "react";
 import type { ArenaView } from "../view/arena-view.ts";
 import { arenaSummary } from "../view/arena-view.ts";
+import { LAB_EMPTY_STATE_COPY } from "../view/onboarding.ts";
 import { arenaLifecycleStatus } from "../view/status.ts";
 import { Banner, DataTable, Panel } from "./primitives.tsx";
+import { EmptySurface } from "./empty-surface.tsx";
 import { StatusChip } from "./status-chip.tsx";
 import { STYLE } from "./tokens.ts";
 
+export interface ArenaPanelProps {
+  readonly view: ArenaView;
+  /** The REAL next step of the first-run empty state: one port pull. */
+  readonly onRefresh?: () => void;
+}
+
 /** The Arena surface. */
-export function ArenaPanel({ view }: { readonly view: ArenaView }): ReactNode {
+export function ArenaPanel({ view, onRefresh }: ArenaPanelProps): ReactNode {
   return (
     <Panel title="Arena escalation cases" summary={arenaSummary(view)}>
       <Banner tone="info">
         Decided escalations only (R18): a case exists because the host issued a verified decision;
         Arena is external and optional — evidence is ingested read-only (E10/E11).
       </Banner>
-      <DataTable
-        columns={[
-          { key: "caseId", header: "Case", render: (row) => <span style={STYLE.mono}>{row.caseId}</span> },
-          { key: "tenant", header: "Tenant", render: (row) => <span style={row.foreignTenant ? STYLE.faint : STYLE.muted}>{row.tenant}</span> },
-          { key: "decidedBy", header: "Decided by", render: (row) => <span style={STYLE.mono}>{row.decidedBy}</span> },
-          { key: "source", header: "Source", render: (row) => <span style={STYLE.mono}>{row.sourceKind}</span> },
-          { key: "request", header: "Request kind", render: (row) => <span style={STYLE.mono}>{row.requestKind}</span> },
-          { key: "lifecycle", header: "Lifecycle", render: (row) => <StatusChip status={arenaLifecycleStatus(row.lifecycleState)} /> },
-          { key: "trail", header: "Trail (E10)", render: (row) => <span style={STYLE.mono}>{row.lifecycleTrail}</span> },
-          { key: "verdict", header: "Evidence verdict", render: (row) => row.evidenceVerdict ?? "—" },
-          { key: "counts", header: "R/E/A", render: (row) => <span style={STYLE.mono}>{row.resultCount}/{row.evidenceCount}/{row.artifactCount}</span> },
-          { key: "openedAt", header: "Opened at", render: (row) => <span style={STYLE.mono}>{row.openedAt}</span> },
-        ]}
-        rows={view.rows}
-        rowKey={(row) => row.caseId}
-        empty="no Arena escalation cases"
-      />
+      {view.rows.length === 0 ? (
+        <EmptySurface copy={LAB_EMPTY_STATE_COPY.arena} onNextStep={onRefresh} />
+      ) : (
+        <DataTable
+          columns={[
+            { key: "caseId", header: "Case", render: (row) => <span style={STYLE.mono}>{row.caseId}</span> },
+            { key: "tenant", header: "Tenant", render: (row) => <span style={row.foreignTenant ? STYLE.faint : STYLE.muted}>{row.tenant}</span> },
+            { key: "decidedBy", header: "Decided by", render: (row) => <span style={STYLE.mono}>{row.decidedBy}</span> },
+            { key: "source", header: "Source", render: (row) => <span style={STYLE.mono}>{row.sourceKind}</span> },
+            { key: "request", header: "Request kind", render: (row) => <span style={STYLE.mono}>{row.requestKind}</span> },
+            { key: "lifecycle", header: "Lifecycle", render: (row) => <StatusChip status={arenaLifecycleStatus(row.lifecycleState)} /> },
+            { key: "trail", header: "Trail (E10)", render: (row) => <span style={STYLE.mono}>{row.lifecycleTrail}</span> },
+            { key: "verdict", header: "Evidence verdict", render: (row) => row.evidenceVerdict ?? "—" },
+            { key: "counts", header: "R/E/A", render: (row) => <span style={STYLE.mono}>{row.resultCount}/{row.evidenceCount}/{row.artifactCount}</span> },
+            { key: "openedAt", header: "Opened at", render: (row) => <span style={STYLE.mono}>{row.openedAt}</span> },
+          ]}
+          rows={view.rows}
+          rowKey={(row) => row.caseId}
+          empty="no Arena escalation cases"
+        />
+      )}
     </Panel>
   );
 }

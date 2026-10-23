@@ -18,6 +18,7 @@ import type { LabCommandIntent, LabCommandLogEntry } from "../ports.ts";
 import type { LabWorkbenchViewModel, LabTab } from "../view/lab-view.ts";
 import { labSummary } from "../view/lab-view.ts";
 import type { LabSelectionRefusal } from "../view/lab-selection.ts";
+import { commandLogNextHint, refreshFailureNextStep } from "../view/onboarding.ts";
 import { commandReceiptStatus, refusalStatus } from "../view/status.ts";
 import { ArenaPanel } from "./arena-panel.tsx";
 import { EvidencePanel } from "./evidence-panel.tsx";
@@ -86,12 +87,15 @@ function LabSurface({
   tab,
   onDispatchCommand,
   onSelectSearch,
+  onRefresh,
 }: {
   readonly view: LabWorkbenchViewModel;
   readonly viewer: LabViewer;
   readonly tab: LabTab;
   readonly onDispatchCommand: (intent: LabCommandIntent) => void;
   readonly onSelectSearch: (searchId: string) => void;
+  /** The REAL next step of a no-data surface: one data-port pull. */
+  readonly onRefresh?: () => void;
 }): ReactNode {
   switch (tab) {
     case "searches":
@@ -104,11 +108,11 @@ function LabSurface({
         />
       );
     case "evidence":
-      return <EvidencePanel view={view.evidence} />;
+      return <EvidencePanel view={view.evidence} onRefresh={onRefresh} />;
     case "learning":
-      return <LearningPanel view={view.learning} />;
+      return <LearningPanel view={view.learning} onRefresh={onRefresh} />;
     case "guidance":
-      return <GuidancePanel view={view.guidance} />;
+      return <GuidancePanel view={view.guidance} onRefresh={onRefresh} />;
     case "gaps":
       return (
         <GapsPanel
@@ -116,10 +120,11 @@ function LabSurface({
           viewer={viewer}
           onDispatchCommand={onDispatchCommand}
           selectedCapability={view.selection.gapCapability}
+          onRefresh={onRefresh}
         />
       );
     case "arena":
-      return <ArenaPanel view={view.arena} />;
+      return <ArenaPanel view={view.arena} onRefresh={onRefresh} />;
   }
 }
 
@@ -174,7 +179,12 @@ export function LabShell({
         <h1 style={{ margin: 0, fontSize: 17, letterSpacing: "0.01em" }}>PlayLiquid · Game Engineering Lab</h1>
         <p style={{ ...STYLE.muted, margin: "6px 0 10px", fontSize: 12.5 }}>{labSummary(view)}</p>
         {loadError === null ? null : (
-          <Banner tone="error">Lab read-model load failed (E11): {loadError}</Banner>
+          <>
+            <Banner tone="error">Lab read-model load failed (E11): {loadError}</Banner>
+            <p style={{ ...STYLE.muted, margin: "6px 0 0", fontSize: 12.5 }}>
+              {refreshFailureNextStep(loadError)}
+            </p>
+          </>
         )}
         {selectionRefusal === null ? null : (
           <Banner tone="error">
@@ -228,6 +238,7 @@ export function LabShell({
           tab={view.selection.tab}
           onDispatchCommand={onDispatchCommand}
           onSelectSearch={onSelectSearch}
+          onRefresh={onRefresh}
         />
         <Panel title="Command log (append-only)" summary={`${commandLog.length} dispatched intent${commandLog.length === 1 ? "" : "s"} · typed outcomes, never silent (E8)`}>
           {commandLog.length === 0 ? (
@@ -235,21 +246,26 @@ export function LabShell({
               no command intents dispatched yet
             </p>
           ) : (
-            <table style={STYLE.table}>
-              <thead>
-                <tr>
-                  <th key="kind" scope="col" style={STYLE.th}>Intent</th>
-                  <th key="detail" scope="col" style={STYLE.th}>Detail</th>
-                  <th key="outcome" scope="col" style={STYLE.th}>Outcome</th>
-                  <th key="code" scope="col" style={STYLE.th}>Code</th>
-                </tr>
-              </thead>
-              <tbody>
-                {commandLog.map((entry, index) => (
-                  <CommandLogRow key={String(index)} entry={entry} />
-                ))}
-              </tbody>
-            </table>
+            <>
+              <table style={STYLE.table}>
+                <thead>
+                  <tr>
+                    <th key="kind" scope="col" style={STYLE.th}>Intent</th>
+                    <th key="detail" scope="col" style={STYLE.th}>Detail</th>
+                    <th key="outcome" scope="col" style={STYLE.th}>Outcome</th>
+                    <th key="code" scope="col" style={STYLE.th}>Code</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {commandLog.map((entry, index) => (
+                    <CommandLogRow key={String(index)} entry={entry} />
+                  ))}
+                </tbody>
+              </table>
+              <p style={{ ...STYLE.muted, margin: 0, fontSize: 12 }}>
+                {commandLogNextHint(commandLog)}
+              </p>
+            </>
           )}
         </Panel>
       </main>

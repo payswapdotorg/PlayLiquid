@@ -13,8 +13,10 @@ import type { LabCommandIntent } from "../ports.ts";
 import type { LabViewer } from "../view/lab-view.ts";
 import type { SearchesView } from "../view/search-view.ts";
 import { searchesSummary } from "../view/search-view.ts";
+import { LAB_EMPTY_STATE_COPY } from "../view/onboarding.ts";
 import { searchProgressStatus } from "../view/status.ts";
 import { DataTable, EmptyState, KeyValue, Panel } from "./primitives.tsx";
+import { EmptySurface } from "./empty-surface.tsx";
 import { StatusChip } from "./status-chip.tsx";
 import { STYLE } from "./tokens.ts";
 
@@ -35,64 +37,67 @@ export function SearchesPanel({
   onSelectSearch,
 }: SearchesPanelProps): ReactNode {
   const selected = view.rows.find((row) => row.searchId === view.selectedSearchId) ?? null;
+  // The REAL first-run next step: one request-search typed intent through
+  // the command port (the organization service owns admission).
+  const requestSearch = (): void => {
+    onDispatchCommand({
+      kind: "request-search",
+      tenant: viewer.tenant,
+      subject: viewer.subject,
+      cycleId: "cycle-ui-request",
+      seed: "seed-ui-request",
+      maxAgents: 2,
+    });
+  };
   return (
     <Panel title="Organization searches" summary={searchesSummary(view)}>
-      <DataTable
-        columns={[
-          {
-            key: "searchId",
-            header: "Search",
-            render: (row) => (
-              <>
-                {row.foreignTenant ? (
-                  <span title="another tenant's session — selection is refused (R20)" style={STYLE.muted}>
-                    {row.searchId}
-                  </span>
-                ) : (
-                  <button
-                    type="button"
-                    style={STYLE.selectButton}
-                    onClick={() => {
-                      onSelectSearch(row.searchId);
-                    }}
-                  >
-                    {row.searchId}
-                  </button>
-                )}
-              </>
-            ),
-          },
-          { key: "tenant", header: "Tenant", render: (row) => <span style={row.foreignTenant ? STYLE.faint : STYLE.muted}>{row.tenant}</span> },
-          { key: "cycle", header: "Cycle", render: (row) => <span style={STYLE.mono}>{row.cycleId}</span> },
-          { key: "seed", header: "Seed (E9)", render: (row) => <span style={STYLE.mono}>{row.seed}</span> },
-          { key: "space", header: "Space", render: (row) => <span style={STYLE.mono}>{row.emitted}/{row.spaceSize}</span> },
-          {
-            key: "state",
-            header: "State",
-            render: (row) => <StatusChip status={searchProgressStatus(row.done)} />,
-          },
-          { key: "digest", header: "Space digest", render: (row) => <span style={STYLE.mono}>{row.spaceDigest}</span> },
-          { key: "openedAt", header: "Opened at", render: (row) => <span style={STYLE.mono}>{row.openedAt}</span> },
-        ]}
-        rows={view.rows}
-        rowKey={(row) => row.searchId}
-        empty="no organization searches recorded"
-      />
+      {view.rows.length === 0 ? (
+        <EmptySurface copy={LAB_EMPTY_STATE_COPY.searches} onNextStep={requestSearch} />
+      ) : (
+        <DataTable
+          columns={[
+            {
+              key: "searchId",
+              header: "Search",
+              render: (row) => (
+                <>
+                  {row.foreignTenant ? (
+                    <span title="another tenant's session — selection is refused (R20)" style={STYLE.muted}>
+                      {row.searchId}
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      style={STYLE.selectButton}
+                      onClick={() => {
+                        onSelectSearch(row.searchId);
+                      }}
+                    >
+                      {row.searchId}
+                    </button>
+                  )}
+                </>
+              ),
+            },
+            { key: "tenant", header: "Tenant", render: (row) => <span style={row.foreignTenant ? STYLE.faint : STYLE.muted}>{row.tenant}</span> },
+            { key: "cycle", header: "Cycle", render: (row) => <span style={STYLE.mono}>{row.cycleId}</span> },
+            { key: "seed", header: "Seed (E9)", render: (row) => <span style={STYLE.mono}>{row.seed}</span> },
+            { key: "space", header: "Space", render: (row) => <span style={STYLE.mono}>{row.emitted}/{row.spaceSize}</span> },
+            {
+              key: "state",
+              header: "State",
+              render: (row) => <StatusChip status={searchProgressStatus(row.done)} />,
+            },
+            { key: "digest", header: "Space digest", render: (row) => <span style={STYLE.mono}>{row.spaceDigest}</span> },
+            { key: "openedAt", header: "Opened at", render: (row) => <span style={STYLE.mono}>{row.openedAt}</span> },
+          ]}
+          rows={view.rows}
+          rowKey={(row) => row.searchId}
+          empty="no organization searches recorded"
+        />
+      )}
       <Panel title="Request a search (typed intent)" summary="dispatched through the command port — the host owns admission">
-        <button
-          type="button"
-          style={{ ...STYLE.selectButton, fontSize: 12.5 }}
-          onClick={() => {
-            onDispatchCommand({
-              kind: "request-search",
-              tenant: viewer.tenant,
-              subject: viewer.subject,
-              cycleId: "cycle-ui-request",
-              seed: "seed-ui-request",
-              maxAgents: 2,
-            });
-          }}
-        >
+        <button type="button" style={{ ...STYLE.selectButton, fontSize: 12.5 }} onClick={requestSearch}>
           request-search · cycle-ui-request · seed seed-ui-request
         </button>
       </Panel>

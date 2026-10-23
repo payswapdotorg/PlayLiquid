@@ -77,6 +77,14 @@ export {
   toolJobStatus,
 } from "./view/status.ts";
 
+// Onboarding copy + contextual next-step hints (pure; UX-002).
+export type { EmptySurfaceCopy, StudioEmptySurfaceId } from "./view/onboarding.ts";
+export {
+  STUDIO_EMPTY_STATE_COPY,
+  refreshFailureNextStep,
+  timelineNextHint,
+} from "./view/onboarding.ts";
+
 // Presentational components (zero data fetching).
 export { StudioShell } from "./components/studio-shell.tsx";
 export type { StudioShellProps } from "./components/studio-shell.tsx";
@@ -90,6 +98,8 @@ export { CountPill, StatusChip } from "./components/status-chip.tsx";
 export type { StatusChipProps } from "./components/status-chip.tsx";
 export { Banner, ChipList, DataTable, EmptyState, KeyValue, Mono, Panel } from "./components/primitives.tsx";
 export type { DataTableColumn, DataTableProps } from "./components/primitives.tsx";
+export { EmptySurface } from "./components/empty-surface.tsx";
+export type { EmptySurfaceProps } from "./components/empty-surface.tsx";
 export { FONT, STYLE, SURFACE, TONE_STYLE } from "./components/tokens.ts";
 export type { ToneStyle } from "./components/tokens.ts";
 

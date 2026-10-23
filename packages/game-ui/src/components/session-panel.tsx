@@ -11,8 +11,10 @@
 import type { ReactNode } from "react";
 import type { SessionTimelineRow, SessionView } from "../view/runtime-view.ts";
 import { sessionSummary } from "../view/runtime-view.ts";
+import { STUDIO_EMPTY_STATE_COPY, timelineNextHint } from "../view/onboarding.ts";
 import { StatusChip } from "./status-chip.tsx";
 import { EmptyState, KeyValue, Mono, Panel } from "./primitives.tsx";
+import { EmptySurface } from "./empty-surface.tsx";
 import { STYLE } from "./tokens.ts";
 
 /** One timeline row: operation, outcome chip, detail, epoch + stale marker. */
@@ -35,13 +37,20 @@ function TimelineRow({ row }: { readonly row: SessionTimelineRow }): ReactNode {
 }
 
 /** The Session surface: session card, latest events, operation timeline. */
-export function SessionPanel({ view }: { readonly view: SessionView }): ReactNode {
+export function SessionPanel({
+  view,
+  onRefresh,
+}: {
+  readonly view: SessionView;
+  /** The REAL next step of the first-run empty state: one port pull. */
+  readonly onRefresh?: () => void;
+}): ReactNode {
   const card = view.card;
   return (
     <div style={{ display: "grid", gap: 14 }}>
       <Panel title="Runtime session" summary={sessionSummary(view)}>
         {card === undefined ? (
-          <EmptyState label="no active runtime session" />
+          <EmptySurface copy={STUDIO_EMPTY_STATE_COPY.session} onNextStep={onRefresh} />
         ) : (
           <KeyValue
             entries={[
@@ -83,13 +92,18 @@ export function SessionPanel({ view }: { readonly view: SessionView }): ReactNod
         {view.timeline.length === 0 ? (
           <EmptyState label="no operations recorded yet" />
         ) : (
-          <div style={{ maxHeight: 340, overflowY: "auto", paddingRight: 4 }}>
-            <ol style={{ margin: 0, paddingLeft: 0, listStyle: "none", display: "grid", gap: 8 }}>
-              {view.timeline.map((row, index) => (
-                <TimelineRow key={`${row.operation}-${String(index)}`} row={row} />
-              ))}
-            </ol>
-          </div>
+          <>
+            <div style={{ maxHeight: 340, overflowY: "auto", paddingRight: 4 }}>
+              <ol style={{ margin: 0, paddingLeft: 0, listStyle: "none", display: "grid", gap: 8 }}>
+                {view.timeline.map((row, index) => (
+                  <TimelineRow key={`${row.operation}-${String(index)}`} row={row} />
+                ))}
+              </ol>
+            </div>
+            <p style={{ ...STYLE.muted, margin: 0, fontSize: 12 }}>
+              {timelineNextHint(view.timeline.length)}
+            </p>
+          </>
         )}
       </Panel>
     </div>
