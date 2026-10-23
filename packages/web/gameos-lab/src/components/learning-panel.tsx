@@ -8,29 +8,41 @@
 import type { ReactNode } from "react";
 import type { LearningView } from "../view/learning-view.ts";
 import { learningSummary } from "../view/learning-view.ts";
+import { LAB_EMPTY_STATE_COPY } from "../view/onboarding.ts";
 import { DataTable, KeyValue, Panel } from "./primitives.tsx";
+import { EmptySurface } from "./empty-surface.tsx";
 import { STYLE } from "./tokens.ts";
 
+export interface LearningPanelProps {
+  readonly view: LearningView;
+  /** The REAL next step of the first-run empty state: one port pull. */
+  readonly onRefresh?: () => void;
+}
+
 /** The Learning surface. */
-export function LearningPanel({ view }: { readonly view: LearningView }): ReactNode {
+export function LearningPanel({ view, onRefresh }: LearningPanelProps): ReactNode {
   return (
     <Panel title="Learning cycles & signals" summary={learningSummary(view)}>
-      <DataTable
-        columns={[
-          { key: "recordId", header: "Record", render: (row) => <span style={STYLE.mono}>{row.recordId}</span> },
-          { key: "cycle", header: "Cycle", render: (row) => <span style={STYLE.mono}>{row.cycleId}</span> },
-          { key: "sequence", header: "Seq", render: (row) => <span style={STYLE.mono}>{row.sequence}</span> },
-          { key: "outcomes", header: "Outcomes", render: (row) => <span style={STYLE.mono}>{row.outcomeCount}</span> },
-          { key: "conclusions", header: "Conclusions", render: (row) => <span style={STYLE.mono}>{row.conclusionCount}</span> },
-          { key: "evaluations", header: "Evaluations", render: (row) => <span style={STYLE.mono}>{row.evaluationCount}</span> },
-          { key: "searches", header: "Search results", render: (row) => <span style={STYLE.mono}>{row.searchResultCount}</span> },
-          { key: "gaps", header: "Gaps", render: (row) => <span style={STYLE.mono}>{row.gapCount}</span> },
-          { key: "learnedAt", header: "Learned at", render: (row) => <span style={STYLE.mono}>{row.learnedAt}</span> },
-        ]}
-        rows={view.rows}
-        rowKey={(row) => row.recordId}
-        empty="no learning cycles recorded yet"
-      />
+      {view.rows.length === 0 ? (
+        <EmptySurface copy={LAB_EMPTY_STATE_COPY.learning} onNextStep={onRefresh} />
+      ) : (
+        <DataTable
+          columns={[
+            { key: "recordId", header: "Record", render: (row) => <span style={STYLE.mono}>{row.recordId}</span> },
+            { key: "cycle", header: "Cycle", render: (row) => <span style={STYLE.mono}>{row.cycleId}</span> },
+            { key: "sequence", header: "Seq", render: (row) => <span style={STYLE.mono}>{row.sequence}</span> },
+            { key: "outcomes", header: "Outcomes", render: (row) => <span style={STYLE.mono}>{row.outcomeCount}</span> },
+            { key: "conclusions", header: "Conclusions", render: (row) => <span style={STYLE.mono}>{row.conclusionCount}</span> },
+            { key: "evaluations", header: "Evaluations", render: (row) => <span style={STYLE.mono}>{row.evaluationCount}</span> },
+            { key: "searches", header: "Search results", render: (row) => <span style={STYLE.mono}>{row.searchResultCount}</span> },
+            { key: "gaps", header: "Gaps", render: (row) => <span style={STYLE.mono}>{row.gapCount}</span> },
+            { key: "learnedAt", header: "Learned at", render: (row) => <span style={STYLE.mono}>{row.learnedAt}</span> },
+          ]}
+          rows={view.rows}
+          rowKey={(row) => row.recordId}
+          empty="no learning cycles recorded yet"
+        />
+      )}
       <Panel title="Dimension outcome affinities (signals)" summary="folded by lab-learning — read-only here">
         <DataTable
           columns={[

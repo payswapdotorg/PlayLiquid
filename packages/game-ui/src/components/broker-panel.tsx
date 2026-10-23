@@ -12,34 +12,47 @@
 import type { ReactNode } from "react";
 import type { BrokerView } from "../view/broker-view.ts";
 import { brokerSummary } from "../view/broker-view.ts";
+import { STUDIO_EMPTY_STATE_COPY } from "../view/onboarding.ts";
 import { StatusChip } from "./status-chip.tsx";
 import { ChipList, DataTable, Mono, Panel } from "./primitives.tsx";
+import { EmptySurface } from "./empty-surface.tsx";
 import { STYLE } from "./tokens.ts";
 
 /** The Capabilities surface: coverage, restrictions, grants, evaluations. */
-export function BrokerPanel({ view }: { readonly view: BrokerView }): ReactNode {
+export function BrokerPanel({
+  view,
+  onRefresh,
+}: {
+  readonly view: BrokerView;
+  /** The REAL next step of the first-run empty state: one port pull. */
+  readonly onRefresh?: () => void;
+}): ReactNode {
   return (
     <div style={{ display: "grid", gap: 14 }}>
       <Panel title="Capabilities" summary={brokerSummary(view)}>
-        <DataTable
-          columns={[
-            { key: "capability", header: "capability", render: (row) => <Mono>{row.capability}</Mono> },
-            {
-              key: "intents",
-              header: "authorized intents",
-              render: (row) =>
-                row.intentKinds.length === 0 ? (
-                  <span style={STYLE.muted}>—</span>
-                ) : (
-                  <span style={{ ...STYLE.mono, fontSize: 12 }}>{row.intentKinds.join(", ")}</span>
-                ),
-            },
-            { key: "status", header: "policy", render: (row) => <StatusChip status={row.status} /> },
-          ]}
-          rows={view.coverage}
-          rowKey={(row) => row.capability}
-          empty="no capabilities declared"
-        />
+        {view.coverage.length === 0 ? (
+          <EmptySurface copy={STUDIO_EMPTY_STATE_COPY.capabilities} onNextStep={onRefresh} />
+        ) : (
+          <DataTable
+            columns={[
+              { key: "capability", header: "capability", render: (row) => <Mono>{row.capability}</Mono> },
+              {
+                key: "intents",
+                header: "authorized intents",
+                render: (row) =>
+                  row.intentKinds.length === 0 ? (
+                    <span style={STYLE.muted}>—</span>
+                  ) : (
+                    <span style={{ ...STYLE.mono, fontSize: 12 }}>{row.intentKinds.join(", ")}</span>
+                  ),
+              },
+              { key: "status", header: "policy", render: (row) => <StatusChip status={row.status} /> },
+            ]}
+            rows={view.coverage}
+            rowKey={(row) => row.capability}
+            empty="no capabilities declared"
+          />
+        )}
       </Panel>
       <Panel title="Host restrictions" summary={`${view.restrictions.length} active restriction${view.restrictions.length === 1 ? "" : "s"} (R5)`}>
         <ChipList

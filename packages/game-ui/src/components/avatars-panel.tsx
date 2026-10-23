@@ -13,8 +13,10 @@
 import type { ReactNode } from "react";
 import type { AvatarCardView, AvatarsView } from "../view/avatar-view.ts";
 import { avatarsSummary } from "../view/avatar-view.ts";
+import { STUDIO_EMPTY_STATE_COPY } from "../view/onboarding.ts";
 import { StatusChip } from "./status-chip.tsx";
-import { Banner, ChipList, DataTable, EmptyState, KeyValue, Mono, Panel } from "./primitives.tsx";
+import { Banner, ChipList, DataTable, KeyValue, Mono, Panel } from "./primitives.tsx";
+import { EmptySurface } from "./empty-surface.tsx";
 import { STYLE } from "./tokens.ts";
 
 function AvatarCard({
@@ -101,10 +103,13 @@ export function AvatarsPanel({
   view,
   selectedAvatarId,
   onSelectAvatar,
+  onRefresh,
 }: {
   readonly view: AvatarsView;
   readonly selectedAvatarId?: string | null;
   readonly onSelectAvatar?: (avatarId: string) => void;
+  /** The REAL next step of the first-run empty state: one port pull. */
+  readonly onRefresh?: () => void;
 }): ReactNode {
   return (
     <div style={{ display: "grid", gap: 14 }}>
@@ -115,7 +120,7 @@ export function AvatarsPanel({
       )}
       <Panel title="Avatars" summary={avatarsSummary(view)}>
         {view.cards.length === 0 ? (
-          <EmptyState label="no avatar definitions composed" />
+          <EmptySurface copy={STUDIO_EMPTY_STATE_COPY.avatars} onNextStep={onRefresh} />
         ) : (
           <div style={{ display: "grid", gap: 10 }}>
             {view.cards.map((card) => (

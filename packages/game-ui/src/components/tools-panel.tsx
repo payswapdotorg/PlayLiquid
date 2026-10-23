@@ -14,8 +14,10 @@
 import type { ReactNode } from "react";
 import type { ToolsView } from "../view/tools-view.ts";
 import { toolsSummary } from "../view/tools-view.ts";
+import { STUDIO_EMPTY_STATE_COPY } from "../view/onboarding.ts";
 import { StatusChip } from "./status-chip.tsx";
 import { DataTable, Mono, Panel } from "./primitives.tsx";
+import { EmptySurface } from "./empty-surface.tsx";
 import { STYLE } from "./tokens.ts";
 
 export interface ToolsPanelProps {
@@ -24,6 +26,8 @@ export interface ToolsPanelProps {
   readonly selectedJobId?: string | null;
   /** Called when the user picks a job (selection belongs to the app). */
   readonly onSelectJob?: (jobId: string) => void;
+  /** The REAL next step of the first-run empty state: one port pull. */
+  readonly onRefresh?: () => void;
 }
 
 /** One job row; selection (when wired) renders the id as a real button. */
@@ -51,48 +55,52 @@ function JobIdCell({
 }
 
 /** The Tools surface: registrations, queued job models, job events. */
-export function ToolsPanel({ view, selectedJobId, onSelectJob }: ToolsPanelProps): ReactNode {
+export function ToolsPanel({ view, selectedJobId, onSelectJob, onRefresh }: ToolsPanelProps): ReactNode {
   return (
     <div style={{ display: "grid", gap: 14 }}>
       <Panel title="Tool registrations" summary={toolsSummary(view)}>
-        <DataTable
-          columns={[
-            { key: "toolId", header: "tool", render: (row) => <Mono>{row.toolId}</Mono> },
-            { key: "title", header: "title", render: (row) => row.title },
-            { key: "surface", header: "surface", render: (row) => <Mono>{row.surface}</Mono> },
-            {
-              key: "adapter",
-              header: "adapter",
-              render: (row) => (
-                <span style={STYLE.chipRow}>
-                  <Mono>{row.adapterLabel}</Mono>
-                  <span style={{ ...STYLE.mono, fontSize: 11, color: STYLE.faint.color }}>
-                    #{row.adapterId}
+        {view.registrations.length === 0 ? (
+          <EmptySurface copy={STUDIO_EMPTY_STATE_COPY.tools} onNextStep={onRefresh} />
+        ) : (
+          <DataTable
+            columns={[
+              { key: "toolId", header: "tool", render: (row) => <Mono>{row.toolId}</Mono> },
+              { key: "title", header: "title", render: (row) => row.title },
+              { key: "surface", header: "surface", render: (row) => <Mono>{row.surface}</Mono> },
+              {
+                key: "adapter",
+                header: "adapter",
+                render: (row) => (
+                  <span style={STYLE.chipRow}>
+                    <Mono>{row.adapterLabel}</Mono>
+                    <span style={{ ...STYLE.mono, fontSize: 11, color: STYLE.faint.color }}>
+                      #{row.adapterId}
+                    </span>
                   </span>
-                </span>
-              ),
-            },
-            { key: "adapterState", header: "state", render: (row) => <StatusChip status={row.adapterState} /> },
-            {
-              key: "dispatchCapability",
-              header: "dispatch",
-              render: (row) => <Mono>{row.dispatchCapability}</Mono>,
-            },
-            {
-              key: "capabilities",
-              header: "offers",
-              render: (row) =>
-                row.capabilities.length === 0 ? (
-                  <span style={STYLE.muted}>—</span>
-                ) : (
-                  <span style={{ ...STYLE.mono, fontSize: 12 }}>{row.capabilities.join(", ")}</span>
                 ),
-            },
-          ]}
-          rows={view.registrations}
-          rowKey={(row) => row.toolId}
-          empty="no tools registered"
-        />
+              },
+              { key: "adapterState", header: "state", render: (row) => <StatusChip status={row.adapterState} /> },
+              {
+                key: "dispatchCapability",
+                header: "dispatch",
+                render: (row) => <Mono>{row.dispatchCapability}</Mono>,
+              },
+              {
+                key: "capabilities",
+                header: "offers",
+                render: (row) =>
+                  row.capabilities.length === 0 ? (
+                    <span style={STYLE.muted}>—</span>
+                  ) : (
+                    <span style={{ ...STYLE.mono, fontSize: 12 }}>{row.capabilities.join(", ")}</span>
+                  ),
+              },
+            ]}
+            rows={view.registrations}
+            rowKey={(row) => row.toolId}
+            empty="no tools registered"
+          />
+        )}
       </Panel>
       <Panel
         title="Tool jobs"

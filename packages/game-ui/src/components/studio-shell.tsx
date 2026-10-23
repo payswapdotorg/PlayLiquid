@@ -14,6 +14,7 @@
 import type { ReactNode } from "react";
 import type { GameStudioViewModel, StudioTab } from "../view/studio-view.ts";
 import { studioSummary } from "../view/studio-view.ts";
+import { refreshFailureNextStep } from "../view/onboarding.ts";
 import { CountPill } from "./status-chip.tsx";
 import { Banner } from "./primitives.tsx";
 import { AvatarsPanel } from "./avatars-panel.tsx";
@@ -56,7 +57,8 @@ function StudioSurface({
   onSelectPackage,
   onSelectAvatar,
   onSelectJob,
-}: Omit<StudioShellProps, "loadError" | "onSelectTab" | "onRefresh"> & {
+  onRefresh,
+}: Omit<StudioShellProps, "loadError" | "onSelectTab"> & {
   readonly tab: StudioTab;
 }): ReactNode {
   switch (tab) {
@@ -66,23 +68,30 @@ function StudioSurface({
           view={view.packages}
           selectedPackageId={view.selection.packageId}
           onSelectPackage={onSelectPackage}
+          onRefresh={onRefresh}
         />
       );
     case "session":
-      return <SessionPanel view={view.session} />;
+      return <SessionPanel view={view.session} onRefresh={onRefresh} />;
     case "avatars":
       return (
         <AvatarsPanel
           view={view.avatars}
           selectedAvatarId={view.selection.avatarId}
           onSelectAvatar={onSelectAvatar}
+          onRefresh={onRefresh}
         />
       );
     case "capabilities":
-      return <BrokerPanel view={view.broker} />;
+      return <BrokerPanel view={view.broker} onRefresh={onRefresh} />;
     case "tools":
       return (
-        <ToolsPanel view={view.tools} selectedJobId={view.selection.jobId} onSelectJob={onSelectJob} />
+        <ToolsPanel
+          view={view.tools}
+          selectedJobId={view.selection.jobId}
+          onSelectJob={onSelectJob}
+          onRefresh={onRefresh}
+        />
       );
   }
 }
@@ -144,20 +153,7 @@ export function StudioShell({
           <p style={{ ...STYLE.panelSummary, marginTop: 4 }}>{studioSummary(view)}</p>
         </div>
         {onRefresh === undefined ? null : (
-          <button
-            type="button"
-            onClick={onRefresh}
-            style={{
-              all: "unset",
-              cursor: "pointer",
-              padding: "6px 14px",
-              borderRadius: 8,
-              fontSize: 12.5,
-              fontWeight: 600,
-              color: "#0b1220",
-              background: "#2dd4bf",
-            }}
-          >
+          <button type="button" onClick={onRefresh} style={STYLE.emptyStepButton}>
             Refresh snapshot
           </button>
         )}
@@ -205,7 +201,12 @@ export function StudioShell({
       <main style={{ flex: 1, padding: 22 }}>
         <div style={{ display: "grid", gap: 14 }}>
           {loadError === null ? null : (
-            <Banner tone="error">studio load failed (E11): {loadError}</Banner>
+            <>
+              <Banner tone="error">studio load failed (E11): {loadError}</Banner>
+              <p style={{ ...STYLE.muted, margin: 0, fontSize: 12.5 }}>
+                {refreshFailureNextStep(loadError)}
+              </p>
+            </>
           )}
           <StudioSurface
             tab={tab}
@@ -213,6 +214,7 @@ export function StudioShell({
             onSelectPackage={onSelectPackage}
             onSelectAvatar={onSelectAvatar}
             onSelectJob={onSelectJob}
+            onRefresh={onRefresh}
           />
         </div>
       </main>

@@ -10,6 +10,7 @@
 import type { ReactNode } from "react";
 import type { ProvenanceView } from "../view/provenance-view.ts";
 import { provenanceSummary } from "../view/provenance-view.ts";
+import { COMMUNITY_EMPTY_STATE_COPY } from "../view/onboarding.ts";
 import {
   aiDisclosureStatus,
   contributionKindStatus,
@@ -18,23 +19,23 @@ import {
   originStatus,
   trustStatus,
 } from "../view/status.ts";
-import { Banner, ChipList, KeyValue, Mono, Panel } from "./primitives.tsx";
+import { ChipList, KeyValue, Mono, Panel } from "./primitives.tsx";
+import { EmptySurface } from "./empty-surface.tsx";
 import { StatusChip } from "./status-chip.tsx";
 import { STYLE } from "./tokens.ts";
 
 export interface ProvenancePanelProps {
   readonly view: ProvenanceView;
+  /** The REAL next step of the no-selection state: one port pull. */
+  readonly onRefresh?: () => void;
 }
 
 /** The Provenance surface. */
-export function ProvenancePanel({ view }: ProvenancePanelProps): ReactNode {
+export function ProvenancePanel({ view, onRefresh }: ProvenancePanelProps): ReactNode {
   if (view.detail === null) {
     return (
       <Panel title="Provenance" summary="no contribution selected">
-        <Banner tone="info">
-          Open a contribution from the Contributions surface to inspect its full provenance chain:
-          origin lineage, content digest, AI disclosure, gap link and trust state.
-        </Banner>
+        <EmptySurface copy={COMMUNITY_EMPTY_STATE_COPY.provenance} onNextStep={onRefresh} />
       </Panel>
     );
   }

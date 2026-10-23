@@ -14,8 +14,10 @@ import type { CommunityCommandIntent } from "../ports.ts";
 import type { CommunityViewer } from "../view/community-view.ts";
 import type { WorkflowView } from "../view/workflow-view.ts";
 import { workflowSummary } from "../view/workflow-view.ts";
+import { COMMUNITY_EMPTY_STATE_COPY } from "../view/onboarding.ts";
 import { transitionStatus } from "../view/status.ts";
 import { Banner, DataTable, Mono, Panel } from "./primitives.tsx";
+import { EmptySurface } from "./empty-surface.tsx";
 import { StatusChip } from "./status-chip.tsx";
 import { STYLE } from "./tokens.ts";
 
@@ -25,6 +27,8 @@ export interface WorkflowPanelProps {
   readonly viewer: CommunityViewer;
   /** Dispatch one typed command intent (the host command port). */
   readonly onDispatchCommand: (intent: CommunityCommandIntent) => void;
+  /** The REAL next step of the first-run empty state: one port pull. */
+  readonly onRefresh?: () => void;
 }
 
 /** The Lifecycle surface. */
@@ -32,6 +36,7 @@ export function WorkflowPanel({
   view,
   viewer,
   onDispatchCommand,
+  onRefresh,
 }: WorkflowPanelProps): ReactNode {
   return (
     <Panel title="Lifecycle (append-only)" summary={workflowSummary(view)}>
@@ -40,39 +45,43 @@ export function WorkflowPanel({
         append-only (E10) — recorded transitions are never rewritten, reordered or dropped.
         Verdicts (accept/reject) and withdraw are terminal.
       </Banner>
-      <DataTable
-        columns={[
-          { key: "record", header: "Transition", render: (row) => <Mono>{row.recordId}</Mono> },
-          { key: "contribution", header: "Contribution", render: (row) => <Mono>{row.contributionId}</Mono> },
-          { key: "from", header: "From", render: (row) => <Mono>{row.from ?? "—"}</Mono> },
-          {
-            key: "to",
-            header: "To",
-            render: (row) => <StatusChip status={transitionStatus(row.to)} />,
-          },
-          { key: "actor", header: "Actor", render: (row) => <Mono>{row.actor}</Mono> },
-          {
-            key: "reason",
-            header: "Reason",
-            render: (row) =>
-              row.reason === null ? (
-                <span style={STYLE.faint}>—</span>
-              ) : (
-                <span style={STYLE.muted}>{row.reason}</span>
+      {view.rows.length === 0 ? (
+        <EmptySurface copy={COMMUNITY_EMPTY_STATE_COPY.lifecycle} onNextStep={onRefresh} />
+      ) : (
+        <DataTable
+          columns={[
+            { key: "record", header: "Transition", render: (row) => <Mono>{row.recordId}</Mono> },
+            { key: "contribution", header: "Contribution", render: (row) => <Mono>{row.contributionId}</Mono> },
+            { key: "from", header: "From", render: (row) => <Mono>{row.from ?? "—"}</Mono> },
+            {
+              key: "to",
+              header: "To",
+              render: (row) => <StatusChip status={transitionStatus(row.to)} />,
+            },
+            { key: "actor", header: "Actor", render: (row) => <Mono>{row.actor}</Mono> },
+            {
+              key: "reason",
+              header: "Reason",
+              render: (row) =>
+                row.reason === null ? (
+                  <span style={STYLE.faint}>—</span>
+                ) : (
+                  <span style={STYLE.muted}>{row.reason}</span>
+                ),
+            },
+            {
+              key: "tenant",
+              header: "Tenant scope",
+              render: (row) => (
+                <span style={STYLE.mono}>{row.foreignTenant ? "foreign (R20)" : "viewer"}</span>
               ),
-          },
-          {
-            key: "tenant",
-            header: "Tenant scope",
-            render: (row) => (
-              <span style={STYLE.mono}>{row.foreignTenant ? "foreign (R20)" : "viewer"}</span>
-            ),
-          },
-        ]}
-        rows={view.rows}
-        rowKey={(row) => row.recordId}
-        empty="no workflow transitions recorded"
-      />
+            },
+          ]}
+          rows={view.rows}
+          rowKey={(row) => row.recordId}
+          empty="no workflow transitions recorded"
+        />
+      )}
       {view.selectedTrail === null ? (
         <p style={{ ...STYLE.muted, margin: "12px 0 0", fontSize: 12.5, fontStyle: "italic" }}>
           select a contribution to see its walked trail and dispatch workflow intents

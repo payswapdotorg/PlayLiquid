@@ -11,8 +11,10 @@
 import type { ReactNode } from "react";
 import type { PackageCardView, PackagesView } from "../view/package-view.ts";
 import { packagesSummary } from "../view/package-view.ts";
+import { STUDIO_EMPTY_STATE_COPY } from "../view/onboarding.ts";
 import { StatusChip } from "./status-chip.tsx";
-import { DataTable, EmptyState, KeyValue, Mono, Panel } from "./primitives.tsx";
+import { DataTable, KeyValue, Mono, Panel } from "./primitives.tsx";
+import { EmptySurface } from "./empty-surface.tsx";
 import { STYLE } from "./tokens.ts";
 
 export interface PackagesPanelProps {
@@ -21,6 +23,8 @@ export interface PackagesPanelProps {
   readonly selectedPackageId?: string | null;
   /** Called when the user picks a package (selection belongs to the app). */
   readonly onSelectPackage?: (packageId: string) => void;
+  /** The REAL next step of the first-run empty state: one port pull. */
+  readonly onRefresh?: () => void;
 }
 
 function PackageCard({
@@ -92,12 +96,17 @@ function PackageCard({
 }
 
 /** The Packages surface: record cards + lockfile pins (PL-011). */
-export function PackagesPanel({ view, selectedPackageId, onSelectPackage }: PackagesPanelProps): ReactNode {
+export function PackagesPanel({
+  view,
+  selectedPackageId,
+  onSelectPackage,
+  onRefresh,
+}: PackagesPanelProps): ReactNode {
   return (
     <div style={{ display: "grid", gap: 14 }}>
       <Panel title="Packages" summary={packagesSummary(view)}>
         {view.cards.length === 0 ? (
-          <EmptyState label="no package records loaded" />
+          <EmptySurface copy={STUDIO_EMPTY_STATE_COPY.packages} onNextStep={onRefresh} />
         ) : (
           <div style={{ display: "grid", gap: 10 }}>
             {view.cards.map((card) => (

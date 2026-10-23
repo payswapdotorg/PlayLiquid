@@ -81,6 +81,14 @@ export {
   trustStatus,
 } from "./view/status.ts";
 
+// Onboarding copy + contextual next-step hints (pure; UX-002).
+export type { CommunityEmptySurfaceId, EmptySurfaceCopy } from "./view/onboarding.ts";
+export {
+  COMMUNITY_EMPTY_STATE_COPY,
+  commandLogNextHint,
+  refreshFailureNextStep,
+} from "./view/onboarding.ts";
+
 // Presentational components (zero data fetching).
 export { CommunityShell } from "./components/community-shell.tsx";
 export type { CommunityShellProps } from "./components/community-shell.tsx";
@@ -90,6 +98,8 @@ export { WorkflowPanel } from "./components/workflow-panel.tsx";
 export type { WorkflowPanelProps } from "./components/workflow-panel.tsx";
 export { ProvenancePanel } from "./components/provenance-panel.tsx";
 export type { ProvenancePanelProps } from "./components/provenance-panel.tsx";
+export { EmptySurface } from "./components/empty-surface.tsx";
+export type { EmptySurfaceProps } from "./components/empty-surface.tsx";
 export { CountPill, StatusChip } from "./components/status-chip.tsx";
 export type { StatusChipProps } from "./components/status-chip.tsx";
 export { Banner, DataTable, EmptyState, KeyValue, Mono, Panel } from "./components/primitives.tsx";
