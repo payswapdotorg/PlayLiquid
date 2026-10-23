@@ -26,9 +26,35 @@ export const PRODUCT_MARKERS = Object.freeze({
   labHeading: "PlayLiquid · Game Engineering Lab",
   communityHeading: "PlayLiquid · Community Contributions",
   labRefresh: "Refresh read models",
+  communityRefresh: "Refresh read models",
+  labLoadErrorPrefix: "Lab read-model load failed (E11):",
+  communityLoadErrorPrefix: "Community read-model load failed (E11):",
   /** The shell navigation affordance that opens the ZCode workbench (RW-001
    * reachability requirement; the label honestly names the target). */
   workbenchAffordance: "ZCode workbench",
+});
+
+/** The FROZEN shell marker vocabulary (spec/ux/work-items.md — UX-001
+ * implements, UX-003 asserts). data-testid selectors + the frozen `AI &
+ * Agents` escape-hatch label that replaces the inherited `ZCode workbench`. */
+export const SHELL_MARKERS = Object.freeze({
+  bar: "gameos-shell-bar",
+  brand: "gameos-shell-brand",
+  navStudio: "gameos-nav-studio",
+  navLab: "gameos-nav-lab",
+  navCommunity: "gameos-nav-community",
+  navWorkbench: "gameos-nav-workbench",
+  workspaceHost: "gameos-workspace-host",
+  composeFailed: "gameos-compose-failed",
+  /** Optional compact-width overflow control (frozen contract marks it
+   * optional; when present, collapsed navigation may live behind it). */
+  shellOverflow: "gameos-shell-overflow",
+  emptyState: "gameos-empty-state",
+  emptyNextStep: "gameos-empty-next-step",
+  workbenchLabel: "AI & Agents",
+  /** The window-control accessible names rendered by the shell chrome
+   * (platform desktop commands; stable, honest, screen-reader labels). */
+  windowControlLabels: ["Minimize window", "Maximize window", "Restore window", "Close window"],
 });
 
 /** Viewports mandated by AGENTS.md (UI evidence standard). */
@@ -62,20 +88,33 @@ export const DEFAULTS = Object.freeze({
   memWaitMaxMs: 20 * 60_000,
 });
 
-/** Checks whose failure is EXPECTED on the current (pre-A/B integration)
- * main artifact. Used only to annotate the baseline report; the raw pass/fail
- * status is always the observed truth. */
+/** Checks whose failure is EXPECTED on the pre-UX-001/002 baseline artifact
+ * (the published PlayLiquid-GameOS-3.14.3 release, built from main 4f88d746
+ * — the honest pre-integration state). Used only to annotate the baseline
+ * report; the raw pass/fail status is always the observed truth. Every id
+ * listed here is a FROZEN-contract requirement (spec/ux/work-items.md) that
+ * Workers A/B implement; after A+B integration (TL rebases this branch) the
+ * same checks must pass without this annotation:
+ * - identity/workbench: the 3.14.3 escape hatch still carries the inherited
+ *   `ZCode workbench` label and ZCode text in the top bar (frozen new label:
+ *   `AI & Agents`, testid gameos-nav-workbench);
+ * - geometry: `gameos-shell-brand` does not exist on 3.14.3 and the known
+ *   defect (release evidence ubuntu-20261015-061743) is real — Game
+ *   Studio/Lab overflow off-screen at the 480px minimum window;
+ * - a11y: the 3.14.3 chrome has no visible focus styles and its surfaces
+ *   skip heading levels (h1 → h3 panels);
+ * - first-run: the frozen empty-state vocabulary (gameos-empty-state +
+ *   gameos-empty-next-step) is not implemented yet (Worker B).
+ */
 export const BASELINE_EXPECTED_FAILURES = Object.freeze([
-  "product-identity-title",
   "no-zcode-primary-branding",
-  "product-shell-renders",
-  "studio-surface",
-  "lab-surface",
-  "community-surface",
-  "product-navigation",
-  "studio-real-operation",
-  "first-run-empty-state",
-  "packaging-identity",
+  "workbench-escape-hatch-label",
+  "geometry-1280x800",
+  "geometry-480-window",
+  "geometry-390x844-emulated",
+  "a11y-visible-focus",
+  "a11y-heading-hierarchy",
+  "gameos-empty-state-contract",
 ]);
 
 export function usage() {

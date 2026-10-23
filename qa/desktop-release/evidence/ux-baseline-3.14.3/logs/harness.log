@@ -1,0 +1,20 @@
+[2026-10-23T22:22:42.213Z] environment: Debian GNU/Linux 13 (trixie) (kernel 5.10.134-013.15.kangaroo.al8.x86_64), node v24.21.0, fuse=false
+[2026-10-23T22:22:42.875Z] xvfb: started on :89 (pid 18676, screen 1920x1080x24)
+[2026-10-23T22:22:42.876Z] memory gate: 1618 MB available (>= 600 MB required) — proceeding
+[2026-10-23T22:22:42.881Z] launch[main]: pid 18679 mode=appimage-extract-and-run cwd=/home/z/station/tmp/rw003-smoke-FZYP0r/profile-main/home argv=["--appimage-extract-and-run","--remote-debugging-port=9333"]
+[2026-10-23T22:22:49.042Z] cdp: endpoint up — browser Chrome/146.0.7680.80
+[2026-10-23T22:22:49.093Z] cdp: page target ready — file:///home/z/station/tmp/rw003-smoke-FZYP0r/profile-main/tmp/appimage_extracted_e6dd8b1ea1fc521e8030cffd3ecce22e/resources/app.asar/out/renderer/index.html?restoreSession=true&supportsSettings=true&initialWorkspacePath=%2Fhome%2Fz%2Fstation%2Ftmp%2Frw003-smoke-FZYP0r%2Fprofile-main%2Fhome%2F.playliquid-gameos%2F.zcode%2Fworkspace%2Fdefault&initialWorkspacePurpose=conversation&zcodeLaunchMarks=%7B%22createdAt%22%3A1792794165480%2C%22mainStart%22%3A1792794166946%2C%22appReady%22%3A1792794168028%2C%22loadUrl%22%3A1792794168401%7D
+[2026-10-23T22:22:51.809Z] render: first pass after 2208 ms (297 nodes) — waiting for DOM to stabilize
+[2026-10-23T22:23:00.897Z] render: settled after 11296 ms (427 nodes, stable)
+[2026-10-23T22:23:53.108Z] shutdown[profile-main pid 18679]: method=cdp-browser-close code=0
+[2026-10-23T22:23:53.108Z] port 9333 is free again
+[2026-10-23T22:23:53.110Z] memory gate: 1589 MB available (>= 600 MB required) — proceeding
+[2026-10-23T22:23:53.116Z] launch[offline]: pid 19329 mode=appimage-extract-and-run cwd=/home/z/station/tmp/rw003-smoke-FZYP0r/profile-offline/home argv=["--appimage-extract-and-run","--remote-debugging-port=9334","--proxy-server=http://127.0.0.1:9","--proxy-bypass-list=<-loopback>"]
+[2026-10-23T22:23:59.133Z] cdp: endpoint up — browser Chrome/146.0.7680.80
+[2026-10-23T22:23:59.136Z] cdp: page target ready — file:///home/z/station/tmp/rw003-smoke-FZYP0r/profile-offline/tmp/appimage_extracted_e6dd8b1ea1fc521e8030cffd3ecce22e/resources/app.asar/out/renderer/index.html?restoreSession=true&supportsSettings=true&initialWorkspacePath=%2Fhome%2Fz%2Fstation%2Ftmp%2Frw003-smoke-FZYP0r%2Fprofile-offline%2Fhome%2F.playliquid-gameos%2F.zcode%2Fworkspace%2Fdefault&initialWorkspacePurpose=conversation&zcodeLaunchMarks=%7B%22createdAt%22%3A1792794235840%2C%22mainStart%22%3A1792794237312%2C%22appReady%22%3A1792794238343%2C%22loadUrl%22%3A1792794238717%7D
+[2026-10-23T22:24:01.085Z] render: first pass after 1565 ms (305 nodes) — waiting for DOM to stabilize
+[2026-10-23T22:24:07.096Z] render: settled after 7576 ms (427 nodes, stable)
+[2026-10-23T22:24:37.202Z] offline scenario: alive=true responsive=true
+[2026-10-23T22:24:37.396Z] shutdown[profile-offline pid 19329]: method=cdp-browser-close code=0
+[2026-10-23T22:24:37.396Z] port 9334 is free again
+[2026-10-23T22:24:41.411Z] cleanup: all processes started by this run have exited

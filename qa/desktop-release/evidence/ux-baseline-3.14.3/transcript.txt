@@ -1,0 +1,193 @@
+PlayLiquid GameOS — RW-003 packaged-app smoke run
+started: 2026-10-23T22:22:42.205Z  finished: 2026-10-23T22:24:41.419Z
+artifact: /home/z/station/baseline/PlayLiquid-GameOS-3.14.3-linux-x86_64.AppImage
+mode: baseline (expected pre-integration failures annotated)
+environment: {"distro":"Debian GNU/Linux 13 (trixie)","kernel":"5.10.134-013.15.kangaroo.al8.x86_64","arch":"x64","node":"v24.21.0","memoryTotalMb":4041,"memoryAtStartMb":1693,"fuseAvailable":false,"xvfb":"present (this host's Xvfb does not support -version)","displayServer":"Xvfb (virtual framebuffer, no GPU)","cdpPort":9333,"stationNote":"honest scope: reference station is Debian 13, not Ubuntu; Ubuntu-latest execution of this same harness is the TL integration step (README section 'Run on any Ubuntu machine')","cdpPorts":{"main":9333,"offline":9334}}
+
+[PASS] artifact-checksum — artifact sha256 verified against the release SHA256SUMS
+    PlayLiquid-GameOS-3.14.3-linux-x86_64.AppImage: 1c7f8e0c01d32fd6a9bc86fcb542ae613a867405a6ecf8b505f68456210c3a91 matches /home/z/station/baseline/SHA256SUMS
+[PASS] startup — packaged application starts under Xvfb (CDP endpoint + main window page target + settled DOM)
+    CDP up and main window rendered in 18s (launch mode: appimage-extract-and-run); DOM settled at 427 nodes
+    · page target url: file:///home/z/station/tmp/rw003-smoke-FZYP0r/profile-main/tmp/appimage_extracted_e6dd8b1ea1fc521e8030cffd3ecce22e/resources/app.asar/out/renderer/index.html?restoreSession=true&supportsSettings=true&initialWorkspacePath=%2Fhome%2Fz%2Fstation%2Ftmp%2Frw003-smoke-FZYP0r%2Fprofile-main%2Fhome%2F.playliquid-gameos%2F.zcode%2Fworkspace%2Fdefault&initialWorkspacePurpose=conversation&zcodeLaunchMarks=%7B%22createdAt%22%3A1792794165480%2C%22mainStart%22%3A1792794166946%2C%22appReady%22%3A1792794168028%2C%22loadUrl%22%3A1792794168401%7D
+    · all targets: page:file:///home/z/station/tmp/rw003-smoke-FZYP0r/profile-main/tmp/appimage_extracte
+[PASS] packaged-independence — no dev-server / repo-relative / dev-env dependence (packaged file:// load)
+    main window loads the packaged file:// renderer; the child environment contained no ELECTRON_RENDERER_URL / VITE_* / ZCODE_* variables
+    · page url: file:///home/z/station/tmp/rw003-smoke-FZYP0r/profile-main/tmp/appimage_extracted_e6dd8b1ea1fc521e8030cffd3ecce22e/resources/app.asar/out/renderer/index.html?restoreSession=true&supportsSettings=true&initialWorkspacePath=%2Fhome%2Fz%2Fstation%2Ftmp%2Frw003-smoke-FZYP0r%2Fprofile-main%2Fhome%2F.playliquid-gameos%2F.zcode%2Fworkspace%2Fdefault&initialWorkspacePurpose=conversation&zcodeLaunchMarks=%7B%22createdAt%22%3A1792794165480%2C%22mainStart%22%3A1792794166946%2C%22appReady%22%3A1792794168028%2C%22loadUrl%22%3A1792794168401%7D
+    · child env keys: DISPLAY, HOME, LANG, PATH, TERM, TMPDIR, XDG_CACHE_HOME, XDG_CONFIG_HOME, XDG_DATA_HOME, XDG_RUNTIME_DIR
+[PASS] window-title-captured — window title captured from the packaged run
+    document.title = "PlayLiquid GameOS"
+    · url: file:///home/z/station/tmp/rw003-smoke-FZYP0r/profile-main/tmp/appimage_extracted_e6dd8b1ea1fc521e8030cffd3ecce22e/resources/app.asar/out/renderer/index.html?restoreSession=true&supportsSettings=true&initialWorkspacePath=%2Fhome%2Fz%2Fstation%2Ftmp%2Frw003-smoke-FZYP0r%2Fprofile-main%2Fhome%2F.playliquid-gameos%2F.zcode%2Fworkspace%2Fdefault&initialWorkspacePurpose=conversation&zcodeLaunchMarks=%7B%22createdAt%22%3A1792794165480%2C%22mainStart%22%3A1792794166946%2C%22appReady%22%3A1792794168028%2C%22loadUrl%22%3A1792794168401%7D
+[PASS] product-identity-title — window title carries the PlayLiquid GameOS product identity
+    expected title to match /playliquid/i (default expectation: "PlayLiquid GameOS"); observed document.title = "PlayLiquid GameOS"
+[FAIL] [EXPECTED BASELINE FAILURE] no-zcode-primary-branding — ZCode is not the primary UI identity of the product window (title, headings, headers and the shell top bar carry no ZCode text — the frozen escape-hatch label is `AI & Agents`)
+    primary surfaces carry ZCode branding: {"title":"PlayLiquid GameOS","h1s":["PlayLiquid · Game Studio","PlayLiquid · Game Engineering Lab","PlayLiquid · Community Contributions"],"headers":["PlayLiquid GameOSThe game engineering operating systemGame StudioLabCommunityZCode workbench","PlayLiquid · Game StudioGame Studio · no session · 0 gate-blocked · 0 active tool jobsRefresh snapshot","Packages0 packages · 0 gate-blocked · 0 lock pins"]}
+[PASS] product-shell-renders — the PlayLiquid product shell (Studio/Lab/Community) renders as the default surface
+    PlayLiquid product shell markers present
+[PASS] studio-surface — Game Studio surface renders (heading + surface tabs)
+    studio heading found; tab markers ["Packages","Session","Avatars","Capabilities","Tools"] present: [true,true,true,true,true]
+[PASS] lab-surface — Game Engineering Lab surface renders
+    lab heading found: "PlayLiquid · Game Engineering Lab"
+[PASS] community-surface — Community surface renders
+    community heading found: "PlayLiquid · Community Contributions"
+[PASS] first-run-empty-state — clean profile shows the first-run / no-data state in the product shell
+    Packages surface shows the empty state "no package records loaded"
+[FAIL] [EXPECTED BASELINE FAILURE] workbench-escape-hatch-label — the workbench escape hatch is present, visible and labeled exactly "AI & Agents" (frozen shell vocabulary), with an honest hint, as a secondary affordance
+    label mismatch: expected exactly "AI & Agents" (frozen contract, spec/ux/work-items.md), observed "ZCode workbench"
+    · observed label: "ZCode workbench"
+    · observed title/hint: "Open the ZCode workbench — model selection, agents, provider capabilities"
+    · observed aria-current: null
+    · rect: [725.78125,6.5,119.390625,30]
+    · baseline honesty: the pre-UX-001 artifact ships the inherited "ZCode workbench" label here — the frozen contract replaces it
+[FAIL] [EXPECTED BASELINE FAILURE] gameos-empty-state-contract — first-run guidance: the default first-run surface renders the frozen empty-state contract (gameos-empty-state + a REAL gameos-empty-next-step control)
+    no [gameos-empty-state] container is rendered anywhere on the default first-run surface
+    · baseline honesty: the frozen empty-state vocabulary (gameos-empty-state + gameos-empty-next-step) is implemented by UX-002 (Worker B); the 3.14.3 baseline ships the module's own plain empty texts instead
+    · observed containers: []
+[PASS] studio-real-operation — representative real operation reaches its authoritative module through production-wired ports
+    clicked "Refresh snapshot"; no E11 load-failure banner appeared — the authoritative snapshot pull completed through the production-wired port
+    · click result: {"found":true,"clicked":"Refresh snapshot","tag":"BUTTON"}
+    · studio summary after refresh: ["PlayLiquid GameOS","","The game engineering operating system",""]
+[PASS] product-navigation — Studio / Lab / Community navigation switches to the corresponding product surface
+    all three product surfaces reachable through their navigation controls
+    · Studio: nav control found+clicked, surface rendered
+    · Lab: nav control found+clicked, surface rendered
+    · Community: nav control found+clicked, surface rendered
+[PASS] lab-real-operation — Lab journey: a representative REAL operation (read-model refresh) reaches its authoritative module through the production-wired port
+    clicked "Refresh read models" on the Lab surface; no Lab E11 load-failure banner appeared — the authoritative read-model pull completed through the production-wired data port
+    · nav control label: "Lab" [gameos-nav-lab]
+    · click result: {"found":true,"clicked":"Refresh read models","tag":"BUTTON"}
+    · surface summary after refresh: ["PlayLiquid GameOS","","The game engineering operating system",""]
+[PASS] community-real-operation — Community journey: a representative REAL operation (read-model refresh) reaches its authoritative module through the production-wired port
+    clicked "Refresh read models" on the Community surface; no Community E11 load-failure banner appeared — the authoritative read-model pull completed through the production-wired data port
+    · nav control label: "Community" [gameos-nav-community]
+    · click result: {"found":true,"clicked":"Refresh read models","tag":"BUTTON"}
+    · surface summary after refresh: ["PlayLiquid GameOS","","The game engineering operating system",""]
+[PASS] lab-command-outcome-visible — Lab typed command: dispatching a real command intent renders its typed outcome in the append-only command log (never silent, never fake success)
+    the request-search intent dispatched through its real control and the command log renders its typed outcome (["refused / invalid-context"]) — both an accepted receipt and a typed refusal are honest outcomes; silence is not
+    · control clicked: "request-search · cycle-ui-request · seed seed-ui-request"
+    · command log rows: [["request-search","cycle cycle-ui-request · seed seed-ui-request","refused","invalid-context"]]
+[PASS] community-lifecycle-honest-gate — Community lifecycle: the unavailable maintainer workflow renders a truthful limitation state (no fake powers, no dead surface)
+    no maintainer advance controls are rendered without a selected contribution and the surface explains why: "0 transitions · append-only (E10) · verdicts are terminal"
+    · known first-run marker "select a contribution" observed: true
+[PASS] clean-profile-startup — startup from a clean profile (empty HOME + XDG directories)
+    app created its first-run state in the empty profile: PlayLiquid GameOS
+    · XDG_CONFIG_HOME listing after boot: PlayLiquid GameOS
+[PASS] viewports-evidence — window-level evidence captured at both mandated viewports (390x844 and 1280x800)
+    1280x800 real OS window: resizeTo requested, window.outer = [1280,800] (inner [1280,800]); window resize achieved; screenshot 1280x800; 390x844: real window attempt returned outer = [480,844] (clamped by the product minimum width 480px — recorded, not hidden); captured via CDP device-metrics emulation; screenshots 480x844 (clamp attempt) + 390x844 (emulated viewport)
+    · viewport-1280x800-window.png — 1280x800, 44515 bytes
+    · viewport-1280x800-emulated.png — 1280x800, 44515 bytes
+    · viewport-390x844-clamp-attempt.png — 480x844, 40802 bytes
+    · viewport-390x844-emulated.png — 390x844, 41029 bytes
+[FAIL] [EXPECTED BASELINE FAILURE] geometry-1280x800 — top-bar geometry at 1280x800 (real OS window): no overlap, no clipping, no horizontal overflow, all navigation reachable
+    1 geometry violation(s) at 1280x800: missing required bar element: brand cluster [gameos-shell-brand]
+    · mode: real OS window
+    · Browser.setWindowBounds failed: browser: {"code":-32601,"message":"'Browser.getWindowForTarget' wasn't found"}
+    · window.resizeTo(1280, 800) -> outer [1280,800]
+    · measured viewport: [1280,800]
+    · all required navigation directly visible in the bar
+    · viewport: 1280x800; document scrollWidth 1280; bar 0,0 1280x44
+    · brand cluster [gameos-shell-brand]: (absent)
+    · Game Studio nav [gameos-nav-studio]: 256,7 95x29
+    · Lab nav [gameos-nav-lab]: 355,7 43x29
+    · Community nav [gameos-nav-community]: 402,7 85x29
+    · AI & Agents escape hatch [gameos-nav-workbench]: 766,7 119x30
+    · Minimize window control: 1164,8 34x28
+    · Maximize window control: 1200,8 34x28
+    · Restore window control: (absent)
+    · Close window control: 1236,8 34x28
+    · overflow control [gameos-shell-overflow]: not rendered (optional)
+    · screenshot: geometry-1280x800.png (1280x800, 44515 bytes)
+[FAIL] [EXPECTED BASELINE FAILURE] geometry-480-window — top-bar geometry at the actual 480px minimum OS window: no overlap, no clipping, no horizontal overflow, all navigation reachable
+    3 geometry violation(s) at 480x720: missing required bar element: brand cluster [gameos-shell-brand]; Close window control is clipped by the viewport edges (474,8 34x28 vs viewport 480x720); top bar horizontal overflow: bar scrollWidth 508 > clientWidth 480 (content is cut off)
+    · mode: real OS window
+    · Browser.setWindowBounds failed: browser: {"code":-32601,"message":"'Browser.getWindowForTarget' wasn't found"}
+    · window.resizeTo(480, 720) -> outer [480,720]
+    · measured viewport: [480,720]
+    · all required navigation directly visible in the bar
+    · viewport: 480x720; document scrollWidth 480; bar 0,0 480x44 [internal clip: scrollWidth 508 > 480]
+    · brand cluster [gameos-shell-brand]: (absent)
+    · Game Studio nav [gameos-nav-studio]: 32,7 95x29
+    · Lab nav [gameos-nav-lab]: 131,7 43x29
+    · Community nav [gameos-nav-community]: 178,7 85x29
+    · AI & Agents escape hatch [gameos-nav-workbench]: 273,7 119x30
+    · Minimize window control: 402,8 34x28
+    · Maximize window control: 438,8 34x28
+    · Restore window control: (absent)
+    · Close window control: 474,8 34x28
+    · overflow control [gameos-shell-overflow]: not rendered (optional)
+    · screenshot: geometry-480px-window.png (480x720, 40136 bytes)
+[FAIL] [EXPECTED BASELINE FAILURE] geometry-390x844-emulated — top-bar geometry at the 390x844 emulated viewport: no overlap, no clipping, no horizontal overflow, all navigation reachable
+    7 geometry violation(s) at 390x844: missing required bar element: brand cluster [gameos-shell-brand]; AI & Agents escape hatch [gameos-nav-workbench] is clipped by the viewport edges (273,7 119x30 vs viewport 390x844); Minimize window control is clipped by the viewport edges (402,8 34x28 vs viewport 390x844); Maximize/Restore window control is clipped by the viewport edges (438,8 34x28 vs viewport 390x844); Close window control is clipped by the viewport edges (474,8 34x28 vs viewport 390x844); top bar horizontal overflow: bar scrollWidth 508 > clientWidth 390 (content is cut off); required navigation is not directly visible/unclipped in the bar and no overflow control [gameos-shell-overflow] is rendered — the navigation is unreachable at this width
+    · mode: CDP device-metrics emulation (the DevTools device-mode equivalent)
+    · measured viewport: [390,844]
+    · required navigation is not directly visible/unclipped in the bar and no overflow control [gameos-shell-overflow] is rendered — the navigation is unreachable at this width
+    · viewport: 390x844; document scrollWidth 390; bar 0,0 390x44 [internal clip: scrollWidth 508 > 390]
+    · brand cluster [gameos-shell-brand]: (absent)
+    · Game Studio nav [gameos-nav-studio]: 32,7 95x29
+    · Lab nav [gameos-nav-lab]: 131,7 43x29
+    · Community nav [gameos-nav-community]: 178,7 85x29
+    · AI & Agents escape hatch [gameos-nav-workbench]: 273,7 119x30
+    · Minimize window control: 402,8 34x28
+    · Maximize window control: 438,8 34x28
+    · Restore window control: (absent)
+    · Close window control: 474,8 34x28
+    · overflow control [gameos-shell-overflow]: not rendered (optional)
+    · screenshot: geometry-390x844-emulated.png (390x844, 41029 bytes)
+[PASS] a11y-keyboard-navigation — keyboard navigation: Tab reaches brand → nav buttons → the AI & Agents escape hatch in a sensible order; Enter and Space activate navigation
+    the full top-bar navigation is keyboard-reachable in DOM order and activates with Enter/Space (aria-current tracks the active surface)
+    · start: document.hasFocus=true, activeElement=body
+    · tab order observed: gameos-nav-studio -> gameos-nav-lab -> gameos-nav-community -> gameos-nav-workbench
+    · brand cluster [gameos-shell-brand]: not focusable (a static brand is acceptable; recorded honestly)
+    · Enter on the Lab nav: focus reached=true (after 11 tabs); aria-current="page"; lab heading visible=true
+    · Space on the Community nav: focus reached=true (after 1 tabs); aria-current="page"; community heading visible=true
+[FAIL] [EXPECTED BASELINE FAILURE] a11y-visible-focus — visible focus: keyboard-focused top-bar controls render a focus indicator
+    gameos-nav-lab shows NO visible focus indicator when keyboard-focused (:focus-visible=true, outline=none 0px, boxShadow=none, no focused-vs-blurred style change); gameos-nav-workbench shows NO visible focus indicator when keyboard-focused (:focus-visible=true, outline=none 0px, boxShadow=none, no focused-vs-blurred style change)
+    · gameos-nav-lab: :focus-visible=true, outline=none 0px rgb(143, 163, 191), boxShadow=none, focused-vs-blurred change=false
+    · gameos-nav-workbench: :focus-visible=true, outline=none 0px rgb(143, 163, 191), boxShadow=none, focused-vs-blurred change=false
+[PASS] a11y-accessible-names — accessible names: every visible interactive element is named (aria-label / text / title); the active nav carries aria-current
+    13 visible interactive elements checked — all named; active nav aria-current="page"
+    · BUTTON[gameos-nav-studio] "Game Studio" — name via text
+    · BUTTON[gameos-nav-lab] "Lab" — name via text
+    · BUTTON[gameos-nav-community] "Community" — name via text
+    · BUTTON[gameos-nav-workbench] "ZCode workbench" — name via text
+    · BUTTON[?] "Minimize window" — name via aria-label
+    · BUTTON[?] "Maximize window" — name via aria-label
+    · BUTTON[?] "Close window" — name via aria-label
+    · BUTTON[?] "Refresh snapshot" — name via text
+    · BUTTON[?] "Packages0" — name via text
+    · BUTTON[?] "Session0" — name via text
+    · BUTTON[?] "Avatars0" — name via text
+    · BUTTON[?] "Capabilities0" — name via text
+    · BUTTON[?] "Tools0" — name via text
+[FAIL] [EXPECTED BASELINE FAILURE] a11y-heading-hierarchy — heading hierarchy: every surface has its h1 and visible heading levels never skip
+    Game Studio: heading level skips h1 → h3 ("Packages"); Lab: heading level skips h1 → h3 ("Organization searches"); Community: heading level skips h1 → h3 ("Lifecycle (append-only)")
+    · Game Studio: visible headings ["h1 PlayLiquid · Game Studio","h3 Packages","h3 Lockfile pins"]
+    · Lab: visible headings ["h1 PlayLiquid · Game Engineering ","h3 Organization searches","h3 Request a search (typed intent","h3 Command log (append-only)"]
+    · Community: visible headings ["h1 PlayLiquid · Community Contrib","h3 Lifecycle (append-only)","h3 Command log (append-only)"]
+[PASS] packaging-identity — packaging identity (desktop entry / deb package) serves PlayLiquid GameOS
+    deb desktop entry observed: Name="PlayLiquid GameOS" Exec="\"/opt/PlayLiquid GameOS/playliquid-gameos\" %U" Icon="playliquid-gameos"; expectation: Name matches /playliquid/i and Exec/Icon are not ZCode-branded (PlayLiquid GameOS)
+    · dpkg-deb -f /home/z/station/baseline/PlayLiquid-GameOS-3.14.3-linux-amd64.deb Package Version -> Package: playliquid-gameos / Version: 3.14.3
+    · deb ./usr/share/applications/playliquid-gameos.desktop: Name=PlayLiquid GameOS Exec="/opt/PlayLiquid GameOS/playliquid-gameos" %U Icon=playliquid-gameos
+[PASS] console-evidence-recorded — renderer console evidence captured from the packaged run (informational)
+    0 console entries captured (0 error-level)
+[PASS] clean-shutdown — application terminates in a bounded, controlled way when asked to close (no hang, no forced kill)
+    exit code 0 via cdp-browser-close after 70s of uptime
+    · exit code: 0
+    · shutdown method: cdp-browser-close
+    · uptime: 70s
+[PASS] error-handling-offline-render — packaged app renders its UI with all renderer network egress failing (dead proxy)
+    window rendered under a dead proxy: title="PlayLiquid GameOS", primary content ["PlayLiquid · Game Studio","PlayLiquid · Game Engineering Lab","PlayLiquid · Community Contributions"]
+    · observed text head: "PlayLiquid GameOS\n\nThe game engineering operating system\n\nGame Studio\nLab\nCommunity\nZCode workbench\nPlayLiquid · Game Studio\n\nGame Studio · no session · 0 gate-blocked · 0 active tool jobs\n\nRefresh snapshot\nPackages\n0\nSession\n0\nAvatars\n0\nCapabilities\n0\nTools\n0\nPACKAGES\n\n0 packages · 0 gate-blocked · 0 lock pins\n\nno package records loaded\n\nLOCKFILE PINS\n\n0 pinned coordinates\n\nno owning lockfile\n\nRead-only projection of authoritative systems · packages PL-011 · session PL-013 · avatars PL-026 · br"
+[PASS] error-handling-offline-stability — app stays alive and responsive while its services are unavailable
+    observed for 30s after render: process alive=true, renderer responsive=true
+    · stability samples: [{"secondsIn":5,"alive":true,"responsive":true},{"secondsIn":10,"alive":true,"responsive":true},{"secondsIn":15,"alive":true,"responsive":true},{"secondsIn":20,"alive":true,"responsive":true},{"secondsIn":25,"alive":true,"responsive":true},{"secondsIn":30,"alive":true,"responsive":true}]
+    · screenshot: offline-dead-proxy-window.png (1200x800, 44297 bytes)
+[PASS] clean-shutdown-offline — offline-scenario application instance also terminates in a bounded, controlled way
+    exit code 0 via cdp-browser-close after 44s of uptime
+    · exit code: 0
+    · shutdown method: cdp-browser-close
+    · uptime: 44s
+
+NOTE: launch discipline: the packaged app is always launched with a clean profile (fresh HOME/XDG/TMPDIR) and a NEUTRAL cwd (the clean profile HOME, like a real desktop user), never from inside a repository checkout — the current artifact's agent resolver is cwd-sensitive (findUpward from process.cwd() can bind a repo dev agent when launched from inside a checkout, which breaks its first-run storage preparation); observed and recorded honestly, harness avoids it by construction
+NOTE: offline scenario: renderer network egress forced through a dead proxy (127.0.0.1:9) via the standard Chromium --proxy-server switch — an unavailable external service simulated without app cooperation
+
+counts: {"pass":26,"fail":8,"skip":0,"expectedFailure":8,"unexpectedFailure":0}  exit code: 0
