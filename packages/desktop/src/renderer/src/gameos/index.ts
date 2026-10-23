@@ -18,6 +18,9 @@ export {
   LOCAL_TENANT,
   PRODUCT_NAME,
   PRODUCT_TAGLINE,
+  PRODUCT_WORDMARK,
+  WORKBENCH_NAV_HINT,
+  WORKBENCH_NAV_LABEL,
   WORKBENCH_QUERY_FLAG,
   buildCommitSha,
   localProjectIdentity,
@@ -34,10 +37,11 @@ export {
 } from "./host/desktop-host.ts";
 
 // The module port adapters (the typed seams' desktop implementations).
-export {
-  DesktopStudioDataPort,
-  type StudioDataResult,
-} from "./host/studio-adapter.ts";
+// NOTE (UX-001): the dead `type StudioDataResult` re-export was removed —
+// the adapter declares it as a local import alias only, so the re-export
+// never compiled under a real typecheck (latent fork debt; no consumer
+// imports it from this entrypoint — game-ui owns that type's export).
+export { DesktopStudioDataPort } from "./host/studio-adapter.ts";
 export {
   DesktopCommunityCommandPort,
   DesktopCommunityDataPort,
@@ -52,8 +56,6 @@ export {
   mountProductShell,
   type ProductComposition,
 } from "./shell/product-shell.tsx";
-export {
-  SHELL_WORKSPACES,
-  type ShellWorkspaceId,
-} from "./shell/shell-chrome.tsx";
+export { SHELL_WORKSPACES, type ShellWorkspace } from "./shell/shell-workspaces.ts";
+export type { ShellWorkspaceId } from "./shell/shell-workspaces.ts";
 export { SHELL_FONT, SHELL_STYLE, SHELL_SURFACE } from "./shell/shell-tokens.ts";

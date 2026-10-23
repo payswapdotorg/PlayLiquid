@@ -1,7 +1,7 @@
 /**
- * THE PRODUCT SHELL COMPOSITION ROOT (RW-001): mounts the PlayLiquid
- * GameOS product — the DEFAULT first-window experience — from the REAL
- * product modules behind the desktop host's REAL port seams.
+ * THE PRODUCT SHELL COMPOSITION ROOT (RW-001, restyled UX-001): mounts the
+ * PlayLiquid GameOS product — the DEFAULT first-window experience — from the
+ * REAL product modules behind the desktop host's REAL port seams.
  *
  * The frozen PL-033/034 mount recipe, executed per module: the host
  * loads the FIRST authoritative snapshot BEFORE the store exists, wires
@@ -14,9 +14,14 @@
  * Failure discipline (E11): a failed composition is RENDERED, never
  * swallowed — an honest banner with the typed detail and a real retry
  * (re-running the whole composition). No fabricated states, ever.
+ *
+ * UX-001 rework scope here: presentation only (the shell design system +
+ * the shared ShellButton discipline for the retry control). The
+ * composition, the kept-mounted HIDDEN display switching, the honest
+ * starting/failed states and the ready event are preserved exactly.
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import type { ReactNode } from "react";
 import type { Root } from "react-dom/client";
 import type { IPlatformService } from "@zcode/shared";
@@ -32,9 +37,10 @@ import {
 } from "../../../../../../web/gameos-community/src/index.ts";
 import type { CommunityStore } from "../../../../../../web/gameos-community/src/index.ts";
 import { PRODUCT_NAME, PRODUCT_TAGLINE } from "../identity.ts";
-import { ProductMark, ShellChrome, openWorkbench } from "./shell-chrome.tsx";
+import { prefersReducedMotion, subscribeReducedMotion } from "./shell-density.ts";
+import { ProductMark, ShellButton, ShellChrome, openWorkbench } from "./shell-chrome.tsx";
 import type { ShellWorkspaceId } from "./shell-chrome.tsx";
-import { SHELL_STYLE } from "./shell-tokens.ts";
+import { SHELL_HOVER, SHELL_SPACE, SHELL_STYLE, SHELL_TYPE } from "./shell-tokens.ts";
 
 /** The fully composed product: the host + the ONE store per module. */
 export interface ProductComposition {
@@ -128,6 +134,11 @@ function ProductShellRoot({
 }): ReactNode {
   const [state, setState] = useState<ProductRootState>({ status: "starting" });
   const [attempt, setAttempt] = useState(0);
+  const reducedMotion = useSyncExternalStore(
+    subscribeReducedMotion,
+    prefersReducedMotion,
+    () => false,
+  );
   useEffect(() => {
     let cancelled = false;
     setState({ status: "starting" });
@@ -144,7 +155,7 @@ function ProductShellRoot({
   }, [attempt]);
   useEffect(() => {
     // Retire the HTML startup shell once React has committed the product
-    // surface (the same ready event the ZCode entry dispatches).
+    // surface (the same ready event the fork's entry dispatches).
     window.dispatchEvent(new Event("zcode-react-startup-ready"));
   }, []);
   if (state.status === "ready") {
@@ -156,24 +167,30 @@ function ProductShellRoot({
         <p style={SHELL_STYLE.banner} data-testid="gameos-compose-failed">
           {PRODUCT_NAME} failed to compose its product modules (E11): {state.detail}
         </p>
-        <button
-          type="button"
+        <ShellButton
           style={SHELL_STYLE.retryButton}
+          hoverStyle={SHELL_HOVER.retry}
+          reducedMotion={reducedMotion}
           onClick={() => setAttempt((current) => current + 1)}
         >
           retry composition
-        </button>
+        </ShellButton>
       </div>
     );
   }
   return (
     <div
-      style={{ ...SHELL_STYLE.root, alignItems: "center", justifyContent: "center", gap: 10 }}
+      style={{
+        ...SHELL_STYLE.root,
+        alignItems: "center",
+        justifyContent: "center",
+        gap: SHELL_SPACE.md,
+      }}
       role="status"
       aria-label={`${PRODUCT_NAME} starting`}
     >
-      <ProductMark size={40} />
-      <p style={{ ...SHELL_STYLE.brandName, fontSize: 15 }}>{PRODUCT_NAME}</p>
+      <ProductMark size={44} />
+      <p style={{ ...SHELL_STYLE.brandName, ...SHELL_TYPE.startupName }}>{PRODUCT_NAME}</p>
       <p style={SHELL_STYLE.brandTagline}>{PRODUCT_TAGLINE} — starting…</p>
     </div>
   );
@@ -182,8 +199,8 @@ function ProductShellRoot({
 /**
  * Mounts the PlayLiquid GameOS product shell onto an existing React root
  * (the desktop renderer entry creates the root and routes here for the
- * product surface; the ZCode workbench stays reachable through its own
- * entry path).
+ * product surface; the inherited agent workspace stays reachable through
+ * its own entry path — the shell's "AI & Agents" escape hatch).
  */
 export function mountProductShell(
   root: Root,
