@@ -117,16 +117,25 @@ body {
  * 表现为和产品主题无关的黄色描边，看起来像“随机冒出来的无障碍样式”。
  * 这里在全局层同时清掉 outline 和 focus ring 对应的 box-shadow，避免系统高亮和组件局部 ring 混用。
  */
-*:focus,
-*:focus-visible {
+
+/*
+ * PlayLiquid product shell exception (UX-004 TL integration): the gameos
+ * product shell (packages/desktop/src/renderer/src/gameos/shell) owns its
+ * focus indicators through inline design tokens — the global kill above
+ * is scoped AWAY from its subtree (.gameos-product-root) so those inline
+ * focus rings actually render (live-caught by the UX-003 packaged harness:
+ * the ring was in the inline style but lost the cascade to !important).
+ */
+*:focus:not(.gameos-product-root, .gameos-product-root *),
+*:focus-visible:not(.gameos-product-root, .gameos-product-root *) {
   outline: none !important;
   box-shadow: none !important;
   -webkit-box-shadow: none !important;
 }
 
 @media (forced-colors: active) {
-  *:focus,
-  *:focus-visible {
+  *:focus:not(.gameos-product-root, .gameos-product-root *),
+  *:focus-visible:not(.gameos-product-root, .gameos-product-root *) {
     outline: none !important;
     box-shadow: none !important;
   }

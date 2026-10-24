@@ -326,7 +326,7 @@ export function ShellChrome({
   const metrics = SHELL_DENSITY_METRICS[density];
   const workbenchLabel = workbenchLabelForDensity(density);
   return (
-    <div style={SHELL_STYLE.root as ShellCssProperties}>
+    <div className="gameos-product-root" style={SHELL_STYLE.root as ShellCssProperties}>
       <header
         style={{
           ...barStyle(density),

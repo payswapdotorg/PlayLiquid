@@ -163,7 +163,7 @@ function ProductShellRoot({
   }
   if (state.status === "failed") {
     return (
-      <div style={SHELL_STYLE.root} role="alert">
+      <div className="gameos-product-root" style={SHELL_STYLE.root} role="alert">
         <p style={SHELL_STYLE.banner} data-testid="gameos-compose-failed">
           {PRODUCT_NAME} failed to compose its product modules (E11): {state.detail}
         </p>
@@ -180,6 +180,7 @@ function ProductShellRoot({
   }
   return (
     <div
+      className="gameos-product-root"
       style={{
         ...SHELL_STYLE.root,
         alignItems: "center",
