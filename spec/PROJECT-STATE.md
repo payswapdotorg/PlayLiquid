@@ -84,3 +84,9 @@ UX-003 enforceable packaged UX QA battery — 34 checks incl. geometry at the
 the release-workflow tag-collision refusal. The frozen architecture is
 unchanged (no ACR; all work inside existing managed modules), and the
 program ledger (program/graph.json) stays closed at PL-045.
+
+The UX workstream shipped as release `playliquid-gameos-v3.15.0` (2026-10-24,
+tag at `d9e13bc`): the enforceable UX battery (34 checks — geometry at three
+viewports, accessibility, journeys, first-run contracts) runs in the release
+workflow and passes on both Ubuntu flows; issue #9 is closed with the TL
+report (journey map `docs/ux/JOURNEY-MAP.md`, baseline evidence in-repo).

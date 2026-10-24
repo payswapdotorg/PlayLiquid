@@ -246,3 +246,12 @@ when the existing tag points to a different commit (replace the current
   module Panel primitives, root version 3.15.0, README download/install
   sections, release-workflow tag-collision refusal) + gate battery on
   integrated main + publication `playliquid-gameos-v3.15.0` + verification.
+
+## Publication record (2026-10-24)
+
+Released: `playliquid-gameos-v3.15.0` at the exact pinned, tested commit
+`d9e13bc9c122eb7f3595598ae0423947a28e09e8` — CI battery 34/34 checks green
+on BOTH flows (.deb install + AppImage; runs 40045502786 smoke and
+40047774766 publish+verify); the published asset was downloaded,
+SHA-256-verified and launched in-CI by the workflow's post-publication
+verification. Issue #9 closed with the required TL report.
