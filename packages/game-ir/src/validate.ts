@@ -17,7 +17,9 @@ import {
   isSceneRef,
   isSpatialPartitionDescriptor,
   isStreamingPolicy,
+  isTargetProfile,
   isValidIdText,
+  isWorldKind,
 } from "@playliquid/game-contracts";
 import { isGameIRValue } from "./values.ts";
 import { isValueShape } from "./shapes.ts";
@@ -116,6 +118,38 @@ function validateAvatarBindingNode(node: Record<string, unknown>, path: string, 
   }
   if (!isHostRestriction(node.restrictions)) {
     diagnostics.push(error("GAMEIR/E011", "avatar binding has invalid host restrictions", `${path}.restrictions`));
+  }
+}
+
+/**
+ * ACR-001: granular validation of the optional document-level `world`
+ * declaration. Absent means the legacy default (kind `game`, profile
+ * unspecified) and is VALID — no diagnostic is emitted for absence.
+ */
+function validateWorldDeclaration(world: unknown, diagnostics: Diagnostic[]): void {
+  if (typeof world !== "object" || world === null || Array.isArray(world)) {
+    diagnostics.push(error("GAMEIR/E017", "world declaration must be an object", "world"));
+    return;
+  }
+  const declaration = world as Record<string, unknown>;
+  if (declaration.kind !== undefined && !isWorldKind(declaration.kind)) {
+    diagnostics.push(
+      error("GAMEIR/E019", `unknown world kind ${JSON.stringify(declaration.kind)}`, "world.kind"),
+    );
+  }
+  if (declaration.targetProfile !== undefined && !isTargetProfile(declaration.targetProfile)) {
+    diagnostics.push(
+      error(
+        "GAMEIR/E020",
+        `unknown target profile ${JSON.stringify(declaration.targetProfile)}`,
+        "world.targetProfile",
+      ),
+    );
+  }
+  for (const key of Object.keys(declaration)) {
+    if (key !== "kind" && key !== "targetProfile") {
+      diagnostics.push(error("GAMEIR/E017", `unknown world declaration key ${JSON.stringify(key)}`, "world"));
+    }
   }
 }
 
@@ -266,6 +300,9 @@ export function validate(input: unknown): ValidationResult {
     }
     if (input.lifecycle !== undefined && !isGameLifecycleState(input.lifecycle)) {
       diagnostics.push(error("GAMEIR/E015", "invalid lifecycle state", "lifecycle"));
+    }
+    if (input.world !== undefined) {
+      validateWorldDeclaration(input.world, diagnostics);
     }
     if (!isSceneRef(input.entry)) {
       diagnostics.push(error("GAMEIR/E016", "entry is not a valid SceneRef", "entry"));

@@ -59,6 +59,16 @@ export {
 } from "./game-identity.ts";
 export type { GameKind, GameLifecycleState, GameIdentity } from "./game-identity.ts";
 export {
+  WORLD_KINDS,
+  TARGET_PROFILES,
+  DEFAULT_WORLD_KIND,
+  isWorldKind,
+  isTargetProfile,
+  isWorldDeclaration,
+  resolveWorldKind,
+} from "./world.ts";
+export type { WorldKind, TargetProfile, WorldDeclaration } from "./world.ts";
+export {
   isFiniteVec2,
   isFiniteVec3,
   isValidBounds2,
