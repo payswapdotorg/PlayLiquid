@@ -1,95 +1,75 @@
 # PlayLiquid GameOS
 
-**PlayLiquid GameOS** is a Git-native, AI-native operating system for building, maintaining, testing, collaborating on, and running executable worlds.
+**PlayLiquid GameOS** is a Git-native, AI-native operating system for building, maintaining, testing, collaborating on, publishing, discovering and running executable worlds.
 
-The repository started from **ZCode 3.14.3**. ZCode remains the underlying AI workspace, agent runtime, desktop/web/CLI foundation, and provider/model infrastructure. PlayLiquid adds the canonical GameOS semantic kernel and lifecycle on top of it.
+The repository started from **ZCode 3.14.3**. ZCode remains the underlying AI workspace, task/agent runtime, desktop/web/CLI foundation, model/provider infrastructure and tool environment. PlayLiquid adds world/package/Git lifecycle, runtime, platform services, Tool Fabric and discovery/play experiences on top.
 
-## Download PlayLiquid GameOS for Ubuntu
+## Product direction and implementation handoff
 
-You do **not** need to clone or build this repository to use the desktop app.
-Ready-to-run Linux x64 packages are published on the
-[GitHub Releases](https://github.com/payswapdotorg/PlayLiquid/releases/latest) page:
+The repository is the source of truth; implementation must not depend on prior chats.
 
-| asset | what it is |
-| --- | --- |
-| `PlayLiquid-GameOS-<version>-linux-amd64.deb` | Debian/Ubuntu package (**recommended on Ubuntu 24.04**) |
-| `PlayLiquid-GameOS-<version>-linux-x86_64.AppImage` | single-file portable app, no installation |
-| `SHA256SUMS` | checksums for the above assets |
+- [Product Experience Specification](docs/product/PRODUCT-EXPERIENCE-SPEC.md) — canonical product and UX requirements.
+- [Figma Implementation Contract](docs/product/FIGMA-IMPLEMENTATION-CONTRACT.md) — authoritative Figma frames and exact screen rules.
+- [Final Product Implementation Handoff](docs/handoff/FINAL-PRODUCT-IMPLEMENTATION-HANDOFF.md) — complete TL/worker implementation brief.
+- [Product Experience Work Orders](spec/product-experience/WORK-ORDERS.md) — phases, ownership and acceptance.
+- [Cross-Platform Distribution Contract](docs/release/CROSS-PLATFORM-DISTRIBUTION.md) — installable Linux/Windows build requirements.
+- [Figma Design File](https://www.figma.com/design/LWlycZ5B3vCrUZ0a4pnu5u) — visual source.
 
-Direct links always point at the **latest** release (stay version-agnostic):
+## Download and install
 
-- Latest release page: <https://github.com/payswapdotorg/PlayLiquid/releases/latest>
-- `.deb`: <https://github.com/payswapdotorg/PlayLiquid/releases/latest/download/PlayLiquid-GameOS-3.15.0-linux-amd64.deb>
-- AppImage: <https://github.com/payswapdotorg/PlayLiquid/releases/latest/download/PlayLiquid-GameOS-3.15.0-linux-x86_64.AppImage>
-- `SHA256SUMS`: <https://github.com/payswapdotorg/PlayLiquid/releases/latest/download/SHA256SUMS>
+You do **not** need to clone or build this repository to use a published desktop app.
 
-*(Per-version assets use the same names with that release's version; find them
-on the release page if you need a specific one.)*
+### Current published builds
 
-### Requirements
+The latest published release is **Linux x64 only**. Windows installer publication is a required implementation task and must not be assumed available yet.
 
-- Linux x64 (built and smoke-tested on Ubuntu 24.04; also runs on Debian and
-  other distributions with unprivileged user namespaces)
-- Common desktop libraries already present on stock Ubuntu:
-  `libgtk-3-0`, `libnotify4`, `libnss3`, `libxss1`, `libxtst6`, `xdg-utils`,
-  `libatspi2.0-0`, `libuuid1`, `libsecret-1-0`
+[GitHub Releases](https://github.com/payswapdotorg/PlayLiquid/releases/latest)
 
-### Install (Ubuntu, recommended: the .deb)
+| Asset | Use |
+|---|---|
+| `PlayLiquid-GameOS-<version>-linux-amd64.deb` | Debian/Ubuntu install package (recommended on Ubuntu 24.04) |
+| `PlayLiquid-GameOS-<version>-linux-x86_64.AppImage` | Portable Linux application |
+| `SHA256SUMS` | Checksums for published artifacts |
+
+Latest Linux release at the time of this update:
+- [Release page](https://github.com/payswapdotorg/PlayLiquid/releases/tag/playliquid-gameos-v3.15.0)
+- [.deb installer](https://github.com/payswapdotorg/PlayLiquid/releases/download/playliquid-gameos-v3.15.0/PlayLiquid-GameOS-3.15.0-linux-amd64.deb)
+- [AppImage](https://github.com/payswapdotorg/PlayLiquid/releases/download/playliquid-gameos-v3.15.0/PlayLiquid-GameOS-3.15.0-linux-x86_64.AppImage)
+- [SHA256SUMS](https://github.com/payswapdotorg/PlayLiquid/releases/download/playliquid-gameos-v3.15.0/SHA256SUMS)
+
+### Install on Ubuntu/Linux
+
+Recommended .deb installation:
 
 ```bash
-# 1. download (or use the links above)
-wget https://github.com/payswapdotorg/PlayLiquid/releases/latest/download/PlayLiquid-GameOS-3.15.0-linux-amd64.deb
-
-# 2. verify the checksum (recommended)
-wget https://github.com/payswapdotorg/PlayLiquid/releases/latest/download/SHA256SUMS
+wget https://github.com/payswapdotorg/PlayLiquid/releases/download/playliquid-gameos-v3.15.0/PlayLiquid-GameOS-3.15.0-linux-amd64.deb
+wget https://github.com/payswapdotorg/PlayLiquid/releases/download/playliquid-gameos-v3.15.0/SHA256SUMS
 sha256sum --ignore-missing -c SHA256SUMS
-
-# 3. install and launch
 sudo apt-get install -y ./PlayLiquid-GameOS-3.15.0-linux-amd64.deb
 playliquid-gameos
 ```
 
-The `.deb` is recommended on Ubuntu 24.04: its install step registers the
-app's AppArmor profile and sandbox fallback that stock 24.04 requires.
-
-### Run the AppImage (no installation)
+AppImage:
 
 ```bash
-wget https://github.com/payswapdotorg/PlayLiquid/releases/latest/download/PlayLiquid-GameOS-3.15.0-linux-x86_64.AppImage
+wget https://github.com/payswapdotorg/PlayLiquid/releases/download/playliquid-gameos-v3.15.0/PlayLiquid-GameOS-3.15.0-linux-x86_64.AppImage
 chmod +x PlayLiquid-GameOS-3.15.0-linux-x86_64.AppImage
 ./PlayLiquid-GameOS-3.15.0-linux-x86_64.AppImage
 ```
 
-On Ubuntu 24.04's default namespace restriction the AppImage needs the
-one-time documented workaround
-(`sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0`) — or simply
-prefer the `.deb` above. We do **not** recommend changing system security
-settings as a default path; the `.deb` avoids it entirely.
+On stock Ubuntu 24.04, .deb is recommended because the package registers the AppArmor profile/sandbox fallback. AppImage may require the documented namespace workaround on systems that restrict unprivileged user namespaces. Do not change system security settings by default.
 
-### Troubleshooting
+### Windows
 
-- **AppImage fails to start on Ubuntu 24.04** — use the `.deb` (see above), or
-  apply the one-time sysctl workaround documented in the release notes.
-- **Missing libraries** — install the requirements list above
-  (`sudo apt-get install -y libgtk-3-0 libnotify4 libnss3 libxss1 libxtst6 xdg-utils libatspi2.0-0 libuuid1 libsecret-1-0`).
-- **Checksum mismatch** — do not run the file; re-download from the release
-  page and verify against `SHA256SUMS`.
-- **Where are release notes / source / license?** — every release page carries
-  the notes, the exact source commit SHA, and build evidence; the source is
-  this repository (`Apache-2.0`, see `LICENSE`).
+A Windows installer is **not yet published** in the current release. The release contract requires an installable Windows x64 build, a native Windows launch smoke test, checksum and immutable SHA provenance. Do not tell users that Windows is supported for installation until a verified Windows asset is attached to a release.
 
-### Updates
+### Inspect builds from any commit
 
-PlayLiquid GameOS does not auto-update: the product's own update channel is
-deliberately disabled (the inherited ZCode feed could replace PlayLiquid with
-a ZCode build). Download a new release from the
-[releases page](https://github.com/payswapdotorg/PlayLiquid/releases/latest)
-to update; a PlayLiquid-owned verified feed may arrive later.
+The release engineering requirement is that every successful main commit uploads Linux and Windows installable inspection artifacts to its GitHub Actions run, and a `workflow_dispatch` workflow can rebuild an exact historical SHA after ordinary workflow artifacts expire. See [Cross-Platform Distribution Contract](docs/release/CROSS-PLATFORM-DISTRIBUTION.md). This policy is planned; verify the workflow has landed before promising availability.
 
+## Repository source of truth and fresh-agent recovery order
 
-## Repository source of truth
-
-A fresh Tech Lead must read, in order:
+A fresh Tech Lead/agent must read:
 
 1. `AGENTS.md`
 2. `AI_CONTINUATION.md`
@@ -97,90 +77,84 @@ A fresh Tech Lead must read, in order:
 4. `spec/architecture.md`
 5. `spec/architecture-lock.md`
 6. `spec/requirements.md`
-7. `spec/dependency-graph.md`
-8. `spec/module-dependency-matrix.md`
-9. `spec/work-items.md`
-10. `spec/worker-contract.md`
-11. `docs/handoff/FINAL-TECH-LEAD-HANDOFF.md`
-12. `docs/handoff/EXECUTION-PLAN.md`
-13. the exact Work Order
-14. live GitHub branch/PR/CI state
+7. `docs/product/PRODUCT-EXPERIENCE-SPEC.md`
+8. `docs/product/FIGMA-IMPLEMENTATION-CONTRACT.md`
+9. `docs/handoff/FINAL-PRODUCT-IMPLEMENTATION-HANDOFF.md`
+10. `spec/product-experience/WORK-ORDERS.md`
+11. `docs/release/CROSS-PLATFORM-DISTRIBUTION.md`
+12. `spec/dependency-graph.md`
+13. `spec/module-dependency-matrix.md`
+14. `spec/work-items.md`
+15. `spec/worker-contract.md`
+16. `docs/handoff/FINAL-TECH-LEAD-HANDOFF.md`
+17. `docs/handoff/EXECUTION-PLAN.md`
+18. exact active Work Order and live GitHub branch/PR/CI state.
 
-Actual source, tests, runtime behavior, Git history, and deployment evidence outrank summaries or chat.
+Actual source, tests, runtime behavior, browser evidence, package evidence and exact SHAs outrank docs summaries or agent reports.
 
 ## Product thesis
 
-> **GitHub + ZCode + game platform + engine/tool orchestration + autonomous Game Engineering Lab.**
+> **ZCode + Git-native world projects + package ecosystem + game platform + engine/tool orchestration + Game Engineering Lab.**
 
 The stable foundation is:
 
 `GameIR + Package Graph + Capability ABI + Git lifecycle`.
 
-A game is a Git repository. A world, asset, avatar, system, skill, tool, simulation, test, evaluation, and target build definition are all packages. Games can be public/private and open/closed source, forked where rights permit, and evolved through normal repository lifecycle primitives.
+A World is the umbrella semantic/project model and is expressed as a game, Spark experience, interactive experience, simulation/training environment, real-world digital twin or future profile. A Spark remains a fast 9:16 mobile-first delivery/runtime target profile, not a separate root content model.
+
+A World Project is a Git repository. Reusable worlds, regions, assets, avatars, systems, skills, tools and target definitions are independently versioned packages. Developers should be able to create and review native PlayLiquid changes without using GitHub; connected Git remotes are optional.
 
 ## Core concepts
 
-### Game
-
-`Game = versioned composition of packages executed by a runtime`.
-
 ### World
 
-A versioned, addressable semantic world definition plus mutable runtime state. Large worlds are region/zone/chunk partitionable.
+A versioned, addressable semantic world definition plus mutable runtime state. Large worlds are region/zone/chunk partitionable and progressively loaded as players explore. A world may have several delivery/experience profiles.
 
-### Asset
+### Package
 
-A independently versioned package with provenance, license, content digest and target/runtime compatibility.
+An independently versioned, content-addressed reusable unit with dependencies, capabilities, permissions, license, provenance, compatibility and lineage. Large binary artifacts are stored through CAS/object storage, not placed wholesale in ordinary Git history.
 
 ### Avatar
 
-`Avatar = Body + Intelligence`.
-
-The body, sensors, actuators, memory, skills and cognitive substrate are separately versioned where appropriate. Games restrict avatar capabilities through the platform Capability Broker.
+`Avatar = Body + Intelligence`. The body, sensors, actuators, memory, skills and cognitive substrate can be versioned independently and composed into multiple worlds. World policies constrain capabilities via the Capability Broker.
 
 ### Spark
 
-A Spark is a **delivery/runtime target profile**, not a separate content model: vertical 9:16, mobile-first, aggressively cached, minimally booting, progressively streamed, and optimized for near-instant first interaction.
+A fast 9:16 delivery/runtime profile designed for minimal critical boot, aggressive caching, progressive streaming and near-instant first interaction. Playing a Spark stays within the vertical Sparks feed.
 
 ### Lab
 
-The Game Engineering Lab learns which organizations, tools, capabilities, workflows and human interventions produce the best results for the current game/task/phase/constraints. It must improve from real project evidence over time.
+The Game Engineering Lab learns which organizations, tools, capabilities, workflows and human interventions produce the best results for a particular world/task/phase/constraints.
 
 ### Arena
 
-Arena is an external human-capability provider. PlayLiquid creates a capability gap/escalation request and consumes the validated result through a provider-neutral integration. Arena is not a second PlayLiquid workflow, world, package registry, or experiment authority.
+Arena is an external human-capability provider. It is not a second PlayLiquid workflow, world, package registry or experiment authority.
 
 ## Platform capabilities supplied once
 
 Games declare events/policies; they do not reimplement platform infrastructure for:
-
-- leaderboards;
-- multiplayer/matchmaking/presence;
-- replay;
-- rewards/play-to-earn;
-- achievements;
-- social;
-- moderation;
-- cloud save;
-- analytics;
-- tournament primitives;
-- competitive integrity / bot detection.
+- leaderboards and tournaments;
+- multiplayer, matchmaking and presence;
+- replay and stream VOD;
+- rewards and Liquid spending/economy;
+- achievements and cloud save;
+- channel, social, follows/subscriptions and chat;
+- analytics and moderation;
+- competitive integrity/bot detection.
 
 ## Tool and engine strategy
 
-PlayLiquid is the main semantic/control interface, not a universal replacement for mature engines.
+PlayLiquid is the semantic/control interface, not a universal replacement for mature engines.
 
-The Tool Fabric integrates Unreal, Unity, Godot, Blender, PlayCanvas, generic CLI/process tools, filesystem/Git tooling, and MCP transports behind provider-neutral contracts.
-
-Native engine projects remain native projects. GameOS orchestrates them through adapters and builds target-specific artifacts where the required SDK/toolchain is available.
+Tool Fabric integrates Unreal, Unity, Godot, Blender, PlayCanvas, generic CLI/process tools, filesystem/Git tooling and MCP transports behind provider-neutral contracts. Native engine projects remain native projects. Prefer reuse and orchestration of mature software over rebuilding editors.
 
 ## Build targets
 
-The target system is designed for web, Spark, desktop, mobile, dedicated server, XR, and console workflows. Console builds are gated on the required vendor SDKs/toolchains; the platform must never claim a console artifact that was not actually built and verified.
+The target system is designed for web, Spark, desktop, mobile, dedicated server, XR and console workflows. Console capability is gated on authorized vendor SDK/toolchains and actual verification. Deployment targets include Vercel, Cloudflare and other provider adapters the user chooses and that are actually supported.
 
 ## Development
 
-The inherited ZCode toolchain remains authoritative for base development:
+The inherited ZCode toolchain remains authoritative:
 
 ```bash
 pnpm bootstrap
@@ -190,41 +164,33 @@ pnpm architecture:check --changed
 pnpm architecture:report
 ```
 
-PlayLiquid program checks are:
+PlayLiquid program checks:
 
 ```bash
 pnpm program:check
 pnpm program:frontier
 ```
 
-The initial repository state is **architecture/bootstrap only**. No PlayLiquid GameOS feature is considered implemented until a Work Order proves it with source, tests, runtime, and applicable browser/deployment evidence.
+A previously completed architecture/program work order does not prove a new UI or external integration is production-ready. Each new feature requires a Work Order with source, tests, runtime and applicable browser/deployment evidence.
 
 ## Architecture overview
 
 ```text
-ZCode
-  └── PlayLiquid GameOS
-        ├── GameIR
-        ├── Package Graph
-        ├── Capability Broker
-        ├── Runtime / Simulation / Replay
-        ├── Platform Services
+ZCode foundation (preserved)
+  ├── Existing New Task / Settings / Model Providers / Automations / Plugins
+  ├── Existing Agent runtime / Browser / Terminal / tool services
+  └── PlayLiquid product experience
+        ├── World Projects / Git lifecycle
+        ├── GameIR / Package Graph / Capability Broker
+        ├── Interactive Runtime / Simulation / Replay
+        ├── Platform Services (social, multiplayer, live, economy)
         ├── Tool + Engine Fabric
-        ├── Build / Target Orchestrator
-        └── Game Engineering Lab
-               └── Arena capability escalation
+        ├── Build / Deployment / Streaming
+        └── Discovery / Home / Play / Sparks / Channels
 ```
 
-See `spec/architecture.md` for the canonical architecture and `spec/architecture-lock.md` for non-negotiable authority boundaries.
-
-## Research basis
-
-Architecture decisions are recorded with research and implementation references in `docs/research/ARCHITECTURE-RESEARCH.md`, including generative agents, lifelong embodied agents, game balancing/bot-detection work, OpenUSD/glTF composition and delivery, and current engine packaging constraints.
+See `spec/architecture.md` and `spec/architecture-lock.md` for the frozen technical authorities.
 
 ## UI Plugins
 
-### UI Plugin 开发
-
-参见 [UI Plugin：能力、API 与调试](UI_PLUGIN.md)，从 Excalidraw 的画布协作示例开始，了解插件安装更新、页面 API 和宿主联调入口。
-
-**向 `zcode-plugins` 提交插件 PR 时，必须在 PR 模板中声明是否为 UI Plugin，并填写插件名称。** 判断标准见[提交 PR 时声明插件类型](UI_PLUGIN.md#提交-pr-时声明插件类型)。
+See [UI_PLUGIN.md](UI_PLUGIN.md) for the UI Plugin API, plugin lifecycle and debugging. Plugin PRs must declare whether they include a UI Plugin and identify it.
