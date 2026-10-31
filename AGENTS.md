@@ -14,6 +14,7 @@ The current product UX and information architecture are defined by:
 - `docs/product/PRODUCT-EXPERIENCE-SPEC.md`
 - `docs/product/FIGMA-IMPLEMENTATION-CONTRACT.md`
 - `docs/handoff/FINAL-PRODUCT-IMPLEMENTATION-HANDOFF.md`
+- `docs/handoff/FINAL-IMPLEMENTATION-HANDOFF.md` (authoritative complete TL execution handoff)
 - `spec/product-experience/WORK-ORDERS.md`
 - `docs/release/CROSS-PLATFORM-DISTRIBUTION.md`
 
