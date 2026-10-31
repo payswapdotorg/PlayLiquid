@@ -228,3 +228,8 @@ Architecture decisions are recorded with research and implementation references 
 参见 [UI Plugin：能力、API 与调试](UI_PLUGIN.md)，从 Excalidraw 的画布协作示例开始，了解插件安装更新、页面 API 和宿主联调入口。
 
 **向 `zcode-plugins` 提交插件 PR 时，必须在 PR 模板中声明是否为 UI Plugin，并填写插件名称。** 判断标准见[提交 PR 时声明插件类型](UI_PLUGIN.md#提交-pr-时声明插件类型)。
+
+
+## Current product direction and TL handoff
+
+The current, chat-independent product definition is [`PRODUCT-NORTH-STAR.md`](PRODUCT-NORTH-STAR.md). The implementation mission is [`docs/handoff/FINAL-TL-HANDOFF-2026-10-31.md`](docs/handoff/FINAL-TL-HANDOFF-2026-10-31.md). Supporting contracts: [Figma implementation map](docs/product/FIGMA-IMPLEMENTATION-MAP.md), [feature matrix](docs/product/FEATURE-MATRIX.md), and [Linux/Windows install and release contract](docs/product/INSTALL-AND-RELEASE-CONTRACT.md). These documents supersede older conflicting product UX choices while preserving historical records. A fresh TL must read them before starting product work.
