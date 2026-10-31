@@ -17,17 +17,18 @@ Base: ZCode 3.14.3 fork (check Git history for the exact pinned fork baseline; d
 7. `docs/product/PRODUCT-EXPERIENCE-SPEC.md`
 8. `docs/product/FIGMA-IMPLEMENTATION-CONTRACT.md`
 9. `docs/handoff/FINAL-PRODUCT-IMPLEMENTATION-HANDOFF.md`
-10. `spec/product-experience/WORK-ORDERS.md`
-11. `docs/release/CROSS-PLATFORM-DISTRIBUTION.md`
-12. `spec/dependency-graph.md`
-13. `spec/module-dependency-matrix.md`
-14. `spec/work-items.md`
-15. `spec/worker-contract.md`
-16. `docs/handoff/FINAL-TECH-LEAD-HANDOFF.md` (original architecture/program handoff)
-17. `docs/handoff/EXECUTION-PLAN.md`
-18. `docs/research/ARCHITECTURE-RESEARCH.md`
-19. exact active Work Order and target module docs/tests
-20. live GitHub main/branch/PR/CI/release state
+10. `docs/handoff/FINAL-IMPLEMENTATION-HANDOFF.md` (complete product implementation handoff)
+11. `spec/product-experience/WORK-ORDERS.md`
+12. `docs/release/CROSS-PLATFORM-DISTRIBUTION.md`
+13. `spec/dependency-graph.md`
+14. `spec/module-dependency-matrix.md`
+15. `spec/work-items.md`
+16. `spec/worker-contract.md`
+17. `docs/handoff/FINAL-TECH-LEAD-HANDOFF.md` (original architecture/program handoff)
+18. `docs/handoff/EXECUTION-PLAN.md`
+19. `docs/research/ARCHITECTURE-RESEARCH.md`
+20. exact active Work Order and target module docs/tests
+21. live GitHub main/branch/PR/CI/release state
 
 ## Evidence precedence
 
