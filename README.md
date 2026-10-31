@@ -14,7 +14,7 @@ Ready-to-run packages are published on the
 
 | | status |
 | --- | --- |
-| Latest `main` commit | [`d217c95`](https://github.com/payswapdotorg/PlayLiquid/commits/main) (2026-10-31 — see [commits](https://github.com/payswapdotorg/PlayLiquid/commits/main) for the current head) |
+| Latest `main` commit | [`75eef9d`](https://github.com/payswapdotorg/PlayLiquid/commits/main) (2026-10-31, PLX-UX-003 step 1 — preview [`preview/75eef9d2f2`](https://github.com/payswapdotorg/PlayLiquid/releases/tag/preview/75eef9d2f2); see [commits](https://github.com/payswapdotorg/PlayLiquid/commits/main) for the current head) |
 | Latest stable release | [playliquid-gameos-v3.15.0](https://github.com/payswapdotorg/PlayLiquid/releases/tag/playliquid-gameos-v3.15.0) — **Linux-only assets** (predates Windows packaging) |
 | Per-commit previews | every push to `main` publishes an immutable cross-platform prerelease tagged `preview/<short-sha>` (Linux + Windows assets, `SHA256SUMS` + `BUILD-INFO.txt`) — [releases list](https://github.com/payswapdotorg/PlayLiquid/releases) |
 | PR-head previews | opt-in per PR via the `release-preview` label (Actions artifacts from the exact PR head SHA) |
