@@ -117,6 +117,10 @@ Migration/compatibility tests land with the ACR's implementation Work
 Orders PLX-ARCH-002/003 (defined in ACR-001 §6).
 
 Pending gates (see the ledger): PLX-UX-001 on the Figma correction (blocked
-by the Starter-plan MCP limit — not claimed done), PLX-UX-002 on the WebFlix
-license/source audit, PLX-REL-001 on the Windows/per-commit release
-pipeline.
+by the Starter-plan MCP limit — not claimed done) and PLX-UX-002 on the
+approved Figma map. Resolved 2026-10-31: the WebFlix license/source audit
+(clean-room only — `docs/product/AUDIT-2026-10-31-WEBFLIX-AND-AUTHORITIES.md`
+§A) and the Git/package/live/replay authorities audit (PLX-UX-003 READY TO
+DISPATCH — audit §B); PLX-REL-001 merged (PR #17 + follow-up PR #19;
+cross-platform per-commit previews proven, runs 41222127702 and 41230433701
+all-green).

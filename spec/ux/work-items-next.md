@@ -34,8 +34,15 @@ Rules: max 3 concurrent workers; one WO = one worker = one branch = one PR = one
   R6; `spec/module-dependency-matrix.md` (runtime-spark / spark /
   engine-playcanvas); `packages/game-ir/src/document.ts` (version-freeze
   rule satisfied by the ACR).
-- **WebFlix:** not yet audited (license/commit/notices) — remains Worker B's
-  PLX-UX-002 dependency; no WebFlix code may be copied before that audit.
+- **WebFlix:** AUDITED 2026-10-31 — see
+  `docs/product/AUDIT-2026-10-31-WEBFLIX-AND-AUTHORITIES.md` §A. Upstream
+  `payswapdotorg/WebFlix-2.0` at `e6a0a24d` has **no license file, no
+  license field, `"private": true`** — all-rights-reserved; no WebFlix code
+  exists in this repository (verified: whole tree, filenames, fonts,
+  third-party manifests, all refs' history). Verdict: **clean-room only**;
+  interaction-grammar reference is authorized, file copying is not. The
+  WebFlix live stack is rejected; live/replay comes from PlayLiquid's own
+  authorities (§B.3–B.4 of the audit).
 - **Figma correction status (honest):** BLOCKED — the Figma MCP hit the
   connected account's Starter-plan call limit on 2026-10-31 (recorded in
   `PRODUCT-NORTH-STAR.md` §Figma authority). The correction is NOT done and
@@ -61,14 +68,15 @@ Proof: model/provider regression tests; project assignment; panel toggles; brows
 
 ## PLX-UX-002 — WebFlix-style player and discovery
 
-Owner: Worker B. Dependencies: WebFlix license/source audit (pending) and approved Figma map (pending — see FIGMA-IMPLEMENTATION-MAP.md status).
+Owner: Worker B. Dependencies: WebFlix license/source audit (**RESOLVED 2026-10-31 — clean-room only**, `docs/product/AUDIT-2026-10-31-WEBFLIX-AND-AUTHORITIES.md` §A: upstream `WebFlix-2.0` @ `e6a0a24d` is unlicensed/private — no file copying, interaction-grammar reference only, no ported server actions/DB/YouTube/Netflix adapters, no WebFlix live stack); approved Figma map (**still pending** — see FIGMA-IMPLEMENTATION-MAP.md status). Dispatch remains HELD on the Figma gate only.
 Write surface: player/discovery UI component trees and tests only; no shared shell route registration, domain contracts or release workflow.
 Requirements: Home landscape cards, poster-first hover previews, infinite scroll, Continue Watching/Playing, Spark shelf; long-form World play page; instant in-feed Sparks; World Details; channel/subscriptions/liked/history. Previews isolated/disposable and resource-limited. Feeds consume `worldKind` (read model only — ACR-001 Phase B).
 Proof: real playable session path; hover preview launch/cancel; fallback poster; touch behavior; Sparks auto-enter without Play CTA or redirect; screenshots and tests.
 
 ## PLX-UX-003 — World Projects and social/live/replay
 
-Owner: Worker C. Dependencies: World-kind ACR (ACCEPTED — ACR-001); existing Git/package/live/replay authorities audit (pending).
+Owner: Worker C. Dependencies: World-kind ACR (ACCEPTED — ACR-001, Phase B complete); Git/package/live/replay authorities audit (**RESOLVED 2026-10-31 — READY TO DISPATCH**; full record: `docs/product/AUDIT-2026-10-31-WEBFLIX-AND-AUTHORITIES.md` §B).
+Audit verdicts (binding): package composition REUSE-READY (`openRegistry`, `resolve`, `checkReleaseGate`); semantic-diff classification contract REUSE-READY (`git-lineage/src/semantic-diff.ts`) with the diff producer BUILD-NEW; git engine + PR lifecycle BUILD-NEW behind a TL git-adapter decision (never a second engine; never an import of ZCode `services/src/git`); replay engine REUSE-READY (`sealReplayRecord`, `reExecuteReplay`, `ReplaySource`) with durable store/index/player BUILD-NEW; subscriptions reuse `platform-social` `SocialService` follow edges; live + chat BUILD-NEW (zero broadcast stacks exist — the first implementation registers as the single broadcast authority; scope decision: external stack vs multiplayer-kernel live session). Execution order: (1) world projects + composition + semantic PR, (2) replay record/index/play, (3) channel/subscriptions, (4) live + chat. Do-not-duplicate register: audit §B.7.
 Write surface: project workspace and social/live/replay UI module trees + colocated tests; no central route registration or shared contracts.
 Requirements: world projects, tasks, package composition, semantic PR/review; Your Channel/Subscriptions/Live & Replays/Live Player/Start Live/Replay. Reuse existing live implementation if legally and technically ready; do not create duplicate broadcast stack.
 Proof: real branch/PR lifecycle; live session/chat; durable replay record/index/play; semantic package diff; browser evidence.
@@ -117,6 +125,6 @@ Post-merge follow-up (recorded per rule 5): the first push-triggered preview (ru
 
 1. TL performs baseline audit, Figma correction and file-level ownership mapping. — audit + mapping DONE 2026-10-31; **Figma correction HELD** (operator gate; see the audit record).
 2. PLX-ARCH-001 begins immediately; other work that depends on World kind waits for ACR. — **ACR-001 ACCEPTED; Phase B COMPLETE**: PLX-ARCH-002 MERGED (PR #16) and PLX-ARCH-003 MERGED (PR #18, squash `c7a55f5c94`, CI 41213627492).
-3. Dispatch PLX-UX-001/002/003 only when write surfaces are pairwise disjoint. — surfaces now frozen above; PLX-UX-001 HELD on the Figma gate; PLX-UX-002 HELD on the WebFlix audit; PLX-UX-003 UNBLOCKED by ACR-001 Phase B completion (worldKind/targetProfile dispatch now available to feeds and project surfaces) but HELD on its authorities audit.
+3. Dispatch PLX-UX-001/002/003 only when write surfaces are pairwise disjoint. — surfaces now frozen above; PLX-UX-001 HELD on the Figma gate; PLX-UX-002 license audit RESOLVED (clean-room only, audit §A) but still HELD on the approved Figma map; PLX-UX-003 **READY TO DISPATCH** — ACR-001 Phase B complete AND the authorities audit resolved (audit §B; execution order + do-not-duplicate register recorded).
 4. PLX-REL-001 can run in parallel only after workflow ownership is disjoint from root integration and existing release work. — audit done; **PLX-REL-001 MERGED** (PR #17, squash `c6b6bc5f30`, governance 41225816582; dispatch proof 41222127702 all-green both OS families; first push-triggered preview 41225919507 at the merge SHA).
 5. TL merges only after source + tests + runtime + browser + packaged build evidence agree. Update this ledger with branch, PR, base/head/merge SHA, test results and evidence URLs.
