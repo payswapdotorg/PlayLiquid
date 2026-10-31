@@ -4,7 +4,8 @@ Work orders: `spec/release/work-items.md` **RW-003** (branch `release/wc-smoke-e
 base `80d227b`) and `spec/ux/work-items.md` **UX-003** (branch `ux/wc-packaged-ux-qa`,
 base `ccb489b`) — the UX workstream strengthened this harness so green CI means
 more than "the window booted". Module manifest: `src/module.ts` (`qa-desktop-release`,
-per `spec/release/ACR-R1-desktop-product-release.md` Change 2).
+per `spec/release/ACR-R1-desktop-product-release.md` Change 2). The **Windows
+harness** (below) was added by **PLX-REL-001** (cross-platform installable delivery).
 
 This harness tests the **PACKAGED Linux application** — the AppImage (and the
 .deb, metadata-level) produced by the release workflow — never a dev server,
@@ -105,6 +106,60 @@ and excludes exactly those IDs from the exit-code calculation.
 | `error-handling-offline-render` / `error-handling-offline-stability` | with all renderer network egress dead (`--proxy-server` to a closed port), the app still renders, stays alive and responsive — visible degradation, not breakage |
 | `clean-shutdown` / `clean-shutdown-offline` | CDP `Browser.close` → exit code 0 within bounds, no orphan processes (both scenarios) |
 | `console-evidence-recorded` | renderer console entries captured as evidence |
+
+## Windows smoke harness (PLX-REL-001)
+
+The Windows side is a **separate, honest-scope harness** — it does NOT reuse the
+Linux CDP battery (that battery is Xvfb- and Linux-specific); it verifies what
+can genuinely be proven headlessly on a real Windows machine, at the
+process/file/registry level:
+
+```powershell
+# from the repo root, on Windows (Node >= 22 + Windows PowerShell 5.1 present):
+node qa/desktop-release/scripts/run-windows.mjs `
+  --installer "release-out\PlayLiquid GameOS-<version>-win-x64.exe" `
+  --portable-zip "release-out\PlayLiquid GameOS-<version>-win-x64.zip" `
+  --sums "release-out\SHA256SUMS"
+```
+
+`scripts/run-windows.mjs` is the thin driver (mirrors `run-ubuntu.sh`'s shape);
+`scripts/run-windows.ps1` is the harness. Environment alternatives:
+`QA_RELEASE_INSTALLER`, `QA_RELEASE_PORTABLE_ZIP`, `QA_RELEASE_SUMS`. Evidence
+lands in `evidence/windows-<stamp>/` (`report.json` + `transcript.txt`) with the
+same exit-code semantics (0 pass / 1 unexpected failure / 2 nothing ran / 3
+harness error) and the same always-raw-status discipline.
+
+| id | check |
+| --- | --- |
+| `artifact-checksum-installer` / `artifact-checksum-portable-zip` | sha256 vs `SHA256SUMS` (skipped+recorded if no sums file) |
+| `portable-zip-structure` | portable zip payload: `PlayLiquid GameOS.exe` + packaged `.zcode-install-manifest` present |
+| `portable-zip-launch` | the PORTABLE app launches and stays alive 20+ s (flags `--disable-gpu`, neutral cwd) |
+| `clean-install` | NSIS silent install (`/S`, per-user) exits 0 |
+| `install-dir-exe` | installed exe exists (install location resolved from the HKCU uninstall entry) |
+| `install-manifest-present` | the packaged `.zcode-install-manifest` was installed (full-payload evidence) |
+| `uninstall-registry-identity` | HKCU uninstall entry: DisplayName/Publisher/DisplayVersion/InstallLocation recorded |
+| `start-menu-shortcut` | Start Menu shortcut present |
+| `desktop-shortcut` | desktop shortcut — recorded observation (silent-install default checkbox state cannot be confirmed headlessly) |
+| `launch-installed-alive` / `launch-installed-exe-path` | the INSTALLED app launches and the running process IS the installed product exe |
+| `product-identity-window-title` | the main window title carries the PlayLiquid identity |
+| `user-data-dir-created` | `%APPDATA%\PlayLiquid GameOS` created on launch (product data root observed alongside) |
+| `data-retention-marker` | a retention marker is written into the app data dir |
+| `reinstall-over-existing` / `reinstall-app-present` | installer re-run over the existing install (the honest same-version approximation of an upgrade) keeps the app present |
+| `data-retention-across-reinstall` | user data (marker) retained across the reinstall |
+| `relaunch-after-reinstall` | the app relaunches after the reinstall |
+| `uninstall-silent` / `uninstall-shortcut-removed` / `uninstall-registry-removed` | silent uninstall removes app files, Start Menu shortcut and the registry entry |
+| `user-data-retained-after-uninstall` | user data RETAINED after uninstall (electron-builder NSIS default) |
+
+**Honest scope (recorded in every report's `scope` block):** no synthetic GUI
+interactions are driven (process/file/registry evidence only); the
+"upgrade" check is a same-version reinstall — a true cross-version upgrade
+needs two different builds and is NOT claimed; no code-signing/SmartScreen
+verification (the installer is unsigned; a silent `/S` install never exercises
+the SmartScreen UI); no auto-update verification (auto-update is disabled by
+product policy — `desktop-product-identity.mjs`, `remoteUpdateFeedEnabled:
+false`). The app is always launched with `--disable-gpu` from a NEUTRAL working
+directory (never the repository checkout — see the neutral-cwd discipline note
+above; the packaged app's agent-runtime resolution is cwd-sensitive).
 
 ## Evidence layout
 
