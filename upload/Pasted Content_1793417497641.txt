@@ -1,0 +1,767 @@
+# FINAL IMPLEMENTATION HANDOFF — PLAYLIQUID GAMEOS
+## ZCode Foundation Preservation, WebFlix UX Reuse, Figma-Exact Implementation and Game Studio
+
+**To:** Technical Lead (TL) and implementation team  
+**Product:** PlayLiquid  
+**Implementation strategy:** Preserve ZCode in full, reuse WebFlix UI/UX, and reproduce the approved Figma designs as the product interface.
+
+---
+
+# 1. Mission and governing principles
+
+Build PlayLiquid as a game creation, discovery, playback, social and publishing platform on top of the existing ZCode codebase.
+
+The objective is NOT to build another AI coding application, game launcher or generic game dashboard.
+
+The objective is to take the existing ZCode application and extend it into PlayLiquid while retaining the capabilities that already make ZCode useful.
+
+The team must follow five non-negotiable rules:
+
+1. **Do not rebuild existing ZCode features.** Preserve the existing implementation and extend it only where necessary.
+2. **Do not replace ZCode's existing settings page.** Its model/provider configuration capabilities are particularly important and must remain functional.
+3. **Reuse WebFlix's existing UI/UX implementation wherever code reuse is permitted and technically practical.** Do not independently reinvent existing navigation, feed, card, watch-page, Shorts and Creator Studio patterns.
+4. **Reproduce the approved Figma designs.** The TL and workers must implement the actual screens and layouts, not invent their own interpretation of PlayLiquid.
+5. **Game-specific capabilities must integrate with the existing ZCode architecture.** Do not introduce another agent runtime, model-provider framework, settings system or unnecessary backend.
+
+The product should feel like PlayLiquid, not like ZCode with a different logo. However, its underlying ZCode capabilities must remain available.
+
+# 2. Repository strategy: start from the complete ZCode source
+
+Create a new public PlayLiquid repository under `payswapdotorg`.
+
+Proposed repository name: `PlayLiquid-GameOS`, unless the organization already has an appropriate target repository that the user explicitly wants to reuse.
+
+Do not overwrite an existing repository.
+
+## 2.1 Copy the complete ZCode project
+
+Source:
+
+https://github.com/zai-org/ZCode
+
+Start from the current upstream main branch, record the exact source commit SHA and preserve the Git history.
+
+Prefer a proper GitHub fork when practical. Otherwise, mirror the complete repository into the new public repository and configure the original ZCode repository as the `upstream` remote.
+
+The resulting remotes should be conceptually:
+
+- `origin` → payswapdotorg PlayLiquid repository
+- `upstream` → zai-org/ZCode
+
+Do not copy selected folders into a new application and discard the rest of ZCode.
+
+Preserve the entire repository, including:
+
+- Desktop application and packaging.
+- Web application.
+- Server and host infrastructure.
+- Shared React UI and component library.
+- Agent CLI and runtime.
+- Provider and provider-node packages.
+- RPC, shared protocols and client SDK.
+- Services and persistence.
+- Tools, terminal, browser and workspace capabilities.
+- Task orchestration, permissions and interaction flows.
+- Existing tests, architecture governance, CI and build scripts.
+- Localization and accessibility infrastructure.
+- Existing configuration and third-party notices.
+
+The repository should remain capable of receiving upstream ZCode improvements.
+
+Create an explicit upstream synchronization policy. Upstream changes should be reviewed and integrated through controlled pull requests, not blindly merged into a heavily modified product.
+
+## 2.2 Preserve legal and attribution requirements
+
+ZCode's first-party source is Apache-2.0 licensed.
+
+Retain the upstream LICENSE, NOTICE, relevant copyright notices and third-party notices. Modified upstream files must be marked appropriately, and third-party assets and dependencies must retain their own applicable licensing information.
+
+Do not assume that the ZCode license grants rights to unrelated code copied from other repositories.
+
+# 3. ZCode preservation contract
+
+This is the highest-priority technical constraint.
+
+Before making substantial changes, create a baseline inventory of existing ZCode features and their working behavior.
+
+The team must preserve existing functionality rather than creating PlayLiquid-specific replacements.
+
+## 3.1 Settings page — preserve the existing implementation
+
+The existing ZCode Settings experience must remain available.
+
+Do not replace it with a newly designed PlayLiquid settings screen.
+
+Do not remove settings because they do not appear in our Figma mockups.
+
+Do not create a second model settings system.
+
+In particular, preserve the existing Model Provider settings implementation, its underlying services and its persistence behavior.
+
+The preservation contract includes:
+
+- Built-in and custom model providers.
+- Provider connection configuration.
+- API keys and credentials.
+- Provider endpoint/base URL.
+- Provider API-format selection.
+- Provider enablement and access configuration.
+- Adding, editing and deleting models.
+- Model metadata and configuration overrides.
+- Context-window and output-token settings.
+- Input/output modality capabilities, including text, images, video and audio where supported.
+- Tool-call capability configuration.
+- Reasoning-level configuration.
+- Model testing and connectivity checks.
+- Model ordering and enable/disable behavior.
+- Existing provider templates and provider discovery.
+- Coding Plan and other existing entitlement-related behavior.
+- Existing model selection and model resolution in tasks.
+- Credential persistence, refresh and applicable account/workspace boundaries.
+
+Relevant upstream implementation to inspect first:
+
+`packages/ui/src/settings/model-provider-section/`
+
+Important source files include:
+
+- `ProviderCardSections.tsx`
+- `ProviderFormControls.tsx`
+- `ProviderModelMetadataDialog.tsx`
+- `ProviderModelMetadataFields.tsx`
+- `ProviderModelReasoningLevelEditor.tsx`
+- `SortableProviderModelList.tsx`
+- `useProviderModelDraft.ts`
+
+Preserve the associated provider services, shared types, state, persistence and tests as well. Copying just the visible React components without preserving their service contracts is not sufficient.
+
+**Acceptance criterion:** a user must be able to configure the same providers, models, credentials and model capabilities in PlayLiquid that they could configure in the upstream ZCode baseline. Existing configurations must not be silently reset or lost.
+
+## 3.2 Preserve New Task and existing task execution
+
+Our Figma New Task screen changes the presentation, not the underlying task system.
+
+Preserve:
+
+- Existing task creation and task lifecycle.
+- Workspace and project selection.
+- Model selection.
+- Agent selection and orchestration.
+- Task modes and execution settings.
+- File attachments and context.
+- Permissions and approval flows.
+- Terminal, browser and tool access.
+- Task history and recovery.
+- Existing conversation and execution behavior.
+- Existing model/provider resolution.
+
+Map these capabilities into the approved New Task design without removing existing controls or workflows.
+
+Where the Figma screen does not explicitly show an existing ZCode control, retain that control in an appropriate location or reveal it through a suitable existing interaction. Never delete functionality merely to make the screen look simpler.
+
+## 3.3 Other ZCode functionality
+
+Preserve the rest of ZCode's working product, not just Settings and New Task.
+
+The TL must produce a ZCode-to-PlayLiquid preservation matrix covering every major existing feature and its new location or continued access path.
+
+A feature may be rebranded or repositioned when required, but it must not disappear or become a non-functional placeholder.
+
+# 4. Figma is the product UI specification
+
+The following Figma file is the visual source of truth:
+
+https://www.figma.com/design/LWlycZ5B3vCrUZ0a4pnu5u
+
+It contains two pages.
+
+## Page 01 — WebFlix UX Adaptation
+
+https://www.figma.com/design/LWlycZ5B3vCrUZ0a4pnu5u?node-id=1-2
+
+Implement these screens:
+
+1. Home — `1:2`
+2. Play — `1:143`
+3. Sparks — `1:236`
+4. Game Details — `1:302`
+
+## Page 02 — New Task & Game Studio
+
+https://www.figma.com/design/LWlycZ5B3vCrUZ0a4pnu5u?node-id=6-2
+
+Implement these screens:
+
+1. New Task — `6:3`
+2. Game Studio — `6:99`
+3. Game Builder — `6:238`
+4. Creator Studio — `6:350`
+
+## 4.1 Exact reproduction requirement
+
+The implementation must reproduce the Figma screens as closely as possible.
+
+This is not a request for the TL to design a similar product.
+
+Do not:
+
+- Replace the layouts with generic dashboards.
+- Invent new navigation patterns.
+- Change the screen hierarchy without justification.
+- Omit sections because they are difficult to implement.
+- Substitute generic cards for the actual feed layouts.
+- Turn the Game Builder into a generic chat interface.
+- Replace the New Task screen with a new ZCode-like interpretation.
+- Change the visual identity without approval.
+
+The Figma files define the layout, hierarchy, proportions, component placement, typography, colors and visual treatment.
+
+Where the Figma screens do not specify a behavior, use the corresponding WebFlix interaction pattern or existing ZCode behavior rather than inventing something unrelated.
+
+Responsive adaptations are required, but they must preserve the design's hierarchy and intended interaction.
+
+The TL must provide screenshot comparisons between the implemented product and the corresponding Figma frames.
+
+The implementation must also be exercised in the actual desktop application, not only in a browser development server.
+
+# 5. WebFlix: reuse the implementation, not just the idea
+
+Source repository:
+
+https://github.com/payswapdotorg/WebFlix-2.0
+
+WebFlix already implements many interaction patterns we want in PlayLiquid.
+
+The team should inspect its source and create a component-reuse inventory before implementing the corresponding PlayLiquid pages.
+
+## 5.1 Source components to inspect and reuse
+
+App shell:
+
+- `src/components/app/app-shell.tsx`
+- `src/components/app/sidebar.tsx`
+- `src/components/app/topbar.tsx`
+- `src/components/app/notifications-bell.tsx`
+- `src/components/app/account-menu.tsx`
+
+Home feed:
+
+- `src/components/home/home-feed.tsx`
+- `src/components/home/shorts-shelf.tsx`
+- `src/components/home/video-rail.tsx`
+
+Video cards and hover previews:
+
+- `src/components/video/video-card.tsx`
+- `src/components/video/video-hover-preview.tsx`
+
+Shorts:
+
+- `src/components/shorts/shorts-feed.tsx`
+- `src/components/shorts/shorts-engagement-rail.tsx`
+
+Watch page:
+
+- `src/components/watch/watch-page.tsx`
+- `src/components/watch/action-row.tsx`
+- `src/components/watch/comments-section.tsx`
+
+Creator Studio:
+
+- `apps/studio/src/components/studio-shell.tsx`
+- `apps/studio/src/app/(studio)/**`
+
+Also inspect the related hooks, DTOs, layouts and interaction components. A UI component is not meaningfully reused if its behavior is discarded and replaced with hardcoded mock data.
+
+## 5.2 Required reuse process
+
+For each component:
+
+1. Inspect the actual WebFlix implementation.
+2. Identify its visual structure, interactions, state, loading behavior and accessibility behavior.
+3. Identify the parts that are independent of WebFlix's YouTube-specific backend.
+4. Reuse or port the actual UI component where permitted.
+5. Adapt its data contract to PlayLiquid's game, Spark, creator and player entities.
+6. Integrate it with ZCode's existing application architecture and navigation.
+7. Test the resulting behavior.
+
+Do not transplant WebFlix's whole Next.js application into ZCode as a separate competing frontend.
+
+ZCode already has a shared React UI and its own web/desktop rendering architecture. WebFlix uses Next.js 16 and has its own server, database and provider-specific data adapters. Reuse its UI components and interaction logic while adapting the necessary routing, hooks and data contracts to ZCode.
+
+Do not blindly copy WebFlix-specific YouTube credentials, account integrations, data adapters, API routes or database structures.
+
+The product must use PlayLiquid game data, not YouTube's video catalog.
+
+**Important licensing gate:** the WebFlix repository root did not expose a repository-level `LICENSE` during this source inspection. Before copying WebFlix source files into the new repository, verify who owns the code and obtain explicit permission or establish an appropriate license. Do not infer a reuse license from the fact that the repository is public. If written authorization is not yet established, use WebFlix as a visual and behavioral reference and create a clean-room implementation that matches its behavior.
+
+The preferred outcome, once authorization is established, is actual component reuse rather than a second independent implementation.
+
+# 6. The game-thumbnail and hover-to-play experience
+
+This feature is a major product requirement.
+
+WebFlix's video cards do not merely display static thumbnails. When the user hovers over a card, the thumbnail becomes a video-preview surface and plays the content inside the card.
+
+PlayLiquid needs the same experience for games.
+
+The implementation must not be a decorative zoom, animated slideshow or rotating collection of screenshots pretending to be video playback.
+
+## 6.1 Game card presentation
+
+Every game should have a proper thumbnail and preview asset.
+
+The card must support:
+
+- Game thumbnail/poster.
+- Game title.
+- Creator/developer identity.
+- Plays and other relevant game metadata.
+- Game duration or estimated play time where applicable.
+- Continue-playing progress where relevant.
+- Game status, such as live, upcoming or recently updated.
+- A real gameplay preview on hover.
+
+Long-form game cards should use landscape presentation.
+
+Sparks should use vertical 9:16 presentation.
+
+The same reusable card and preview components should be used across Home, recommendations, search, subscriptions, game details and other relevant feed surfaces.
+
+## 6.2 How the hover preview should work
+
+Start by studying the existing WebFlix implementation:
+
+`src/components/video/video-hover-preview.tsx`
+
+Its existing architecture is especially relevant:
+
+- A shared preview layer follows the currently hovered card.
+- A short hover dwell prevents accidental playback.
+- Only one preview player is active at a time.
+- The preview is muted by default.
+- Preview controls provide mute and timeline/scrubbing behavior.
+- Leaving the card stops and cleans up the preview.
+- The preview uses the card's actual geometry.
+- Touch devices do not attempt to use hover.
+- Failed playback falls back honestly to the static thumbnail.
+
+The implementation should reuse this architecture where possible, changing the video entity and media source to PlayLiquid's game-preview assets.
+
+Use a tunable initial hover dwell around 450–600 ms, then optimize through real user testing.
+
+The preview should:
+
+1. Display the static game thumbnail immediately.
+2. Wait until the pointer has remained over the card for the dwell interval.
+3. Load and play the associated gameplay-preview video inside the card.
+4. Start muted and inline.
+5. Display appropriate preview controls, including mute and progress.
+6. Stop playback and release resources when the user leaves the card.
+7. Keep the card clickable so that selecting it opens the game page.
+8. Ensure that moving between the card and its preview controls does not accidentally close the preview.
+
+Only one global preview player should normally be active at a time. Do not create dozens of independent players for every visible card.
+
+## 6.3 Do not launch the full game engine just to preview a card
+
+This is an important architectural distinction.
+
+Hovering over a game card should play a lightweight video asset captured from actual gameplay. It should not boot a full game engine, download a large game bundle or create a live game session for every hover.
+
+That would create unnecessary startup latency, CPU/GPU use, network consumption and memory pressure.
+
+The game preview is a media asset, not a complete game execution.
+
+Actual interactive gameplay should be started through an explicit Play or Try action.
+
+## 6.4 Preview asset generation
+
+Build a reusable game-preview asset pipeline.
+
+Each game should be able to provide:
+
+- A manually uploaded thumbnail.
+- A manually uploaded gameplay-preview video.
+- An automatically captured gameplay-preview video.
+- A fallback poster generated from a valid game frame.
+- Preview orientation and aspect ratio.
+- Preview duration and media metadata.
+- Source build/version information.
+
+A sensible first implementation is:
+
+1. The creator publishes or selects a build.
+2. The creator opens a preview-capture workflow.
+3. A controlled capture session starts the selected game build.
+4. The capture process records a short, representative gameplay sequence.
+5. The capture produces a thumbnail and compressed preview clip.
+6. The creator reviews and approves the generated assets.
+7. The assets are stored and referenced by the game's metadata.
+8. The game card uses those assets for its hover preview.
+
+The creator must be able to replace the automatic capture with a manually uploaded or recorded preview.
+
+Use an asset/media delivery layer that supports efficient playback, caching and appropriate resolutions.
+
+Start with a widely supported browser video format and add additional encodings only when justified by measured compatibility and performance.
+
+## 6.5 Honest fallback behavior
+
+The preview must never silently degrade into a slideshow that looks like a playing video.
+
+If playback is still loading, retain the static thumbnail.
+
+If playback fails, stop attempting playback, display the static poster and optionally show a small "Preview unavailable" indicator.
+
+Do not animate storyboard images as a substitute for a real video preview on video-capable devices.
+
+Browsers may block autoplay of audible media. Use muted inline previews and handle rejected playback promises gracefully. See the browser autoplay guidance:
+
+https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Autoplay
+
+For users who prefer reduced motion, do not force autoplay. For touch devices, provide an explicit preview or play interaction rather than relying on hover.
+
+# 7. PlayLiquid product surfaces
+
+Implement the complete set of Figma screens and connect them to real product functionality.
+
+## Player-facing product
+
+### Home
+
+Reproduce the WebFlix-style home experience:
+
+- Continue Playing.
+- Long-form game recommendations.
+- Sparks shelf.
+- Trending games.
+- Recommended games.
+- Live experiences.
+- Creator/community content.
+- Category navigation.
+- Hover-to-play previews.
+- Infinite scrolling and progressive loading.
+
+The feed must use real PlayLiquid data and personalized recommendations when available.
+
+### Play
+
+Adapt WebFlix's long-form watch page to games.
+
+The page should provide:
+
+- A large game/player surface.
+- Game metadata.
+- Creator information and follow/subscribe action.
+- Like/dislike and sharing.
+- Save/playlist behavior.
+- Description and game information.
+- Comments and replies.
+- Related games and recommendations.
+- Play/resume controls.
+- Multiplayer and controller information where appropriate.
+
+### Sparks
+
+Adapt the Shorts interaction model:
+
+- Vertical 9:16 feed.
+- Full-height snapping/navigation.
+- Next and previous Sparks.
+- Like, comment, share and creator follow.
+- Caption and creator identity.
+- Comments drawer.
+- Instant-play game interaction.
+- Score, replay and challenge actions where applicable.
+- Entry point to the full game.
+
+Sparks is PlayLiquid's game-native short-form experience. Do not build a separate TikTok integration.
+
+### Game Details
+
+Use the video-details page as the UX reference:
+
+- Trailer/gameplay preview.
+- Game title and creator.
+- Ratings and play counts.
+- Primary Play action.
+- Save/follow actions.
+- Overview and gameplay details.
+- Community and discussion.
+- Updates and release information.
+- Leaderboards.
+- Recommended related games.
+
+## Creator-facing product
+
+The Game Studio must be a real development environment, not just a dashboard.
+
+Implement:
+
+- Game Studio dashboard.
+- My Games and project organization.
+- World/scene editing.
+- Asset library.
+- Avatar Lab.
+- Avatar body and intelligence configuration.
+- Logic and gameplay systems.
+- Agent-assisted development.
+- Testing and playtesting.
+- Research Lab and Arena integration.
+- Collaboration and review.
+- Version control and PR lifecycle.
+- Creator Studio.
+- Analytics.
+- Community moderation and feedback.
+- Release and publishing management.
+
+The Figma Game Builder is the visual target for the production workspace.
+
+Preserve the ability to treat a game as a world, assets and avatars, with an avatar's body and intelligence handled as distinct but connected concerns.
+
+# 8. Integration architecture
+
+Do not create two applications that happen to share a product name.
+
+PlayLiquid should be an integrated ZCode-derived product.
+
+Use the existing ZCode application shell, task system, provider architecture, services and agent runtime.
+
+The added PlayLiquid capabilities should be organized as product-specific modules and services that integrate with the existing application.
+
+Establish clear boundaries:
+
+- ZCode core: existing coding workspace, runtime, CLI, providers, settings, tools and execution services.
+- PlayLiquid experience: game discovery, game pages, Sparks, thumbnails, preview playback and community.
+- PlayLiquid Studio: game creation, worlds, assets, avatars, playtests, collaboration and publishing.
+- Shared infrastructure: identity, permissions, workspaces, agent orchestration, model selection, media assets and persistence.
+
+Avoid duplicated model settings, separate agent runtimes, separate provider registries or redundant user/workspace state.
+
+Do not couple the game feed to the game engine. The feed should work independently using game metadata and preview media.
+
+# 9. Work allocation
+
+The TL should coordinate the work using independent branches with clearly defined ownership.
+
+### Worker 1 — ZCode foundation and preservation
+
+- Establish the new repository from the complete upstream source.
+- Audit ZCode functionality.
+- Preserve the desktop/web/server/CLI architecture.
+- Protect the Settings page and model-provider system.
+- Preserve New Task and all existing execution flows.
+- Create baseline tests and regression gates.
+
+### Worker 2 — WebFlix UI/UX reuse
+
+- Audit WebFlix components and licensing.
+- Build the code-reuse map.
+- Port or reuse the permitted app shell, feed, cards, hover preview, Shorts, watch page, comments and Creator Studio components.
+- Adapt them to PlayLiquid data contracts and ZCode's React architecture.
+- Avoid copying YouTube/Netflix integrations.
+
+### Worker 3 — Game preview and media pipeline
+
+- Design the game-preview asset model.
+- Build preview capture and transcoding.
+- Implement the shared hover-preview player.
+- Add preview metadata and storage.
+- Implement poster fallback and device policies.
+- Benchmark performance and verify playback behavior.
+
+### Worker 4 — Figma reproduction and Game Studio
+
+- Translate all eight Figma screens into the product.
+- Implement the player-facing experience.
+- Implement New Task and Game Studio screens.
+- Integrate the world editor, asset library, Avatar Lab and Creator Studio.
+- Capture screenshots and compare them against the Figma frames.
+
+The TL owns the integration, architectural decisions, test gates, release identity and final product acceptance.
+
+Workers must claim file ownership and coordinate shared component changes to avoid conflicting edits.
+
+# 10. Implementation phases
+
+## Phase 0 — Repository and baseline
+
+- Create the public PlayLiquid repository.
+- Import the complete ZCode source.
+- Preserve Git history and attribution.
+- Configure upstream synchronization.
+- Record the upstream commit SHA.
+- Build and launch the unmodified baseline.
+- Inventory existing features.
+- Capture baseline Settings and New Task screenshots.
+- Run baseline tests.
+
+Do not begin substantial product changes until the baseline is reproducible.
+
+## Phase 1 — Protect ZCode
+
+- Establish regression tests for Settings.
+- Establish regression tests for model-provider configuration.
+- Establish regression tests for New Task and task execution.
+- Verify model credentials and provider configurations survive upgrades.
+- Protect the desktop, CLI, web and runtime workflows.
+
+This phase is a gate for all later UI work.
+
+## Phase 2 — Reproduce the Figma experience
+
+- Implement the app shell and navigation.
+- Implement Home.
+- Implement Play.
+- Implement Sparks.
+- Implement Game Details.
+- Implement New Task.
+- Implement Game Studio.
+- Implement Game Builder.
+- Implement Creator Studio.
+
+Integrate existing ZCode functionality behind the redesigned surfaces.
+
+## Phase 3 — WebFlix code reuse and interactions
+
+- Integrate the reusable feed/card infrastructure.
+- Integrate the hover-preview architecture.
+- Integrate Shorts interactions.
+- Integrate long-form watch-page interactions.
+- Integrate comments and creator surfaces.
+- Integrate infinite scrolling.
+- Validate desktop and mobile behavior.
+
+## Phase 4 — Game preview asset pipeline
+
+- Capture game footage.
+- Generate thumbnails and preview videos.
+- Add the preview asset metadata contract.
+- Implement CDN-backed media playback.
+- Integrate hover previews across all applicable game cards.
+- Add preview failure and reduced-motion behavior.
+- Benchmark resource usage.
+
+## Phase 5 — Product completeness and packaging
+
+- Complete end-to-end game creation.
+- Complete testing and publishing workflows.
+- Validate community and player interactions.
+- Validate existing ZCode functionality.
+- Establish branded PlayLiquid application identity.
+- Build and test installable desktop releases.
+- Produce release artifacts and installation documentation.
+
+# 11. Acceptance criteria
+
+The product is not complete merely because the screens look similar.
+
+The TL must demonstrate the following.
+
+## ZCode preservation
+
+- Existing ZCode model settings are still functional.
+- Existing provider configurations can be created, edited, tested and saved.
+- Existing model metadata and capability settings work.
+- Existing model selection continues to work in task creation.
+- Existing credentials and settings are preserved.
+- Existing task execution, workspace, terminal, browser and agent workflows still work.
+- Existing CLI and desktop functionality remains available.
+
+## Figma fidelity
+
+- All eight Figma screens are implemented.
+- Screen layouts and visual hierarchy match their corresponding frames.
+- Screenshots are captured from the actual application.
+- Differences are recorded and resolved rather than silently accepted.
+- Existing ZCode functionality is retained even when the design needs additional controls.
+
+## WebFlix interaction reuse
+
+- Home feed supports the intended shelves and progressive loading.
+- Cards show proper thumbnails.
+- Hovering over a card starts real gameplay-preview video.
+- The preview plays inside the card.
+- Preview starts muted.
+- Preview stops on pointer exit.
+- Only one preview plays at a time.
+- Touch devices have a usable non-hover interaction.
+- Failed playback shows a proper static thumbnail, never a fake slideshow.
+- Sparks uses the vertical feed interaction model.
+- Long-form Play pages use the watch-page interaction model.
+- Comments and creator interactions are functional.
+
+## Game Studio
+
+- Creators can create and organize games.
+- Creators can access the world/scene workspace.
+- Assets can be added and managed.
+- Avatars can be configured.
+- Agents can assist with development.
+- Builds can be tested.
+- Changes can be reviewed.
+- Games can be published.
+- Creators can manage releases and review player feedback.
+
+## Quality and packaging
+
+- No placeholder controls or dead buttons.
+- No fake data presented as live product functionality.
+- No regressions in existing ZCode tests.
+- New features have appropriate unit, integration and end-to-end tests.
+- The packaged desktop application launches and completes real user flows.
+- PlayLiquid has its own app identity, executable/package identity and release metadata.
+- Upstream ZCode attribution and licensing remain intact.
+
+# 12. TL reporting requirements
+
+The repository is the source of truth. Do not rely on chat summaries as the project record.
+
+Maintain:
+
+- `docs/architecture/PRODUCT-BOUNDARIES.md`
+- `docs/architecture/ZCODE-PRESERVATION-MATRIX.md`
+- `docs/architecture/WEBFLIX-REUSE-MAP.md`
+- `docs/architecture/GAME-PREVIEW-ARCHITECTURE.md`
+- `docs/plans/IMPLEMENTATION-PLAN.md`
+- `docs/progress/STATUS.md`
+- `docs/verification/ACCEPTANCE-REPORT.md`
+
+Every completed workstream must provide:
+
+- Exact files changed.
+- Commit SHA.
+- Tests run and their actual results.
+- Before/after screenshots where applicable.
+- Figma frame references.
+- Feature preservation evidence.
+- Known gaps and blockers.
+
+The TL must not report a feature as complete based solely on a successful build or a green test that does not exercise the actual behavior.
+
+A feature is complete only when it is integrated, tested and demonstrated.
+
+---
+
+# Final instruction to the TL
+
+Build PlayLiquid by extending the complete ZCode foundation, not by recreating ZCode.
+
+Reuse WebFlix's existing UI/UX code where authorized, adapting it to the PlayLiquid domain and ZCode architecture.
+
+Follow the Figma designs as the exact visual specification.
+
+Protect the existing Settings page, model-provider settings and New Task execution flows.
+
+Make the game thumbnail and hover-to-play preview a first-class, reusable part of the discovery experience.
+
+Do not take shortcuts that produce a visually convincing but functionally incomplete application.
+
+The final product should combine:
+
+- ZCode's existing AI development workspace and execution capabilities.
+- WebFlix's mature content discovery and playback UX.
+- PlayLiquid's game creation, game-native social experience, Sparks, Game Studio, avatars, agents, testing and publishing.
+
+**The north star is a complete PlayLiquid product built by preserving and extending proven systems, not repeatedly reinventing functionality that already exists.**
