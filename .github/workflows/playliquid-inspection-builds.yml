@@ -1,0 +1,179 @@
+name: PlayLiquid Inspection Builds
+
+# Build installable inspection artifacts for the exact source revision.
+# Push builds make every successful main integration inspectable.
+# Manual builds can target an immutable historical SHA or tag.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      build_ref:
+        description: "Exact commit SHA or immutable tag to build (blank = dispatch SHA)"
+        required: false
+        default: ""
+      upload_retention_days:
+        description: "Actions artifact retention (1-90 days)"
+        required: false
+        default: "30"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: playliquid-inspection-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build ${{ matrix.os }} x64
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: linux
+            runner: ubuntu-latest
+            bundle_args: "--os linux --arch x64"
+          - os: windows
+            runner: windows-latest
+            bundle_args: "--os win --arch x64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 120
+    steps:
+      - name: Resolve requested revision
+        id: revision
+        shell: bash
+        run: |
+          REF="${{ inputs.build_ref }}"
+          if [ -z "$REF" ]; then REF="${{ github.sha }}"; fi
+          echo "ref=$REF" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout exact revision
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.revision.outputs.ref }}
+          fetch-depth: 0
+
+      - name: Verify resolved commit
+        id: source
+        shell: bash
+        run: |
+          ACTUAL="$(git rev-parse HEAD)"
+          REQUESTED="${{ steps.revision.outputs.ref }}"
+          if [[ "$REQUESTED" =~ ^[0-9a-fA-F]{40}$ ]] && [ "$ACTUAL" != "$REQUESTED" ]; then
+            echo "Requested $REQUESTED but checked out $ACTUAL" >&2
+            exit 1
+          fi
+          echo "sha=$ACTUAL" >> "$GITHUB_OUTPUT"
+          echo "short_sha=${ACTUAL:0:12}" >> "$GITHUB_OUTPUT"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.14.0
+          cache: pnpm
+
+      - name: Install Linux packaging dependencies
+        if: matrix.os == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libarchive-tools rpm xvfb libfuse2
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build desktop
+        run: pnpm --filter @zcode/desktop run build
+        env:
+          ZCODE_ENV: production
+
+      - name: Bundle Linux
+        if: matrix.os == 'linux'
+        run: pnpm --filter @zcode/desktop exec pnpm run bundle -- --os linux --arch x64
+        env:
+          ZCODE_ENV: production
+
+      - name: Bundle Windows
+        if: matrix.os == 'windows'
+        run: pnpm --filter @zcode/desktop exec pnpm run bundle -- --os win --arch x64
+        env:
+          ZCODE_ENV: production
+
+      - name: Collect and validate Linux artifacts
+        if: matrix.os == 'linux'
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release-out
+          cp packages/desktop/dist/*.AppImage release-out/
+          cp packages/desktop/dist/*.deb release-out/
+          test -n "$(find release-out -maxdepth 1 -name '*.AppImage' -print -quit)"
+          test -n "$(find release-out -maxdepth 1 -name '*.deb' -print -quit)"
+
+      - name: Collect and validate Windows installer
+        if: matrix.os == 'windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force release-out | Out-Null
+          $installers = Get-ChildItem packages/desktop/dist -Filter *.exe -File
+          if ($installers.Count -eq 0) { throw "No Windows .exe installer produced" }
+          Copy-Item $installers.FullName release-out/
+
+      - name: Generate checksums and build manifest
+        shell: bash
+        env:
+          SOURCE_SHA: ${{ steps.source.outputs.sha }}
+          SOURCE_SHORT_SHA: ${{ steps.source.outputs.short_sha }}
+          TARGET_OS: ${{ matrix.os }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          cd release-out
+          if [ "$TARGET_OS" = "windows" ]; then
+            sha256sum *.exe > SHA256SUMS
+          else
+            sha256sum *.AppImage *.deb > SHA256SUMS
+          fi
+          python - <<'PY'
+          import hashlib, json, os, pathlib, subprocess
+          files=[]
+          for p in sorted(pathlib.Path('.').iterdir()):
+              if p.is_file() and p.name not in {'build-manifest.json','SHA256SUMS'}:
+                  data=p.read_bytes()
+                  files.append({'name':p.name,'size_bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()})
+          version=subprocess.check_output(['node','-p',"require('./package.json').version"],text=True).strip()
+          manifest={
+            'product':'PlayLiquid GameOS','version':version,
+            'source_commit':os.environ['SOURCE_SHA'],
+            'source_short_sha':os.environ['SOURCE_SHORT_SHA'],
+            'platform':os.environ['TARGET_OS'],'architecture':'x64',
+            'workflow_run_url':os.environ['RUN_URL'],
+            'node':subprocess.check_output(['node','--version'],text=True).strip(),
+            'pnpm':subprocess.check_output(['pnpm','--version'],text=True).strip(),
+            'artifacts':files
+          }
+          pathlib.Path('build-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
+          PY
+          cat build-manifest.json
+          cat SHA256SUMS
+
+      - name: Upload installable inspection artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: PlayLiquid-GameOS-${{ matrix.os }}-x64-${{ steps.source.outputs.short_sha }}
+          path: release-out/
+          if-no-files-found: error
+          retention-days: ${{ inputs.upload_retention_days || 30 }}
+
+      - name: Upload packaged QA harness for Linux
+        if: matrix.os == 'linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: PlayLiquid-Linux-QA-${{ steps.source.outputs.short_sha }}
+          path: qa/desktop-release/
+          if-no-files-found: warn
