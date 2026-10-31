@@ -372,10 +372,36 @@ try {
   $sw = [System.Diagnostics.Stopwatch]::StartNew()
   $installExit = Invoke-Installer -InstallerPath $Installer
   $sw.Stop()
+  $installDetail = ("NSIS silent install (/S, per-user) exited 0 in {0:N1}s" -f $sw.Elapsed.TotalSeconds)
+  if ($installExit -ne 0) {
+    # One honest retry for a crashed silent install (PLX-REL-001, run
+    # 41220671862: the identical installer bytes installed cleanly in runs
+    # 41216691320/41218769796 and one run crashed with 0xC0000005 ~30 s in
+    # — an intermittent runner/installer fault, not a reproducible product
+    # defect). BOTH attempts are recorded: the check detail reports the
+    # first exit code and the retry outcome, and evidence preserves it.
+    $firstExit = $installExit
+    Write-Log ("clean-install: first attempt exited {0} — removing partial state and retrying once" -f $firstExit)
+    $partialEntry = Get-UninstallEntry
+    $partialDir = if ($partialEntry -and $partialEntry.InstallLocation) { $partialEntry.InstallLocation } else { Join-Path $env:LOCALAPPDATA "Programs\$script:ProductName" }
+    [void](Stop-PackagedAppProcesses -TimeoutSeconds 30)
+    $partialUninstaller = Get-UninstallerPath -InstallLocation $partialDir -Entry $partialEntry
+    if ($partialUninstaller) {
+      try { $null = Invoke-Uninstaller -InstallLocation $partialDir } catch { Write-Log ("clean-install retry cleanup: {0}" -f $_.Exception.Message) }
+    }
+    $sw.Restart()
+    $installExit = Invoke-Installer -InstallerPath $Installer
+    $sw.Stop()
+    if ($installExit -eq 0) {
+      $installDetail = ("NSIS silent install (/S, per-user) exited 0 in {0:N1}s — first attempt crashed with exit code {1}; the retry succeeded (both attempts recorded)" -f $sw.Elapsed.TotalSeconds, $firstExit)
+    } else {
+      $installDetail = ("NSIS silent install (/S) exited with code {0} (first attempt {1}; retried once, both failed)" -f $installExit, $firstExit)
+    }
+  }
   if ($installExit -eq 0) {
-    Add-Check -Id "clean-install" -Status "pass" -Detail ("NSIS silent install (/S, per-user) exited 0 in {0:N1}s" -f $sw.Elapsed.TotalSeconds)
+    Add-Check -Id "clean-install" -Status "pass" -Detail $installDetail
   } else {
-    Add-Check -Id "clean-install" -Status "fail" -Detail ("NSIS silent install (/S) exited with code {0}" -f $installExit)
+    Add-Check -Id "clean-install" -Status "fail" -Detail $installDetail
   }
   Start-Sleep -Seconds 3
 
