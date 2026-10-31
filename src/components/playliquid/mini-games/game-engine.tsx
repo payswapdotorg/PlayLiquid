@@ -251,9 +251,6 @@ export function GameEngine({
 
       // ---------------- render ----------------
       renderFrame(ctx, s, engine, theme);
-
-      hudT += dt;
-      if (hudT > 0.25) hudT = 0;
     };
     rafRef.current = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(rafRef.current);

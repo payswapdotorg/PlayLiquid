@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "1. **Is a toast visible with the text '3 new notifications'?** Yes.\n2. **Does it have a description line mentioning scores/followers?** Yes.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1793433099,
+  "id": "20261031155137f644b409548b4e2b",
+  "model": "glm-5v-turbo",
+  "object": "chat.completion",
+  "request_id": "20261031155137f644b409548b4e2b",
+  "usage": {
+    "completion_tokens": 37,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 1726,
+    "prompt_tokens_details": {
+      "cached_tokens": 5
+    },
+    "total_tokens": 1763
+  }
+}

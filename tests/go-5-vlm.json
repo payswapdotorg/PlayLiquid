@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "1) **Yes.** A rendered 2D platformer game is visible, featuring a yellow character face and white platforms against a red/orange lava/volcano background.\n2) **No.** There is no visible HUD (score or heart lives) within the game canvas itself in this screenshot.\n3) **Present elements:**\n*   **Game Title:** \"Lava Leap\"\n*   **Creator Info with Avatar:** \"Volcano Interactive\" (with avatar) and follower count\n*   **Action Buttons:** Like (184K), Dislike/Thumbs down, Share, Save, Restart\n*   **Description/Metadata:** Play count, rating, tags (\"Platformer\", \"Score race\")\n*   **Comments:** Not visible\n*   **Related Games:** Not visible",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1793432515,
+  "id": "202610311541539466c1c7bfaf4351",
+  "model": "glm-5v-turbo",
+  "object": "chat.completion",
+  "request_id": "202610311541539466c1c7bfaf4351",
+  "usage": {
+    "completion_tokens": 163,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 1769,
+    "prompt_tokens_details": {
+      "cached_tokens": 5
+    },
+    "total_tokens": 1932
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "Based on the screenshot provided, here is the verification of the short-video feed page:\n\n1.  **Tall Vertical Feed:** **Yes.** The central content area displays a tall, vertical card (9:16 aspect ratio) containing the game clip.\n2.  **Creator Identity and Caption:** **Yes.** The bottom of the feed shows the creator \"Volcano Interactive\" with play stats, a caption (\"SO close to 4k in Lava Leap...\"), and a challenge prompt.\n3.  **Engagement Buttons & Play Button:** **Yes.** There is a vertical column on the right side featuring a Heart (71.5K likes), Comment bubble (2), Share icon, and a \"Play\" button at the very bottom right.\n4.  **Media Content:** **Yes.** The media displays an active gameplay scene for a game titled \"Lava Leap,\" showing platforms and a character sprite, rather than a broken image placeholder.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1793432602,
+  "id": "20261031154318d634ccbb31e44591",
+  "model": "glm-5v-turbo",
+  "object": "chat.completion",
+  "request_id": "20261031154318d634ccbb31e44591",
+  "usage": {
+    "completion_tokens": 198,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 1760,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 1958
+  }
+}

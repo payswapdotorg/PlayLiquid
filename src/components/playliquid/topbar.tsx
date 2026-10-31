@@ -5,7 +5,7 @@ import { Bell, Menu, Mic, Plus, Search, X } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useApi } from "@/hooks/use-api";
 import { usePlayLiquid } from "@/lib/store";
 import { formatCount } from "@/lib/format";
@@ -47,6 +47,7 @@ export function Topbar() {
           </SheetTrigger>
           <SheetContent side="left" className="w-[280px] overflow-y-auto p-0 pt-14 slim-scrollbar">
             <SheetTitle className="sr-only">Navigation</SheetTitle>
+            <SheetDescription className="sr-only">Main navigation for PlayLiquid</SheetDescription>
             <SidebarNav onNavigate={() => setDrawerOpen(false)} />
           </SheetContent>
         </Sheet>

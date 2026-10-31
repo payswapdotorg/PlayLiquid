@@ -7,11 +7,17 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  const body = (await req.json().catch(() => ({}))) as { themeJson?: string; version?: string };
+  const body = (await req.json().catch(() => ({}))) as {
+    themeJson?: string;
+    version?: string;
+    status?: string;
+  };
   const game = await db.game.findFirst({ where: { OR: [{ id }, { slug: id }] } });
   if (!game) return NextResponse.json({ error: "Game not found" }, { status: 404 });
 
-  const data: { themeJson?: string; updatedAt: Date; version?: string } = { updatedAt: new Date() };
+  const data: { themeJson?: string; updatedAt: Date; version?: string; status?: string } = {
+    updatedAt: new Date(),
+  };
   if (body.themeJson) {
     try {
       JSON.parse(body.themeJson);
@@ -21,8 +27,14 @@ export async function POST(
     }
   }
   if (body.version) data.version = body.version;
+  if (body.status && ["draft", "published", "archived"].includes(body.status)) {
+    data.status = body.status;
+  }
 
   await db.game.update({ where: { id: game.id }, data });
-  const updated = await db.game.findUnique({ where: { id: game.id }, select: { version: true, themeJson: true } });
+  const updated = await db.game.findUnique({
+    where: { id: game.id },
+    select: { version: true, themeJson: true, status: true },
+  });
   return NextResponse.json({ game: updated });
 }

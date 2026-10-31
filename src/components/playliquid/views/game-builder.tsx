@@ -132,8 +132,11 @@ export function GameBuilderView({ gameId }: { gameId: string | null }) {
   async function publish() {
     if (!data) return;
     try {
+      // a real publish: persist the theme, promote the draft and release v1.0.0
       await postJson(`/api/games/${data.game.id}/theme`, {
         themeJson: theme ? JSON.stringify(theme) : undefined,
+        version: "1.0.0",
+        status: "published",
       });
       toast.success(`${data.game.title} v1.0.0 published to the feed`);
       navigate("studio");
@@ -161,7 +164,7 @@ export function GameBuilderView({ gameId }: { gameId: string | null }) {
         <div className="min-w-0">
           <h1 className="truncate text-xl font-bold sm:text-2xl">{g.title}</h1>
           <p className="text-xs text-muted-foreground">
-            {g.engine} engine · {theme.label} theme · {g.status === "draft" ? "DRAFT v0.1.0" : `v${g.version}`}
+            {g.engine} engine · {theme.label} theme · {g.status === "draft" ? `DRAFT v${g.version}` : `v${g.version}`}
             {dirty && <span className="ml-2 rounded bg-amber-400/15 px-1.5 py-0.5 text-[10px] font-bold uppercase text-amber-400">unsaved</span>}
           </p>
         </div>

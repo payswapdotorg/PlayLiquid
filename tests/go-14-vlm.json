@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "Based on the screenshot provided, here is the verification of the Creator Studio dashboard:\n\n1.  **Analytics:** **Yes.** The dashboard features a \"Plays this week\" bar chart showing daily performance metrics (Mon–Sun).\n2.  **Games & Releases:** **Yes.** There is a dedicated \"Games & releases\" section listing titles (e.g., *Void Runner*, *Cyber Dash*) with details on version, plays, likes, and publication status.\n3.  **Community Moderation Queue:** **No.** There is no visible moderation queue or community management section in this specific view.\n4.  **Overall Layout:** **Yes.** It displays a professional, clean dark-mode dashboard layout with a functional sidebar, clear data visualization, and no broken visuals.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1793432874,
+  "id": "20261031154751e7ed09b125de4fbd",
+  "model": "glm-5v-turbo",
+  "object": "chat.completion",
+  "request_id": "20261031154751e7ed09b125de4fbd",
+  "usage": {
+    "completion_tokens": 161,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 1726,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 1887
+  }
+}

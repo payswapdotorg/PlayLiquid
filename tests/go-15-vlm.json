@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "Based on the screenshot provided, here is the verification:\n\n1.  **Search Input:** Yes, the search box at the top is visible and contains the text **\"lava\"**.\n2.  **Suggestion Dropdown:** Yes, a dropdown menu is visible directly below the search bar. It lists a game titled **\"Lava Leap\"** (categorized as \"Platformer\").\n3.  **Other Visible Elements:**\n    *   **Sidebar:** Navigation menu including Home, Sparks, Game Studio, and a list of Studios (e.g., PlayLiquid Labs, Cloud Nine Arcade) and Explore options.\n    *   **Main Content:** A dashboard for **\"Creator Studio\"** featuring:\n        *   A bar chart titled **\"Plays this week\"** showing data from Monday to Sunday.\n        *   A table titled **\"Games & releases\"** listing several games (e.g., deep sea catch, Clocktower Ghosts, Void Runner) with columns for Version, Plays, Likes, and Status.\n    *   **Top Bar:** Icons for Create, Notifications, Theme toggle, and User Profile.\n    *   **Bottom Left:** A notification badge indicating \"1 Issue\".",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1793432910,
+  "id": "2026103115482663f7aa38718e4647",
+  "model": "glm-5v-turbo",
+  "object": "chat.completion",
+  "request_id": "2026103115482663f7aa38718e4647",
+  "usage": {
+    "completion_tokens": 246,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 1755,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 2001
+  }
+}
