@@ -24,3 +24,18 @@ Initial acceptance map. TL must fill exact source paths, typed contracts, stores
 | Installers | releases | GitHub Actions | install/launch/upgrade/uninstall |
 
 A visible control without an authoritative operation is incomplete. Do not count placeholder UI as implementation.
+
+## Phase 0 fill (TL, 2026-10-31) — verified source paths and evidence status
+
+Filled only from the actual Phase-0 inspection (main @ `a6c30053`); unverified
+cells stay pending their Work Order. No placeholder is counted as implemented.
+
+| Feature | Verified source paths (main @ a6c30053) | Authority status | Evidence status |
+|---|---|---|---|
+| New Task | `packages/ui/src/NewTaskButtonGroup.tsx`, `packages/ui/src/v4/workbenchNewTaskTarget.ts`, `packages/ui/src/v4/composer/newTaskDraft.ts`; product shell `packages/desktop/src/renderer/src/gameos/shell/product-shell.tsx` (currently defaults to Game Studio — the conflict the contract supersedes) | inherited ZCode machinery intact | product correction pending PLX-UX-001 (Figma gate) |
+| Project assignment | `packages/ui/src/v4/workbenchNewTaskTarget.ts` (workspacePath/identity-scoped targets) | inherited; real new/existing paths pending | pending PLX-UX-001 |
+| Browser/Terminal | browser: `packages/ui/src/browser-use/*` (UnifiedBrowserView suite); terminal: `packages/ui/src/Terminal.tsx`, `packages/ui/src/SidePaneTerminalPane.tsx`, `packages/ui/src/hooks/useAppPanels.ts`, `packages/ui/src/WorkspaceTerminalToggleButton.tsx` | inherited ZCode panels exist (to be operated by composer toggles, not rebuilt) | toggle wiring pending PLX-UX-001 |
+| Model settings | `packages/ui/src/SettingsPage.tsx` + `packages/ui/src/settings/*`; model selection seam `@zcode/services` ModelSelectionView (consumed by `newTaskDraft.ts`) | inherited ZCode settings page intact | regression coverage pending PLX-UX-001 |
+| World/package graph | `packages/game-ir/src/*` (GameIRDocument v"1"); `packages/package-registry` | single authority (ACR-001 reaffirms; additive `world` declaration planned) | kind/profile registries + tests pending PLX-ARCH-002/003 |
+| Sparks | — | now governed by ACR-001 (World kind + `spark_vertical` profile; kind/profile distinct) | pending PLX-ARCH-002 + PLX-UX-002 |
+| Installers | `.github/workflows/release-desktop.yml`; bundle seam `packages/desktop/scripts/bundle.mjs`; smoke harness `qa/desktop-release/scripts/run-ubuntu.sh` | Linux-only today (2 releases, 3 assets each); Windows seam unexercised; no per-commit previews | Windows + per-commit previews + smoke coverage pending PLX-REL-001 |

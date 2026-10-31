@@ -36,3 +36,11 @@ E8. Negative security/concurrency/anti-gaming tests are mandatory.
 E9. Reproducible seeds/locks are used where feasible.
 E10. Historical evidence is immutable.
 E11. External platform limitations are represented truthfully.
+
+## Amendment (ACR-001, 2026-10-31)
+
+R6a. (Supersedes R6's framing; R6's delivery properties are retained.)
+Spark is a valid World content kind AND may carry the `spark_vertical`
+target profile; content kind and target profile are distinct, independently
+declared dimensions. Registries and migration per
+`spec/acr/ACR-001-world-kind-and-target-profile-separation.md`.

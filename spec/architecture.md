@@ -338,3 +338,23 @@ Least privilege, sandboxing and tenant isolation are mandatory.
 Use a federated package graph, CAS artifacts, incremental builds, spatial world partitions and scalable headless simulation.
 
 Goal: Linux-like ecosystem scale rather than a single monolithic game project.
+
+## Amendment — ACR-001 (2026-10-31)
+
+§Spark above and the build Targets list entry `spark` are superseded
+(their text is preserved above for history) by
+`spec/acr/ACR-001-world-kind-and-target-profile-separation.md`:
+
+- World is the general content concept; every top-level content item is a
+  World with a content kind (`WorldKind`: spark | game | experience |
+  digital_twin | other — registered, extensible) and, independently, a
+  delivery target profile (`TargetProfile`: spark_vertical | web | desktop |
+  mobile | xr | dedicated_server | simulation).
+- Spark is both a registered World kind and a delivery profile
+  (`spark_vertical`); neither implies the other. The §Spark delivery
+  properties (9:16, mobile-first, minimal critical boot, aggressive caching,
+  progressive streaming, first-interaction optimization) are retained as the
+  `spark_vertical` profile's properties.
+- The build Targets list becomes: web, windows, macos, linux, android, ios,
+  steamdeck, xr, dedicated-server, console (the delivery axis is no longer
+  conflated into it).
