@@ -87,6 +87,28 @@ cross-version upgrade needs two builds — recorded as follow-up, not claimed);
 the app is launched with `--disable-gpu` from a neutral working directory.
 See `qa/desktop-release/README.md` (Windows section) for the full check table.
 
+**Windows job live record (PLX-REL-001 verification, 2026-10-31):** the first
+proof dispatch on the PLX-REL-001 branch
+([run 41209879846](https://github.com/payswapdotorg/PlayLiquid/actions/runs/41209879846))
+failed at the desktop build step, and the always-on `publish-status` job
+recorded exactly that: `linux-desktop` succeeded (AppImage + `.deb` + the full
+Ubuntu smoke battery; 7-day Actions artifacts), `windows-desktop` failed, and
+the publication gate published **nothing** — no partial "cross-platform"
+preview exists for that SHA. Root cause (verified at the pinned commit): the
+windows-latest runner ships Git with `core.autocrlf=true`, so LF-only blobs
+are checked out with CRLF; the hashed Gen UI vendor assets
+(`apps/zcode-cli/packages/visualize-plugin/skills/visualize/assets/vendor`)
+have no eol rule in `.gitattributes` and failed their sha256 gate at tsup
+config load ("Gen UI vendor hash mismatch: floating-ui-core-1.7.3.min.js").
+The same commit's Linux checkout matches every vendor hash, which is why only
+the Windows job failed. Fixed in-workflow, within the frozen PLX-REL-001
+surface, by forcing a byte-exact checkout
+(`git config --global core.autocrlf false` before `actions/checkout`) — the
+Windows working tree is now byte-identical to the Linux checkout of the same
+SHA. The corrected pipeline proof is dispatch
+[run 41210886456](https://github.com/payswapdotorg/PlayLiquid/actions/runs/41210886456);
+its outcome is recorded in PR #17.
+
 **Signing:** no code-signing certificate exists; Windows installers are
 unsigned and every release discloses SmartScreen/"unknown publisher"
 behavior. Sign when a certificate is available. **No verified auto-update is
