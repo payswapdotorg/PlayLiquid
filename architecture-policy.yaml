@@ -325,6 +325,12 @@ modules:
     requires: [community, platform-contracts]
     publicEntrypoints: [packages/web/gameos-community/src/index.ts]
     owner: Product
+  - id: gameos-projects
+    roots: [packages/web/gameos-projects/src]
+    managed: true
+    requires: [git-lineage, package-system, package-registry, community, game-contracts, platform-contracts]
+    publicEntrypoints: [packages/web/gameos-projects/src/index.ts]
+    owner: Product
   - id: native-game
     roots: [examples/native-game/src]
     managed: true
