@@ -18,6 +18,7 @@
   "dependencies": {
     "@playliquid/build-contracts": "workspace:*",
     "@playliquid/engine-adapter-contract": "workspace:*",
+    "@playliquid/game-contracts": "workspace:*",
     "@playliquid/platform-contracts": "workspace:*",
     "@playliquid/target-profiles": "workspace:*",
     "@playliquid/tool-fabric": "workspace:*",

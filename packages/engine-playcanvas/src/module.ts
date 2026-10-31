@@ -6,13 +6,17 @@
  * 可实施部分一致：tool-fabric-runtime（PL-019 调用运行时 —— 本适配器被
  * 注册进去的宿主）、tool-fabric（PL-005 纯词汇，提供方中立操作清单的
  * 词汇层）、engine-adapter-contract（PL-005 中性 Adapter 契约 —— 本适配
- * 器实现的那道缝）。另有两项刻意直接声明（记录在工单报告）：
+ * 器实现的那道缝）。另有三项刻意直接声明（记录在工单报告）：
  * - target-profiles + build-contracts（PL-008/PL-020 交付物 —— 类型化
  *   PlayCanvasEngineBinding 与冻结目标 profile 分类法 + 构建请求词汇的
  *   组合面，typed compatibility predicate 声明可服务的 web-first 目标）；
  * - platform-contracts —— 租户隔离词汇（TenantId/SubjectId），
  *   tool-blender / platform-economy / lab-simulation 同款先例
- *   （R20 跨租户隔离纪律）。
+ *   （R20 跨租户隔离纪律）；
+ * - game-contracts —— ACR-001（2026-10-31，lock v1.1 修订 1）的
+ *   TYPED TargetProfile 交付注册表（单一定义点，E1；PLX-ARCH-003
+ *   刻意直接声明）：引擎绑定的交付维度（web / spark_vertical）从
+ *   game-contracts 的注册表消费，绝不在此重声明。
  * 对外只暴露 src/index.ts。
  */
 export const engine_playcanvasModule = {
@@ -20,6 +24,7 @@ export const engine_playcanvasModule = {
   requires: [
     "build-contracts",
     "engine-adapter-contract",
+    "game-contracts",
     "platform-contracts",
     "target-profiles",
     "tool-fabric",

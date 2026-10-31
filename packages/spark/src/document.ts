@@ -29,6 +29,8 @@
 
 import { canonicalValueForm } from "@playliquid/game-ir";
 import type { GameIRDocument, GameIRNode } from "@playliquid/game-ir";
+import { resolveWorldKind } from "@playliquid/game-contracts";
+import type { TargetProfile, WorldKind } from "@playliquid/game-contracts";
 import { computeDigest, computeLockFingerprint } from "@playliquid/package-system";
 import type { ContentDigest, PackageLock } from "@playliquid/package-system";
 import { validateTargetProfileRecord } from "@playliquid/target-profiles";
@@ -71,7 +73,9 @@ export type SparkBuildRefusalCode =
   | "engine-binding-not-declared"
   | "engine-binding-not-pinned"
   | "inputs-invalid"
-  | "planning-refused";
+  | "planning-refused"
+  /** ACR-001 (PLX-ARCH-003): the document declares a non-spark delivery. */
+  | "world-delivery-not-spark";
 
 /** One aggregated typed reason (profile failures + planning rejections). */
 export interface SparkBuildReason {
@@ -104,6 +108,28 @@ export interface SparkBuildPlanPayload {
   readonly streamBatchCount: number;
   readonly plannedFirstPaintMs: number;
   readonly plannedFirstInteractionMs: number;
+  /**
+   * ACR-001 (PLX-ARCH-003): the document's DECLARED World content kind —
+   * present iff the document carries `world.kind` (legacy documents and
+   * kind-undeclared documents omit the key entirely, keeping byte-identical
+   * legacy digests). The kind NEVER gates composition (dual citizenship).
+   */
+  readonly worldKind?: WorldKind;
+}
+
+/**
+ * The ACR-001 world context of a spark build document — a DERIVED, always
+ * present projection (never part of the document digest; the digest pins
+ * the declared dimensions through the payload and the target-profile
+ * input when they are declared).
+ */
+export interface SparkBuildWorldContext {
+  /** The effective content kind (legacy default `game`, ACR-001 §4). */
+  readonly worldKind: WorldKind;
+  /** The declared delivery profile, or null when undeclared (legacy). */
+  readonly deliveryProfile: TargetProfile | null;
+  /** How routing was decided: a spark_vertical declaration, or the legacy build-target list. */
+  readonly routing: "declared-spark-vertical" | "legacy-undeclared";
 }
 
 /** The typed spark build document (build-contracts shaped, spark-pinned). */
@@ -117,6 +143,8 @@ export interface SparkBuildDocument {
   readonly inputs: BuildInputs;
   /** The spark planning digests over the same game-ir content (E9). */
   readonly spark: SparkBuildPlanPayload;
+  /** The derived ACR-001 world context (kind + delivery + routing). */
+  readonly world: SparkBuildWorldContext;
   /** Content digest over inputs + spark payload (deterministic, E9). */
   readonly documentDigest: ContentDigest;
 }
@@ -197,6 +225,20 @@ export function composeSparkBuildDocument(
       message: `engine binding "${String(binding.engineId)}" declares no support for the spark target`,
     };
   }
+  // ACR-001 (PLX-ARCH-003): the (worldKind, targetProfile)-aware door.
+  // The spark build surface IS the spark_vertical delivery: a document
+  // DECLARING a different delivery profile does not route here (typed
+  // refusal). The content kind NEVER gates — a World of ANY kind may be
+  // delivered spark_vertical (dual citizenship). Undeclared documents keep
+  // the pre-ACR behavior (routing by the build-target list, unchanged).
+  const declaredDelivery = composition.document.world?.targetProfile;
+  if (declaredDelivery !== undefined && declaredDelivery !== "spark_vertical") {
+    return {
+      ok: false,
+      code: "world-delivery-not-spark",
+      message: `the document declares targetProfile "${declaredDelivery}" — the spark build surface delivers spark_vertical only (ACR-001)`,
+    };
+  }
   // Mutual consent, profile side: the record's engine-binding compatibility
   // declaration must accept the cited engine family (target-profiles is
   // the profile authority; the full typed oracle composition is the engine
@@ -247,6 +289,10 @@ export function composeSparkBuildDocument(
       profileDigest: profileRecord.profileDigest,
       target: asBuildTargetId("spark"),
       vendorGate: { kind: "none" },
+      // ACR-001: the typed delivery profile joins the wire input ONLY when
+      // the document declares it (legacy compositions keep the exact
+      // pre-ACR input shape and digests — the key is absent, never undefined).
+      ...(declaredDelivery === "spark_vertical" ? { deliveryProfile: "spark_vertical" as const } : {}),
     },
     engineBinding: composition.engineBinding,
     toolchain: composition.toolchain,
@@ -272,6 +318,16 @@ export function composeSparkBuildDocument(
     streamBatchCount: schedule.batches.length,
     plannedFirstPaintMs: planning.plan.budgets.plannedFirstPaintMs,
     plannedFirstInteractionMs: planning.plan.budgets.plannedFirstInteractionMs,
+    // ACR-001: the DECLARED content kind joins the payload only when the
+    // document declares it (legacy payload shape and digests unchanged).
+    ...(composition.document.world?.kind !== undefined
+      ? { worldKind: composition.document.world.kind }
+      : {}),
+  };
+  const world: SparkBuildWorldContext = {
+    worldKind: resolveWorldKind(composition.document.world),
+    deliveryProfile: declaredDelivery ?? null,
+    routing: declaredDelivery === "spark_vertical" ? "declared-spark-vertical" : "legacy-undeclared",
   };
   return {
     ok: true,
@@ -280,6 +336,7 @@ export function composeSparkBuildDocument(
     target: "spark",
     inputs,
     spark,
+    world,
     documentDigest: computeDigest(documentDigestInput(inputs, spark)),
   };
 }

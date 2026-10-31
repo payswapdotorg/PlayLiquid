@@ -104,8 +104,13 @@ export type {
 export {
   PLAYCANVAS_ENGINE_ID,
   PLAYCANVAS_SUPPORTED_TARGETS,
+  PLAYCANVAS_DELIVERY_BY_TARGET,
+  PLAYCANVAS_DELIVERY_PROFILES,
   createPlayCanvasEngineBinding,
+  configurePlayCanvasDeliveryProfiles,
   playCanvasCanServeTargetProfile,
+  playCanvasCanServeDeliveryProfile,
+  playCanvasCanServeWorldDelivery,
   toBuildContractsEngineBindingRef,
   isProjectedEngineBindingRef,
 } from "./engine-binding.ts";
@@ -113,6 +118,9 @@ export type {
   PlayCanvasEngineBinding,
   PlayCanvasTargetCompatibility,
   PlayCanvasBindingRefusalCode,
+  PlayCanvasDeliveryConfiguration,
+  PlayCanvasDeliveryCompatibility,
+  PlayCanvasWorldDelivery,
 } from "./engine-binding.ts";
 
 // The adapter

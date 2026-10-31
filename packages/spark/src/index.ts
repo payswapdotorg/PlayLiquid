@@ -38,6 +38,7 @@ export type {
   SparkBuildReason,
   SparkBuildRefusal,
   SparkBuildPlanPayload,
+  SparkBuildWorldContext,
   SparkBuildDocument,
   SparkBuildRequestIdentity,
 } from "./document.ts";

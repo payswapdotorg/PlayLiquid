@@ -202,3 +202,78 @@ test("every door enforces tenant isolation (R20)", () => {
     assert.equal(cross.code, "cross-tenant");
   }
 });
+
+// ---------------------------------------------------------------------------
+// ACR-001 (PLX-ARCH-003): the (worldKind, targetProfile)-aware runtime door.
+// ---------------------------------------------------------------------------
+
+type FixtureWorldKind = "spark" | "game" | "experience" | "digital_twin" | "other";
+type FixtureDelivery = "spark_vertical" | "web" | "desktop";
+
+/** The fixture document plus an explicit ACR-001 world declaration. */
+function worldDeclaredDocument(
+  kind: FixtureWorldKind | undefined,
+  targetProfile: FixtureDelivery | undefined,
+): ReturnType<typeof fixtureSparkDocument> {
+  return { ...fixtureSparkDocument(), world: { ...(kind ? { kind } : {}), ...(targetProfile ? { targetProfile } : {}) } };
+}
+
+function makeWorldKit(document: ReturnType<typeof fixtureSparkDocument>) {
+  const clock = new ManualSparkClock(1_000);
+  const created = createSparkRuntime({
+    tenant: TENANT,
+    sessionId: "spark-session-world",
+    document,
+    profile: fixtureSparkProfile(),
+    costModel: fixtureCostModel(),
+    policy: fixturePolicyRef(),
+    driver: new CounterWorldDriver(),
+    capabilityPort: new GrantTableCapabilityPort({
+      capabilityIntentKinds: {},
+      intentCommandKinds: { "world.increment": "world.increment", "world.move": "world.move" },
+      clock,
+    }),
+    snapshotStore: new InMemorySnapshotStore(),
+    clock,
+    contentSource: new FakeSparkContentSource(),
+    cache: new InMemorySparkCache(),
+    seed: "spark-seed-world",
+  });
+  return created;
+}
+
+test("ACR-001: a declared non-spark delivery is refused at the runtime door (world-delivery-not-spark)", () => {
+  const refused = makeWorldKit(worldDeclaredDocument("game", "web"));
+  assert.equal(refused.ok, false);
+  if (!refused.ok) {
+    assert.equal(refused.code, "world-delivery-not-spark");
+    assert.match(refused.message, /targetProfile "web"/);
+  }
+  const desktop = makeWorldKit(worldDeclaredDocument("spark", "desktop"));
+  assert.equal(desktop.ok, false);
+  if (!desktop.ok) {
+    // Even a spark-KIND world with a desktop delivery refuses: dual
+    // citizenship — the kind never implies the delivery.
+    assert.equal(desktop.code, "world-delivery-not-spark");
+  }
+});
+
+test("ACR-001: every world kind with a declared spark_vertical delivery boots (kind never gates)", () => {
+  for (const kind of ["spark", "game", "experience", "digital_twin", "other"] as const) {
+    const created = makeWorldKit(worldDeclaredDocument(kind, "spark_vertical"));
+    assert.equal(created.ok, true, `${kind}: ${created.ok ? "" : created.message}`);
+    if (created.ok) {
+      created.runtime.boot(TENANT);
+      const view = created.runtime.view(TENANT);
+      assert.equal(view.ok, true, JSON.stringify(view));
+      if (view.ok) {
+        assert.equal(view.phase, "booted");
+      }
+    }
+  }
+});
+
+test("ACR-001: a legacy undeclared document keeps the exact pre-ACR runtime behavior", () => {
+  const created = makeWorldKit(fixtureSparkDocument());
+  assert.equal(created.ok, true);
+});

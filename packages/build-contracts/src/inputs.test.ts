@@ -13,6 +13,7 @@ import {
 import { asEngineId, asToolOperationId } from "./adapter-seam.ts";
 import type { BuildInputs } from "./inputs.ts";
 import { computeBuildInputsDigest, isVendorGateRequirement, validateBuildInputs } from "./inputs.ts";
+import { computeDigest } from "@playliquid/package-system";
 import { fixtureConsoleInputs, fixtureDigest, fixtureWebInputs } from "./fixtures.ts";
 
 test("fixture web inputs are structurally valid", () => {
@@ -132,4 +133,97 @@ test("input-set digest distinguishes different inputs", () => {
     packageLock: { ...a.packageLock, pinnedPackageCount: a.packageLock.pinnedPackageCount + 1 },
   };
   assert.notEqual(computeBuildInputsDigest(a), computeBuildInputsDigest(bumped));
+});
+
+// ---------------------------------------------------------------------------
+// ACR-001 (PLX-ARCH-003): the typed deliveryProfile dimension — optional,
+// independent of the build-target axis, additive-only.
+// ---------------------------------------------------------------------------
+
+test("ACR-001: a typed deliveryProfile is a valid target-profile input", () => {
+  const inputs = fixtureWebInputs();
+  const declared: BuildInputs = {
+    ...inputs,
+    targetProfile: { ...inputs.targetProfile, deliveryProfile: "web" },
+  };
+  const validation = validateBuildInputs(declared);
+  assert.equal(validation.ok, true);
+});
+
+test("ACR-001: an unknown deliveryProfile is refused as an invalid target profile", () => {
+  const inputs = fixtureWebInputs();
+  const broken = {
+    ...inputs,
+    targetProfile: { ...inputs.targetProfile, deliveryProfile: "hologram" },
+  } as unknown as BuildInputs;
+  const validation = validateBuildInputs(broken);
+  assert.equal(validation.ok, false);
+  if (!validation.ok) {
+    assert.equal(validation.reasons.some((r) => r.code === "invalid-target-profile" && r.input === "targetProfile"), true);
+  }
+});
+
+test("ACR-001: absent deliveryProfile keeps the EXACT legacy digest (additive-only)", () => {
+  const inputs = fixtureWebInputs();
+  assert.equal(inputs.targetProfile.deliveryProfile, undefined);
+  // The pre-ACR digest shape: the delivery key is absent, never undefined.
+  const legacyDigest = computeDigest({
+    gameIr: inputs.gameIr.digest,
+    packageLock: {
+      lockFingerprint: inputs.packageLock.lockFingerprint,
+      pinnedPackageCount: inputs.packageLock.pinnedPackageCount,
+    },
+    targetProfile: {
+      profileId: inputs.targetProfile.profileId,
+      profileDigest: inputs.targetProfile.profileDigest,
+      target: inputs.targetProfile.target,
+      vendorGate: inputs.targetProfile.vendorGate.kind,
+    },
+    engineBinding: {
+      engineId: inputs.engineBinding.engineId,
+      bindingDigest: inputs.engineBinding.bindingDigest,
+      supportedTargets: [...inputs.engineBinding.supportedTargets].sort(),
+    },
+    toolchain: {
+      profileId: inputs.toolchain.profileId,
+      profileDigest: inputs.toolchain.profileDigest,
+      citesToolOperations: [...inputs.toolchain.citesToolOperations].sort(),
+    },
+  });
+  assert.equal(computeBuildInputsDigest(inputs), legacyDigest);
+});
+
+test("ACR-001: a declared deliveryProfile changes the digest, deterministically (E9)", () => {
+  const legacy = fixtureWebInputs();
+  const declared: BuildInputs = {
+    ...legacy,
+    targetProfile: { ...legacy.targetProfile, deliveryProfile: "spark_vertical" },
+  };
+  assert.notEqual(computeBuildInputsDigest(declared), computeBuildInputsDigest(legacy));
+  const again: BuildInputs = {
+    ...legacy,
+    targetProfile: { ...legacy.targetProfile, deliveryProfile: "spark_vertical" },
+  };
+  assert.equal(computeBuildInputsDigest(declared), computeBuildInputsDigest(again));
+  const otherDelivery: BuildInputs = {
+    ...legacy,
+    targetProfile: { ...legacy.targetProfile, deliveryProfile: "web" },
+  };
+  assert.notEqual(computeBuildInputsDigest(declared), computeBuildInputsDigest(otherDelivery));
+});
+
+test("ACR-001: deliveryProfile is independent of the build-target axis", () => {
+  const inputs = fixtureWebInputs();
+  // A game-kind build targeting the spark BUILD target may deliver
+  // spark_vertical; the two axes are declared independently (ACR-001 §2).
+  const cross: BuildInputs = {
+    ...inputs,
+    targetProfile: {
+      ...inputs.targetProfile,
+      target: asBuildTargetId("spark"),
+      deliveryProfile: "spark_vertical",
+    },
+  };
+  const validation = validateBuildInputs(cross);
+  assert.equal(validation.ok, true);
 });
