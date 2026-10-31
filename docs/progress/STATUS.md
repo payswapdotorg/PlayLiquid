@@ -5,7 +5,34 @@ hover-preview architecture, the creation→publish→discovery loop, community
 interactions, search, theming, and mobile behavior are verified end-to-end.
 ESLint clean; dev server healthy on :3000; DB seeded.
 
-## Fixes applied in this pass (found by browser verification)
+## Pass 2 (later on 2026-10-31) — credentials + re-verification
+
+1. **Credential handoff executed** (the instruction that still stood): all
+   keys exported to `/home/z/my-project/.env` (single source of truth),
+   `~/.bashrc` + `~/.profile` (profile sources the project `.env`), with
+   primary→fallback ordering exactly as instructed. Verified live from this
+   sandbox: GitHub PAT **and** fallback (200), OpenRouter (authenticated),
+   Vercel T1 (200), Apify (valid). Vercel T2 returns 403 (fallback rejected;
+   primary works, no impact). Neon ×4, Upstash ×2, Composio (ak_/ck_), E2B
+   are exported but their API hosts are DNS-blocked from this sandbox —
+   status, policy and re-check script: `docs/ops/CREDENTIALS.md`.
+2. **Latent sidebar crash fixed** — found by re-verification: `SidebarNav`
+   called `navigate(...)` in the studio rows and the Settings row without
+   declaring it, so those clicks threw `ReferenceError: navigate is not
+   defined` (the studio/Settings entries had never been click-verified).
+   Fixed by declaring `navigate` in `SidebarNav`; re-verified in a fresh
+   session: Settings → `#view=studio`, studio row → `#view=home`, zero
+   page errors.
+3. **Dev overlay unblocked the sidebar** — the Next.js dev indicator
+   (`<nextjs-portal>`) covered the bottom-left corner and intercepted the
+   Settings row / collapse control. `devIndicators: false` in
+   `next.config.ts` (dev-only element; production never renders it).
+4. **Sticky footer re-verified empirically** — tall-viewport (1440×2400)
+   pin test: New Task (~1001px content) → footer bottom == viewport bottom,
+   gap 0; long pages push it naturally (390px mobile: no horizontal
+   overflow, footer at document end).
+
+## Fixes applied in pass 1 (found by browser verification)
 
 1. **Publish was fake** — `publish()` posted only the theme, toasted
    "v1.0.0 published", and left the Game row `draft`. Now: `POST /api/games/[id]/theme`

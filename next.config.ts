@@ -7,6 +7,9 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   reactStrictMode: false,
+  // The dev-tools indicator portal (<nextjs-portal>) overlays the bottom-left
+  // corner and blocks the sidebar's Settings row and the collapse control.
+  devIndicators: false,
 };
 
 export default nextConfig;

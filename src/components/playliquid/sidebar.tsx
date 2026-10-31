@@ -72,6 +72,7 @@ function NavRow({
 /** Sidebar navigation — expanded desktop / mobile drawer share this nav. */
 export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const view = usePlayLiquid((s) => s.view);
+  const navigate = usePlayLiquid((s) => s.navigate);
   const { data } = useApi<HomeDTO>("/api/home");
 
   const studios = Array.from(

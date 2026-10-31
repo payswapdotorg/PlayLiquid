@@ -1,0 +1,815 @@
+     1→name: PlayLiquid Desktop Release
+     2→
+     3→# PLX-REL-001 (release worker): cross-platform installable delivery, built
+     4→# from an EXACT commit SHA on native OS runners.
+     5→#
+     6→# Jobs:
+     7→#   linux-desktop    (ubuntu-latest):  AppImage + .deb, RW-003 Ubuntu smoke
+     8→#                                      battery (unchanged recipe).
+     9→#   windows-desktop  (windows-latest): NSIS installer .exe + portable .zip via
+    10→#                                      the inherited win/nsis seam
+    11→#                                      (`bundle.mjs --os win --targets nsis,zip`)
+    12→#                                      + the Windows smoke harness
+    13→#                                      (`qa/desktop-release/scripts/run-windows.mjs`).
+    14→#   publish          (ubuntu-latest):  publication gate — runs ONLY when both
+    15→#                                      build jobs succeeded. Stable path
+    16→#                                      (publish_release) or immutable per-SHA
+    17→#                                      preview (push to main / publish_preview).
+    18→#   publish-status   (ubuntu-latest):  always-on honest recorder of what did
+    19→#                                      and did not publish, and why.
+    20→#
+    21→# Trigger modes (documented in docs/product/INSTALL-AND-RELEASE-CONTRACT.md):
+    22→#   - push to main: per-commit cross-platform PREVIEW. Actions artifacts
+    23→#     (7-day retention) + an immutable per-SHA GitHub prerelease tagged
+    24→#     `preview/<short-sha>`. Never overwrites another SHA's artifacts.
+    25→#   - pull_request + label `release-preview`: PR-head preview builds from the
+    26→#     EXACT PR head SHA (Actions artifacts only, 7-day retention; no release is
+    27→#     published from PR heads — label-gated so it is opt-in per PR; remove and
+    28→#     re-add the label to rebuild after new pushes).
+    29→#   - workflow_dispatch: manual stable release (publish_release=true → stable
+    30→#     tag pinned to the built SHA, both OS families) or manual preview
+    31→#     publication from any ref (publish_preview=true → preview/<short-sha>).
+    32→#
+    33→# Product identity guard (RW-002): packaged identity stays PlayLiquid GameOS
+    34→# (org.playliquid.gameos / playliquid-gameos). The inherited ZCode auto-update
+    35→# feed stays DISABLED — no auto-update is enabled or claimed anywhere here.
+    36→
+    37→on:
+    38→  push:
+    39→    branches: [main]
+    40→  pull_request:
+    41→    types: [labeled]
+    42→  workflow_dispatch:
+    43→    inputs:
+    44→      build_ref:
+    45→        description: "Commit SHA / branch / tag to build (defaults to the ref this run was dispatched on)"
+    46→        required: false
+    47→        default: ""
+    48→      publish_release:
+    49→        description: "Publish a STABLE GitHub Release from the built artifacts (both OS families; tag pinned to the built SHA)"
+    50→        type: boolean
+    51→        required: false
+    52→        default: false
+    53→      publish_preview:
+    54→        description: "Publish an immutable per-SHA PREVIEW prerelease (preview/<short-sha>) from the built ref"
+    55→        type: boolean
+    56→        required: false
+    57→        default: false
+    58→      tag_name:
+    59→        description: "Stable release tag (created at the built SHA), e.g. playliquid-gameos-v3.15.0 — preview releases ignore this"
+    60→        required: false
+    61→        default: ""
+    62→      release_name:
+    63→        description: "Stable release title, e.g. PlayLiquid GameOS 3.15.0 (Linux + Windows)"
+    64→        required: false
+    65→        default: ""
+    66→
+    67→permissions:
+    68→  contents: read
+    69→
+    70→concurrency:
+    71→  group: desktop-release-${{ github.ref }}
+    72→  cancel-in-progress: false
+    73→
+    74→jobs:
+    75→  linux-desktop:
+    76→    # Build for: push to main, manual dispatch, or a PR that just received the
+    77→    # `release-preview` label (PR-head preview — exact PR head SHA below).
+    78→    if: >-
+    79→      github.event_name == 'push' ||
+    80→      github.event_name == 'workflow_dispatch' ||
+    81→      (github.event_name == 'pull_request' && github.event.label.name == 'release-preview')
+    82→    runs-on: ubuntu-latest
+    83→    timeout-minutes: 90
+    84→    outputs:
+    85→      build_ref: ${{ steps.ref.outputs.build_ref }}
+    86→      publish_mode: ${{ steps.ref.outputs.publish_mode }}
+    87→      appimage: ${{ steps.meta.outputs.appimage }}
+    88→      deb: ${{ steps.meta.outputs.deb }}
+    89→      version: ${{ steps.meta.outputs.version }}
+    90→    steps:
+    91→      - name: Determine build ref and publication mode
+    92→        id: ref
+    93→        run: |
+    94→          set -euo pipefail
+    95→          EVENT="${{ github.event_name }}"
+    96→          if [ "$EVENT" = "pull_request" ]; then
+    97→            # PR-head preview: build the EXACT PR head SHA (github.sha on
+    98→            # pull_request events is the merge ref, not the head).
+    99→            REF="${{ github.event.pull_request.head.sha }}"
+   100→            MODE="none"
+   101→          else
+   102→            REF="${{ inputs.build_ref }}"
+   103→            if [ -z "$REF" ]; then REF="${{ github.sha }}"; fi
+   104→            if [ "$EVENT" = "push" ]; then
+   105→              MODE="preview"
+   106→            elif [ "${{ inputs.publish_release }}" = "true" ]; then
+   107→              MODE="stable"
+   108→            elif [ "${{ inputs.publish_preview }}" = "true" ]; then
+   109→              MODE="preview"
+   110→            else
+   111→              MODE="none"
+   112→            fi
+   113→          fi
+   114→          # Transient Actions artifacts: 7 days for preview builds; stable
+   115→          # publish runs keep 30 days (the release itself is the permanent copy).
+   116→          if [ "$MODE" = "stable" ]; then RETENTION=30; else RETENTION=7; fi
+   117→          {
+   118→            echo "build_ref=$REF"
+   119→            echo "publish_mode=$MODE"
+   120→            echo "retention_days=$RETENTION"
+   121→          } >> "$GITHUB_OUTPUT"
+   122→          echo "building $REF (event=$EVENT, publish_mode=$MODE, artifact_retention_days=$RETENTION)"
+   123→
+   124→      - name: Check out pinned commit
+   125→        uses: actions/checkout@v4
+   126→        with:
+   127→          ref: ${{ steps.ref.outputs.build_ref }}
+   128→          fetch-depth: 0
+   129→
+   130→      - name: Set up pnpm
+   131→        uses: pnpm/action-setup@v4
+   132→        with:
+   133→          version: 10.33.2
+   134→
+   135→      - name: Set up Node
+   136→        uses: actions/setup-node@v4
+   137→        with:
+   138→          node-version: 24.14.0
+   139→          cache: pnpm
+   140→
+   141→      - name: Install Linux packaging tools
+   142→        run: |
+   143→          sudo apt-get update
+   144→          # bsdtar (libarchive-tools) is required by electron-builder's fpm
+   145→          # for the pacman target (live-caught 2026-10-14: exit 127 on run
+   146→          # 38623571228 — ubuntu-latest runners ship without it)
+   147→          # xvfb is required by the RW-003 smoke harness (window-level
+   148→          # evidence: the packaged app runs under a real display server).
+   149→          # libfuse2: real Ubuntu desktops ship FUSE2 so AppImages run in
+   150→          # their normal FUSE mode; the runner mirrors that (live-caught:
+   151→          # run 38678556303 — /dev/fuse present but libfuse2 absent made the
+   152→          # AppImage fall back to --appimage-extract-and-run).
+   153→          sudo apt-get install -y libarchive-tools rpm xvfb libfuse2
+   154→
+   155→      - name: Install dependencies (frozen lockfile)
+   156→        run: pnpm install --frozen-lockfile
+   157→
+   158→      - name: Build desktop package
+   159→        run: pnpm --filter @zcode/desktop run build
+   160→
+   161→      - name: Bundle Linux artifacts (AppImage + deb)
+   162→        run: pnpm --filter @zcode/desktop exec pnpm run bundle -- --os linux --arch x64
+   163→        env:
+   164→          ZCODE_ENV: production
+   165→
+   166→      - name: Collect artifacts
+   167→        run: |
+   168→          mkdir -p release-out
+   169→          ls -la packages/desktop/dist/ || true
+   170→          # AppImage + deb are the Ubuntu-supported artifacts (RW-002)
+   171→          cp packages/desktop/dist/*.AppImage release-out/ 2>/dev/null || true
+   172→          cp packages/desktop/dist/*.deb release-out/ 2>/dev/null || true
+   173→          if ! ls release-out/*.AppImage >/dev/null 2>&1; then
+   174→            echo "ERROR: no AppImage produced"; exit 1
+   175→          fi
+   176→          if ! ls release-out/*.deb >/dev/null 2>&1; then
+   177→            echo "ERROR: no .deb produced"; exit 1
+   178→          fi
+   179→
+   180→      - name: Generate SHA256SUMS
+   181→        run: |
+   182→          cd release-out
+   183→          sha256sum *.AppImage *.deb > SHA256SUMS
+   184→          cat SHA256SUMS
+   185→
+   186→      # ------------------------------------------------------------------
+   187→      # RW-003 smoke harness on ubuntu-latest — the true-Ubuntu launch
+   188→      # evidence (station runs are Debian 13, honestly labeled as such).
+   189→      # Two REAL user flows, both gated (any unexpected check fails the
+   190→      # release):
+   191→      #   1. the .deb INSTALL path (recommended on Ubuntu 24.04: the postinst
+   192→      #      installs the app's AppArmor profile and the SUID fallback —
+   193→      #      live-caught on run 38681143022: stock 24.04 restricts
+   194→      #      unprivileged user namespaces and the AppImage's FUSE mount
+   195→      #      cannot be SUID, so Chromium aborts with SIGTRAP);
+   196→      #   2. the AppImage with the userns sysctl relaxed — the documented
+   197→      #      power-user path on 24.04 (the AppImage runs fully sandboxed
+   198→      #      wherever unprivileged userns are allowed, e.g. Debian and
+   199→      #      Ubuntu <= 23.10).
+   200→      # ------------------------------------------------------------------
+   201→      - name: Run packaged-app smoke harness (Ubuntu)
+   202→        run: |
+   203→          set -euo pipefail
+   204→          APPIMAGE="$(ls release-out/*.AppImage)"
+   205→          DEB="$(ls release-out/*.deb)"
+   206→
+   207→          # --- Flow 1: the .deb install path (the recommended Ubuntu flow) ---
+   208→          sudo apt-get install -y "./$DEB"
+   209→          INSTALLED="$(command -v playliquid-gameos)"
+   210→          echo "installed binary: $INSTALLED"
+   211→          bash qa/desktop-release/scripts/run-ubuntu.sh "$INSTALLED" "$PWD/$DEB"
+   212→
+   213→          # --- Flow 2: the AppImage with the documented 24.04 sysctl ---
+   214→          if sysctl kernel.apparmor_restrict_unprivileged_userns >/dev/null 2>&1; then
+   215→            sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+   216→          else
+   217→            echo "NOTE: kernel.apparmor_restrict_unprivileged_userns not present on this kernel — running the AppImage as-is"
+   218→          fi
+   219→          bash qa/desktop-release/scripts/run-ubuntu.sh "$PWD/$APPIMAGE" "$PWD/$DEB"
+   220→
+   221→      - name: Collect smoke evidence
+   222→        if: ${{ always() }}
+   223→        run: |
+   224→          EVID_DIR="$(ls -dt qa/desktop-release/evidence/ubuntu-* | head -1)"
+   225→          echo "evidence dir: $EVID_DIR"
+   226→          cat "$EVID_DIR"/report.json || true
+   227→          # keep the harness evidence out of the release assets but upload
+   228→          # it as a workflow artifact for the release notes / verification
+   229→          mkdir -p smoke-evidence
+   230→          cp -r qa/desktop-release/evidence/ubuntu-* smoke-evidence/
+   231→          cp release-out/SHA256SUMS smoke-evidence/
+   232→
+   233→      - name: Upload smoke evidence (workflow run)
+   234→        if: ${{ always() }}
+   235→        uses: actions/upload-artifact@v4
+   236→        with:
+   237→          name: playliquid-gameos-smoke-evidence-linux
+   238→          retention-days: ${{ steps.ref.outputs.retention_days }}
+   239→          path: smoke-evidence/
+   240→          if-no-files-found: warn
+   241→
+   242→      - name: Upload artifacts (workflow run)
+   243→        if: ${{ always() }}
+   244→        uses: actions/upload-artifact@v4
+   245→        with:
+   246→          name: playliquid-gameos-linux-amd64
+   247→          retention-days: ${{ steps.ref.outputs.retention_days }}
+   248→          path: release-out/
+   249→          if-no-files-found: error
+   250→
+   251→      - name: Compute release metadata
+   252→        id: meta
+   253→        run: |
+   254→          APPIMAGE="$(cd release-out && ls *.AppImage)"
+   255→          DEB="$(cd release-out && ls *.deb)"
+   256→          SHA_APPIMAGE="$(cd release-out && sha256sum "$APPIMAGE" | cut -d' ' -f1)"
+   257→          SHA_DEB="$(cd release-out && sha256sum "$DEB" | cut -d' ' -f1)"
+   258→          VERSION="$(echo "$APPIMAGE" | sed -E 's/.*-([0-9][^-]*)-linux-.*/\1/')"
+   259→          {
+   260→            echo "appimage=$APPIMAGE"
+   261→            echo "deb=$DEB"
+   262→            echo "sha_appimage=$SHA_APPIMAGE"
+   263→            echo "sha_deb=$SHA_DEB"
+   264→            echo "version=$VERSION"
+   265→          } >> "$GITHUB_OUTPUT"
+   266→          echo "version=$VERSION appimage=$APPIMAGE deb=$DEB"
+   267→
+   268→  windows-desktop:
+   269→    # PLX-REL-001: first exercise of the inherited Windows/nsis seam in this
+   270→    # repository. Produces the NSIS installer .exe + portable .zip from the
+   271→    # same exact-SHA discipline, then runs the Windows smoke harness.
+   272→    if: >-
+   273→      github.event_name == 'push' ||
+   274→      github.event_name == 'workflow_dispatch' ||
+   275→      (github.event_name == 'pull_request' && github.event.label.name == 'release-preview')
+   276→    runs-on: windows-latest
+   277→    timeout-minutes: 120
+   278→    outputs:
+   279→      installer: ${{ steps.meta.outputs.installer }}
+   280→      portable_zip: ${{ steps.meta.outputs.portable_zip }}
+   281→      version: ${{ steps.meta.outputs.version }}
+   282→    env:
+   283→      # Upstream-documented Windows-build-job switch (prepare-runtime-assets.mjs):
+   284→      # the Windows installer does not depend on the mock-cdn remote assets and
+   285→      # preparing them serially in the same job cost ~an hour of CI time.
+   286→      ZCODE_SKIP_REMOTE_ASSETS: "1"
+   287→      # On GitHub-hosted runners pull Electron runtime + electron-builder
+   288→      # helper binaries (nsis / nsis-resources) from the official GitHub
+   289→      # release mirrors instead of the npmmirror default (which exists for
+   290→      # constrained networks; bundle.mjs honors both overrides — trailing
+   291→      # slash required by the mirror URL builders).
+   292→      ELECTRON_MIRROR: "https://github.com/electron/electron/releases/download/"
+   293→      ELECTRON_BUILDER_BINARIES_MIRROR: "https://github.com/electron-userland/electron-builder-binaries/releases/download/"
+   294→    steps:
+   295→      - name: Determine build ref and artifact retention
+   296→        id: ref
+   297→        shell: pwsh
+   298→        run: |
+   299→          $event = "${{ github.event_name }}"
+   300→          if ($event -eq "pull_request") {
+   301→            # PR-head preview: build the EXACT PR head SHA (github.sha on
+   302→            # pull_request events is the merge ref, not the head).
+   303→            $ref = "${{ github.event.pull_request.head.sha }}"
+   304→            $mode = "none"
+   305→          } else {
+   306→            $ref = "${{ inputs.build_ref }}"
+   307→            if ([string]::IsNullOrWhiteSpace($ref)) { $ref = "${{ github.sha }}" }
+   308→            if ($event -eq "push") { $mode = "preview" }
+   309→            elseif ("${{ inputs.publish_release }}" -eq "true") { $mode = "stable" }
+   310→            elseif ("${{ inputs.publish_preview }}" -eq "true") { $mode = "preview" }
+   311→            else { $mode = "none" }
+   312→          }
+   313→          if ($mode -eq "stable") { $retention = 30 } else { $retention = 7 }
+   314→          "build_ref=$ref" >> $env:GITHUB_OUTPUT
+   315→          "publish_mode=$mode" >> $env:GITHUB_OUTPUT
+   316→          "retention_days=$retention" >> $env:GITHUB_OUTPUT
+   317→          Write-Host "building $ref (event=$event, publish_mode=$mode, artifact_retention_days=$retention)"
+   318→
+   319→      - name: Check out pinned commit
+   320→        uses: actions/checkout@v4
+   321→        with:
+   322→          ref: ${{ steps.ref.outputs.build_ref }}
+   323→          fetch-depth: 0
+   324→
+   325→      - name: Set up pnpm
+   326→        uses: pnpm/action-setup@v4
+   327→        with:
+   328→          version: 10.33.2
+   329→
+   330→      - name: Set up Node
+   331→        uses: actions/setup-node@v4
+   332→        with:
+   333→          node-version: 24.14.0
+   334→          cache: pnpm
+   335→
+   336→      - name: Install dependencies (frozen lockfile)
+   337→        shell: pwsh
+   338→        run: pnpm install --frozen-lockfile
+   339→
+   340→      - name: Build desktop package
+   341→        shell: pwsh
+   342→        run: pnpm --filter "@zcode/desktop" run build
+   343→
+   344→      - name: Bundle Windows artifacts (NSIS installer + portable zip)
+   345→        shell: pwsh
+   346→        # --targets nsis,zip (bundle.mjs PLX-REL-001 extension) makes one
+   347→        # electron-builder pass produce BOTH the assisted NSIS installer and
+   348→        # the portable zip (the config default is nsis only).
+   349→        run: pnpm --filter "@zcode/desktop" exec pnpm run bundle -- --os win --arch x64 --targets nsis,zip
+   350→        env:
+   351→          ZCODE_ENV: production
+   352→
+   353→      - name: Collect artifacts
+   354→        shell: pwsh
+   355→        run: |
+   356→          New-Item -ItemType Directory -Force -Path release-out | Out-Null
+   357→          Get-ChildItem packages/desktop/dist -File |
+   358→            Where-Object { $_.Extension -in ".exe", ".zip" } |
+   359→            Copy-Item -Destination release-out
+   360→          Get-ChildItem release-out | Format-Table Name, Length
+   361→          $exe = @(Get-ChildItem release-out -Filter *.exe -File)
+   362→          $zip = @(Get-ChildItem release-out -Filter *.zip -File)
+   363→          if ($exe.Count -ne 1) { throw "expected exactly one installer .exe, found $($exe.Count)" }
+   364→          if ($zip.Count -ne 1) { throw "expected exactly one portable .zip, found $($zip.Count)" }
+   365→
+   366→      - name: Generate SHA256SUMS
+   367→        shell: pwsh
+   368→        run: |
+   369→          # Match the GNU sha256sum text format byte-for-byte (lowercase hex,
+   370→          # two spaces, LF endings, no BOM) so the merged SHA256SUMS in the
+   371→          # release verifies with `sha256sum -c` on Linux.
+   372→          $lines = Get-ChildItem release-out -File | Sort-Object Name | ForEach-Object {
+   373→            $hash = (Get-FileHash -Algorithm SHA256 -LiteralPath $_.FullName).Hash.ToLowerInvariant()
+   374→            "$hash  $($_.Name)"
+   375→          }
+   376→          $content = ($lines -join "`n") + "`n"
+   377→          [System.IO.File]::WriteAllText(
+   378→            (Join-Path (Get-Location).Path "release-out\SHA256SUMS"),
+   379→            $content,
+   380→            (New-Object System.Text.UTF8Encoding($false)))
+   381→          Get-Content release-out\SHA256SUMS
+   382→
+   383→      # ------------------------------------------------------------------
+   384→      # PLX-REL-001 Windows smoke harness — headless, honest scope. It
+   385→      # verifies, on the actual windows-latest runner:
+   386→      #   - artifact checksums vs SHA256SUMS;
+   387→      #   - the portable zip's payload structure and that it LAUNCHES;
+   388→      #   - silent NSIS install (/S), install dir + exe, the packaged
+   389→      #     .zcode-install-manifest, Start Menu shortcut, HKCU uninstall
+   390→      #     registry entry (identity: DisplayName/Publisher);
+   391→      #   - launch of the INSTALLED app (process identity: exe path,
+   392→      #     window title, userData dir creation);
+   393→      #   - data retention across a reinstall-over-existing + relaunch;
+   394→      #   - silent uninstall (/S) removing app/shortcut/registry while
+   395→      #     RETAINING user data (electron-builder default).
+   396→      # It does NOT drive GUI interactions (no synthetic clicks) and does
+   397→      # not fake a cross-version upgrade — see the harness report for the
+   398→      # per-check truth and qa/desktop-release/README.md for the scope.
+   399→      # ------------------------------------------------------------------
+   400→      - name: Run packaged-app smoke harness (Windows)
+   401→        shell: pwsh
+   402→        run: |
+   403→          $installer = (Get-ChildItem release-out -Filter *.exe -File | Select-Object -First 1).FullName
+   404→          $portable = (Get-ChildItem release-out -Filter *.zip -File | Select-Object -First 1).FullName
+   405→          node qa/desktop-release/scripts/run-windows.mjs `
+   406→            --installer "$installer" `
+   407→            --portable-zip "$portable" `
+   408→            --sums "$PWD\release-out\SHA256SUMS"
+   409→
+   410→      - name: Collect smoke evidence
+   411→        if: ${{ always() }}
+   412→        shell: pwsh
+   413→        run: |
+   414→          $evid = Get-ChildItem qa/desktop-release/evidence -Directory -Filter "windows-*" |
+   415→            Sort-Object Name -Descending | Select-Object -First 1
+   416→          if ($evid) {
+   417→            Write-Host "evidence dir: $($evid.FullName)"
+   418→            Get-Content (Join-Path $evid.FullName "report.json") -ErrorAction SilentlyContinue
+   419→            New-Item -ItemType Directory -Force -Path smoke-evidence | Out-Null
+   420→            Copy-Item -Recurse -Force $evid.FullName smoke-evidence/
+   421→            Copy-Item -Force release-out\SHA256SUMS smoke-evidence\
+   422→          } else {
+   423→            Write-Host "WARNING: no windows-* evidence dir found"
+   424→          }
+   425→
+   426→      - name: Upload smoke evidence (workflow run)
+   427→        if: ${{ always() }}
+   428→        uses: actions/upload-artifact@v4
+   429→        with:
+   430→          name: playliquid-gameos-smoke-evidence-windows
+   431→          retention-days: ${{ steps.ref.outputs.retention_days }}
+   432→          path: smoke-evidence/
+   433→          if-no-files-found: warn
+   434→
+   435→      - name: Upload artifacts (workflow run)
+   436→        if: ${{ always() }}
+   437→        uses: actions/upload-artifact@v4
+   438→        with:
+   439→          name: playliquid-gameos-windows-amd64
+   440→          retention-days: ${{ steps.ref.outputs.retention_days }}
+   441→          path: release-out/
+   442→          if-no-files-found: error
+   443→
+   444→      - name: Compute release metadata
+   445→        id: meta
+   446→        shell: pwsh
+   447→        run: |
+   448→          $installer = (Get-ChildItem release-out -Filter *.exe -File | Select-Object -First 1).Name
+   449→          $portable = (Get-ChildItem release-out -Filter *.zip -File | Select-Object -First 1).Name
+   450→          $shaInstaller = (Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path "release-out" $installer)).Hash.ToLowerInvariant()
+   451→          $shaPortable = (Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path "release-out" $portable)).Hash.ToLowerInvariant()
+   452→          if ($installer -notmatch "-([0-9][^-]*)-win-") { throw "cannot parse version from $installer" }
+   453→          $version = $Matches[1]
+   454→          "installer=$installer" >> $env:GITHUB_OUTPUT
+   455→          "portable_zip=$portable" >> $env:GITHUB_OUTPUT
+   456→          "sha_installer=$shaInstaller" >> $env:GITHUB_OUTPUT
+   457→          "sha_portable_zip=$shaPortable" >> $env:GITHUB_OUTPUT
+   458→          "version=$version" >> $env:GITHUB_OUTPUT
+   459→          Write-Host "version=$version installer=$installer portable_zip=$portable"
+   460→
+   461→  publish:
+   462→    # Publication gate: requires BOTH OS build jobs to have succeeded (the
+   463→    # install/release contract forbids publishing when smoke/integrity gates
+   464→    # fail, and a preview release labeled cross-platform must actually carry
+   465→    # both OS families). Runs for push-to-main previews and for dispatch runs
+   466→    # with publish_release or publish_preview — never for PR-head builds.
+   467→    needs: [linux-desktop, windows-desktop]
+   468→    if: >-
+   469→      !cancelled() &&
+   470→      needs.linux-desktop.result == 'success' &&
+   471→      needs.windows-desktop.result == 'success' &&
+   472→      needs.linux-desktop.outputs.publish_mode != 'none'
+   473→    runs-on: ubuntu-latest
+   474→    timeout-minutes: 60
+   475→    permissions:
+   476→      contents: write
+   477→    env:
+   478→      MODE: ${{ needs.linux-desktop.outputs.publish_mode }}
+   479→      BUILD_REF: ${{ needs.linux-desktop.outputs.build_ref }}
+   480→      LINUX_APPIMAGE: ${{ needs.linux-desktop.outputs.appimage }}
+   481→      LINUX_DEB: ${{ needs.linux-desktop.outputs.deb }}
+   482→      LINUX_VERSION: ${{ needs.linux-desktop.outputs.version }}
+   483→      WIN_INSTALLER: ${{ needs.windows-desktop.outputs.installer }}
+   484→      WIN_PORTABLE: ${{ needs.windows-desktop.outputs.portable_zip }}
+   485→      WIN_VERSION: ${{ needs.windows-desktop.outputs.version }}
+   486→    steps:
+   487→      - name: Check out pinned commit
+   488→        uses: actions/checkout@v4
+   489→        with:
+   490→          ref: ${{ needs.linux-desktop.outputs.build_ref }}
+   491→          fetch-depth: 0
+   492→
+   493→      - name: Set up Node (smoke-harness runtime)
+   494→        uses: actions/setup-node@v4
+   495→        with:
+   496→          node-version: 24.14.0
+   497→
+   498→      - name: Install verification tools (Ubuntu smoke re-run)
+   499→        run: |
+   500→          sudo apt-get update
+   501→          sudo apt-get install -y xvfb libfuse2
+   502→
+   503→      - name: Download Linux artifacts
+   504→        uses: actions/download-artifact@v4
+   505→        with:
+   506→          name: playliquid-gameos-linux-amd64
+   507→          path: publish/linux
+   508→
+   509→      - name: Download Windows artifacts
+   510→        uses: actions/download-artifact@v4
+   511→        with:
+   512→          name: playliquid-gameos-windows-amd64
+   513→          path: publish/windows
+   514→
+   515→      - name: Assemble release directory (assets + merged SHA256SUMS + BUILD-INFO)
+   516→        run: |
+   517→          set -euo pipefail
+   518→          if [ "$LINUX_VERSION" != "$WIN_VERSION" ]; then
+   519→            echo "ERROR: version mismatch between OS builds (linux=$LINUX_VERSION windows=$WIN_VERSION) — refusing to publish"
+   520→            exit 1
+   521→          fi
+   522→          mkdir -p release
+   523→          cp "publish/linux/$LINUX_APPIMAGE" release/
+   524→          cp "publish/linux/$LINUX_DEB" release/
+   525→          cp "publish/windows/$WIN_INSTALLER" release/
+   526→          cp "publish/windows/$WIN_PORTABLE" release/
+   527→          # merged checksum manifest: GNU sha256sum format, all four assets
+   528→          cat "publish/linux/SHA256SUMS" \
+   529→              "publish/windows/SHA256SUMS" > release/SHA256SUMS
+   530→          ( cd release && sha256sum -c SHA256SUMS )
+   531→
+   532→          # Per-artifact build identification (contract: every artifact
+   533→          # identifies commit SHA, version, timestamp, OS/arch, SHA-256).
+   534→          BUILD_SHA="$(git rev-parse HEAD)"
+   535→          SHORT_SHA="$(git rev-parse --short=10 HEAD)"
+   536→          BUILT_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+   537→          {
+   538→            echo "product=PlayLiquid GameOS"
+   539→            echo "commit=$BUILD_SHA"
+   540→            echo "commit_short=$SHORT_SHA"
+   541→            echo "version=$LINUX_VERSION"
+   542→            echo "built_at_utc=$BUILT_AT"
+   543→            echo "event=${{ github.event_name }}"
+   544→            echo "ref=${{ github.ref }}"
+   545→            echo "workflow_run=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+   546→            echo "publish_mode=$MODE"
+   547→            echo
+   548→            echo "artifacts (name | os | arch | sha256):"
+   549→            while IFS= read -r line; do
+   550→              NAME="$(echo "$line" | cut -d' ' -f3-)"
+   551→              SHA="$(echo "$line" | cut -d' ' -f1)"
+   552→              case "$NAME" in
+   553→                *.AppImage|*.deb) OS_ARCH="linux | x64" ;;
+   554→                *.exe|*.zip) OS_ARCH="windows | x64" ;;
+   555→                *) OS_ARCH="metadata" ;;
+   556→              esac
+   557→              echo "  $NAME | $OS_ARCH | $SHA"
+   558→            done < release/SHA256SUMS
+   559→          } > release/BUILD-INFO.txt
+   560→          cat release/BUILD-INFO.txt
+   561→          {
+   562→            echo "build_sha=$BUILD_SHA"
+   563→            echo "short_sha=$SHORT_SHA"
+   564→            echo "built_at=$BUILT_AT"
+   565→          } >> "$GITHUB_OUTPUT"
+   566→        id: assemble
+   567→
+   568→      - name: Determine release tag and title
+   569→        id: tag
+   570→        run: |
+   571→          set -euo pipefail
+   572→          VERSION="$LINUX_VERSION"
+   573→          SHORT_SHA="${{ steps.assemble.outputs.short_sha }}"
+   574→          if [ "$MODE" = "preview" ]; then
+   575→            TAG="preview/$SHORT_SHA"
+   576→            NAME="PlayLiquid GameOS preview $SHORT_SHA ($VERSION)"
+   577→          else
+   578→            TAG="${{ inputs.tag_name }}"
+   579→            if [ -z "$TAG" ]; then TAG="playliquid-gameos-v${VERSION}"; fi
+   580→            NAME="${{ inputs.release_name }}"
+   581→            if [ -z "$NAME" ]; then NAME="PlayLiquid GameOS ${VERSION} (Linux + Windows)"; fi
+   582→          fi
+   583→          {
+   584→            echo "tag=$TAG"
+   585→            echo "name=$NAME"
+   586→          } >> "$GITHUB_OUTPUT"
+   587→          echo "mode=$MODE tag=$TAG name=$NAME"
+   588→
+   589→      # ------------------------------------------------------------------
+   590→      # Tag-collision policy (issue #9, applied to previews and stable
+   591→      # alike): a release tag may only ever point at the exact commit its
+   592→      # artifacts were built and tested from. If the tag already exists at a
+   593→      # DIFFERENT commit, refuse — never silently overwrite a release built
+   594→      # from another SHA. (Same-SHA re-runs remain idempotent; preview
+   595→      # assets are never re-uploaded over existing bytes — see below.)
+   596→      # ------------------------------------------------------------------
+   597→      - name: Refuse tag collisions at a different commit
+   598→        run: |
+   599→          set -euo pipefail
+   600→          TAG="${{ steps.tag.outputs.tag }}"
+   601→          BUILD_SHA="${{ steps.assemble.outputs.build_sha }}"
+   602→          if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null 2>&1; then
+   603→            EXISTING_SHA="$(git rev-parse "$TAG^{commit}")"
+   604→            if [ "$EXISTING_SHA" != "$BUILD_SHA" ]; then
+   605→              echo "ERROR: tag $TAG already exists at $EXISTING_SHA, but this run built and tested $BUILD_SHA — refusing to overwrite a release built from another SHA"
+   606→              exit 1
+   607→            fi
+   608→            echo "tag $TAG already exists at the built SHA ($BUILD_SHA) — continuing against the existing tag"
+   609→          fi
+   610→
+   611→      - name: Write release notes
+   612→        run: |
+   613→          set -euo pipefail
+   614→          TAG="${{ steps.tag.outputs.tag }}"
+   615→          NAME="${{ steps.tag.outputs.name }}"
+   616→          BUILD_SHA="${{ steps.assemble.outputs.build_sha }}"
+   617→          BUILT_AT="${{ steps.assemble.outputs.built_at }}"
+   618→          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+   619→          if [ "$MODE" = "preview" ]; then
+   620→            STABLE_LINE="This is an **unstable per-commit preview** (prerelease) — see [releases](https://github.com/payswapdotorg/PlayLiquid/releases) for stable versions. It is published for download and inspection only."
+   621→            RETENTION_LINE="Immutable per-SHA preview: artifacts for this SHA are never overwritten. Preview releases are retained until explicitly pruned by the maintainers; the transient workflow-run artifacts expire after 7 days (stable publish runs: 30 days)."
+   622→          else
+   623→            STABLE_LINE="Stable release."
+   624→            RETENTION_LINE="Stable release assets are retained permanently; workflow-run artifacts from the publishing run expire after 30 days."
+   625→          fi
+   626→          ASSET_ROWS=""
+   627→          while IFS= read -r line; do
+   628→            FNAME="$(echo "$line" | cut -d' ' -f3-)"
+   629→            FSHA="$(echo "$line" | cut -d' ' -f1)"
+   630→            case "$FNAME" in
+   631→              *.AppImage) FOS="Linux x64 (AppImage, no installation)" ;;
+   632→              *.deb) FOS="Linux x64 (Debian/Ubuntu package — recommended on Ubuntu 24.04)" ;;
+   633→              *.exe) FOS="Windows x64 (NSIS installer, unsigned)" ;;
+   634→              *.zip) FOS="Windows x64 (portable zip — extract and run, no installation)" ;;
+   635→              *) FOS="metadata" ;;
+   636→            esac
+   637→            ASSET_ROWS="${ASSET_ROWS}| \`$FNAME\` | $FOS | \`$FSHA\` |"$'\n'
+   638→          done < release/SHA256SUMS
+   639→
+   640→          cat > release-notes.md <<NOTES
+   641→          # ${NAME}
+   642→
+   643→          ${STABLE_LINE}
+   644→
+   645→          - **Built from:** \`${BUILD_SHA}\` (tag: \`${TAG}\`)
+   646→          - **Version:** \`${LINUX_VERSION}\`
+   647→          - **Built at (UTC):** \`${BUILT_AT}\`
+   648→          - **Publishing run:** ${RUN_URL}
+   649→
+   650→          ## Assets
+   651→
+   652→          | asset | OS / arch | SHA-256 |
+   653→          | --- | --- | --- |
+   654→          ${ASSET_ROWS}
+   655→          \`\`\`bash
+   656→          sha256sum --ignore-missing -c SHA256SUMS
+   657→          \`\`\`
+   658→          Full per-artifact identification is in \`BUILD-INFO.txt\` (commit, version, timestamp, OS/arch, SHA-256).
+   659→
+   660→          ## Install
+   661→
+   662→          **Linux (Ubuntu, recommended: the .deb)** — the package postinst installs the app's AppArmor profile and sandbox fallback that stock Ubuntu 24.04 requires:
+   663→
+   664→          \`\`\`bash
+   665→          sudo apt-get install -y ./${LINUX_DEB}
+   666→          playliquid-gameos
+   667→          \`\`\`
+   668→
+   669→          **Linux AppImage** (no installation; on Ubuntu 24.04's default namespace restriction prefer the .deb or apply the one-time documented sysctl \`sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0\`):
+   670→
+   671→          \`\`\`bash
+   672→          chmod +x ${LINUX_APPIMAGE}
+   673→          ./${LINUX_APPIMAGE}
+   674→          \`\`\`
+   675→
+   676→          **Windows installer** (unsigned — SmartScreen will show an "unknown publisher" warning; choose *More info → Run anyway*; see the honesty note below):
+   677→
+   678→          \`\`\`powershell
+   679→          # verify first
+   680→          Get-FileHash -Algorithm SHA256 .\\"${WIN_INSTALLER}"
+   681→          .\\"${WIN_INSTALLER}"
+   682→          \`\`\`
+   683→
+   684→          **Windows portable zip** (no installation — extract and run \`PlayLiquid GameOS.exe\`):
+   685→
+   686→          \`\`\`powershell
+   687→          Expand-Archive .\\"${WIN_PORTABLE}" -DestinationPath PlayLiquidGameOS
+   688→          .\\PlayLiquidGameOS\\"PlayLiquid GameOS.exe"
+   689→          \`\`\`
+   690→
+   691→          ## Honesty notes
+   692→
+   693→          - The Windows installer and portable zip are **unsigned**. No code-signing
+   694→            certificate is available yet; SmartScreen/antivirus heuristics may warn.
+   695→            No signing or auto-update claim is made anywhere in this release.
+   696→          - **Auto-update is disabled by design.** The only known update feed
+   697→            distributes ZCode builds and would replace PlayLiquid with ZCode
+   698→            (see \`packages/desktop/scripts/desktop-product-identity.mjs\`,
+   699→            \`remoteUpdateFeedEnabled: false\`). Update by downloading a new release.
+   700→          - The Linux artifacts passed the full packaged-app smoke battery on
+   701→            ubuntu-latest (startup, shutdown, product shell, navigation, identity,
+   702→            first-run states, viewports, offline resilience — see the run).
+   703→          - The Windows artifacts passed the headless Windows smoke battery on
+   704→            windows-latest (silent install, Start Menu shortcut, registry identity,
+   705→            installed + portable launch, data retention across reinstall, silent
+   706→            uninstall). No GUI-interaction automation is claimed.
+   707→
+   708→          ## Retention
+   709→
+   710→          ${RETENTION_LINE}
+   711→          NOTES
+   712→          cat release-notes.md
+   713→
+   714→      - name: Publish GitHub Release
+   715→        env:
+   716→          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+   717→        run: |
+   718→          set -euo pipefail
+   719→          TAG="${{ steps.tag.outputs.tag }}"
+   720→          NAME="${{ steps.tag.outputs.name }}"
+   721→          BUILD_SHA="${{ steps.assemble.outputs.build_sha }}"
+   722→
+   723→          if [ "$MODE" = "preview" ]; then
+   724→            # --------------------------------------------------------------
+   725→            # Immutable per-SHA preview publication (PLX-REL-001):
+   726→            # - the tag is pinned to the built SHA (collision-checked above);
+   727→            # - assets already present are LEFT AS-IS (no --clobber — a
+   728→            #   re-run of the SAME SHA is idempotent, the bytes of another
+   729→            #   run are never replaced);
+   730→            # - a same-SHA partial upload (interrupted run) is completed by
+   731→            #   uploading only the missing assets.
+   732→            # --------------------------------------------------------------
+   733→            if gh release view "$TAG" >/dev/null 2>&1; then
+   734→              echo "preview release $TAG already exists (tag verified at the built SHA above) — completing missing assets only"
+   735→            else
+   736→              gh release create "$TAG" \
+   737→                --target "$BUILD_SHA" \
+   738→                --title "$NAME" \
+   739→                --prerelease \
+   740→                --notes-file release-notes.md
+   741→            fi
+   742→            EXISTING="$(gh release view "$TAG" --json assets --jq '.[].name' || true)"
+   743→            for f in release/*; do
+   744→              base="$(basename "$f")"
+   745→              if printf '%s\n' "$EXISTING" | grep -Fxq "$base"; then
+   746→                echo "asset $base already published — keeping the existing bytes (immutable per-SHA preview)"
+   747→              else
+   748→                gh release upload "$TAG" "$f"
+   749→              fi
+   750→            done
+   751→          else
+   752→            # Stable path (existing semantics): a same-SHA re-run refreshes
+   753→            # the release assets (--clobber); a different-SHA tag collision
+   754→            # was already refused above.
+   755→            if gh release view "$TAG" >/dev/null 2>&1; then
+   756→              echo "release $TAG already exists (tag verified at the built SHA above) — assets will be refreshed"
+   757→            else
+   758→              gh release create "$TAG" \
+   759→                --target "$BUILD_SHA" \
+   760→                --title "$NAME" \
+   761→                --notes-file release-notes.md
+   762→            fi
+   763→            gh release upload "$TAG" release/* --clobber
+   764→          fi
+   765→          gh release view "$TAG" --json url,assets --jq '{url: .url, assets: [.assets[].name]}'
+   766→
+   767→      # ------------------------------------------------------------------
+   768→      # Post-publication verification: download the PUBLISHED assets from the
+   769→      # release, checksum them (all four + BUILD-INFO), and launch the
+   770→      # published .deb through the RW-003 Ubuntu smoke harness (DoD: the
+   771→      # published file — not the local build — boots as PlayLiquid GameOS).
+   772→      # The Windows assets were smoke-tested pre-publication by the
+   773→      # windows-desktop job; here they are re-verified by checksum only
+   774→      # (the publish job runs on Linux).
+   775→      # ------------------------------------------------------------------
+   776→      - name: Verify published assets (download + checksum + launch)
+   777→        env:
+   778→          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+   779→        run: |
+   780→          set -euo pipefail
+   781→          TAG="${{ steps.tag.outputs.tag }}"
+   782→          mkdir -p verify && cd verify
+   783→          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern "*"
+   784→          sha256sum -c --ignore-missing SHA256SUMS
+   785→          # The PUBLISHED .deb install path (recommended Ubuntu flow — the
+   786→          # postinst AppArmor profile / SUID fallback makes it work on stock
+   787→          # 24.04 where the AppImage needs the userns sysctl):
+   788→          sudo apt-get install -y "./$LINUX_DEB"
+   789→          INSTALLED="$(command -v playliquid-gameos)"
+   790→          echo "published-installed binary: $INSTALLED"
+   791→          bash ../qa/desktop-release/scripts/run-ubuntu.sh "$INSTALLED" "$(pwd)/$LINUX_DEB"
+   792→
+   793→  publish-status:
+   794→    # Always-on honest recorder (PLX-REL-001): what built, what published,
+   795→    # and — when publication was requested but did not happen — exactly why.
+   796→    needs: [linux-desktop, windows-desktop, publish]
+   797→    if: always()
+   798→    runs-on: ubuntu-latest
+   799→    timeout-minutes: 5
+   800→    steps:
+   801→      - name: Record publication status
+   802→        run: |
+   803→          echo "linux-desktop:   ${{ needs.linux-desktop.result }}"
+   804→          echo "windows-desktop: ${{ needs.windows-desktop.result }}"
+   805→          echo "publish:         ${{ needs.publish.result }} (mode: ${{ needs.linux-desktop.outputs.publish_mode }})"
+   806→          echo "workflow run:    ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+   807→          if [ "${{ needs.linux-desktop.outputs.publish_mode }}" != "none" ] && [ "${{ needs.publish.result }}" != "success" ]; then
+   808→            echo ""
+   809→            echo "HONEST STATUS: publication was requested but did NOT complete."
+   810→            echo "Cross-platform publication requires BOTH build jobs to succeed"
+   811→            echo "(linux=${{ needs.linux-desktop.result }}, windows=${{ needs.windows-desktop.result }})."
+   812→            echo "If the Windows job was blocked by runner availability/billing, the job"
+   813→            echo "definition is still correct — record the run URL above as evidence."
+   814→          fi
+   815→
