@@ -109,6 +109,30 @@ SHA. The corrected pipeline proof is dispatch
 [run 41210886456](https://github.com/payswapdotorg/PlayLiquid/actions/runs/41210886456);
 its outcome is recorded in PR #17.
 
+**Windows harness, second live record (PLX-REL-001, dispatch
+[41214918788](https://github.com/payswapdotorg/PlayLiquid/actions/runs/41214918788)):**
+run 41210886456's Windows smoke failure was root-caused to the harness
+driver spawning `powershell.exe` (Windows PowerShell 5.1), which reads
+BOM-less UTF-8 scripts as ANSI — every em-dash's `0x94` byte decodes to a
+smart quote that terminates PowerShell strings early and derails the
+parser. Fixed by preferring `pwsh.exe` (PowerShell 7, shipped on
+windows-latest) in `run-windows.mjs` and stamping a UTF-8 BOM on
+`run-windows.ps1`. With parsing fixed, dispatch 41214918788's Windows
+smoke ran the full battery: **17/19 pass** — checksums, portable payload +
+launch, silent install, install-dir exe + manifest, Start Menu + desktop
+shortcuts, installed launch (alive, exe path, window title), user-data dir,
+data retention across reinstall, same-version reinstall, relaunch. The two
+failures and the fatal were HARNESS expectation bugs, not installer
+defects: electron-builder's assisted NSIS (oneClick=false) registers the
+uninstall entry with DisplayName `"${productName} ${version}"`
+("PlayLiquid GameOS 3.15.0" — `NsisTarget.js` default) and names the
+uninstaller file `"Uninstall ${PRODUCT_FILENAME}.exe"`
+(`common.nsh`'s `UNINSTALL_FILENAME`), where the harness expected the
+plain product name and plain `Uninstall.exe`. The harness now prefix-matches
+the DisplayName and resolves the uninstaller from the registry
+`UninstallString` first (electron-builder default name, then the legacy
+plain name, as fallbacks). The installer itself needs no change.
+
 **Signing:** no code-signing certificate exists; Windows installers are
 unsigned and every release discloses SmartScreen/"unknown publisher"
 behavior. Sign when a certificate is available. **No verified auto-update is

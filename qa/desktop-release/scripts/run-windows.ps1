@@ -125,8 +125,12 @@ function Read-SumsFile {
 }
 
 function Get-UninstallEntry {
+  # electron-builder's assisted NSIS installer registers the uninstall
+  # entry with DisplayName "${productName} ${version}" (NsisTarget.js
+  # default for oneClick=false); oneClick installers register the plain
+  # product name. Match by PREFIX so both shapes are found.
   Get-ItemProperty "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" -ErrorAction SilentlyContinue |
-    Where-Object { $_.DisplayName -eq $script:ProductName } |
+    Where-Object { $_.DisplayName -like "$($script:ProductName)*" } |
     Select-Object -First 1
 }
 
@@ -189,10 +193,33 @@ function Invoke-Installer {
   return $proc.ExitCode
 }
 
+function Get-UninstallerPath {
+  param([string]$InstallLocation, [object]$Entry)
+  # electron-builder's NSIS uninstaller file is NOT plain Uninstall.exe —
+  # common.nsh defines UNINSTALL_FILENAME as "Uninstall ${PRODUCT_FILENAME}.exe"
+  # (e.g. "Uninstall PlayLiquid GameOS.exe"). Resolve from the registry
+  # entry's UninstallString first (authoritative), then the electron-builder
+  # default name, then the plain legacy name.
+  $candidates = @()
+  if ($Entry -and $Entry.UninstallString) {
+    $s = [string]$Entry.UninstallString
+    if ($s.StartsWith('"')) { $candidates += ($s -replace '^"([^"]+)".*$', '$1') }
+    else { $candidates += (($s -split ' ')[0]) }
+  }
+  $candidates += (Join-Path $InstallLocation "Uninstall $script:ProductName.exe")
+  $candidates += (Join-Path $InstallLocation "Uninstall.exe")
+  foreach ($c in $candidates) { if ($c -and (Test-Path -LiteralPath $c)) { return $c } }
+  return $null
+}
+
 function Invoke-Uninstaller {
   param([string]$InstallLocation, [int]$TimeoutSeconds = 600)
-  $uninstaller = Join-Path $InstallLocation "Uninstall.exe"
-  if (-not (Test-Path -LiteralPath $uninstaller)) { throw "uninstaller not found: $uninstaller" }
+  $entry = Get-UninstallEntry
+  $uninstaller = Get-UninstallerPath -InstallLocation $InstallLocation -Entry $entry
+  if (-not $uninstaller) {
+    $expected = Join-Path $InstallLocation "Uninstall $script:ProductName.exe"
+    throw "uninstaller not found (expected `"$expected`" or the registry UninstallString target)"
+  }
   $proc = Start-Process -FilePath $uninstaller -ArgumentList "/S" -PassThru
   # The NSIS uninstaller re-spawns a copy of itself and the parent exits
   # immediately — wait for the APP FILES to disappear instead of the process.
