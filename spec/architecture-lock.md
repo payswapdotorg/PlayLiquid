@@ -48,3 +48,17 @@ Status: FROZEN
 43. No fake engagement or anti-abuse evasion.
 44. No hidden mocks presented as production.
 45. No completion claim without evidence.
+
+## Amendment 1 — ACR-001 (2026-10-31) — lock version 1.1
+
+Supersedes rule 16 (the v1.0 text above is preserved for history; rules
+1–15 and 17–45 are unchanged):
+
+16′. World is the general content concept: a World may be a Spark, game,
+experience, digital twin or another registered extensible kind. Content kind
+and target/delivery profile are distinct dimensions. Spark is both a valid
+World kind and may carry the `spark_vertical` target profile. GameIR remains
+the single semantic authority (rule 1) and the build-target list loses
+`spark` (delivery is a profile, not a build target). No competing World,
+GameIR or Package Graph type may be created. Registries, GameIR migration
+and compatibility plan: `spec/acr/ACR-001-world-kind-and-target-profile-separation.md`.

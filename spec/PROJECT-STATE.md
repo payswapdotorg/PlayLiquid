@@ -90,3 +90,33 @@ tag at `d9e13bc`): the enforceable UX battery (34 checks — geometry at three
 viewports, accessibility, journeys, first-run contracts) runs in the release
 workflow and passes on both Ubuntu flows; issue #9 is closed with the TL
 report (journey map `docs/ux/JOURNEY-MAP.md`, baseline evidence in-repo).
+
+## Product-contract era (2026-10-31 — PR #14 / ACR-001)
+
+The operator-approved product contract landed on main (PR #14, squash
+`a6c30053`): `PRODUCT-NORTH-STAR.md`,
+`docs/handoff/FINAL-TL-HANDOFF-2026-10-31.md`, the Figma map, the feature
+matrix, the install/release contract and the next work ledger
+(`spec/ux/work-items-next.md`). That ledger now governs; the PL-045 program
+ledger (`program/graph.json`) stays closed — historical record, untouched.
+
+The TL Phase-0 baseline audit is recorded in the ledger (main SHA, tags,
+Linux-only releases, workflow gaps — no Windows or per-commit previews exist
+today — the New Task/product-shell conflict, the inherited browser/terminal
+seams, and the honest Figma-correction block).
+
+**ACR-001 (PLX-ARCH-001) is ACCEPTED** (branch
+`tl/PLX-ARCH-001-world-kind-acr`, base `a6c30053`):
+`spec/acr/ACR-001-world-kind-and-target-profile-separation.md` — World is
+the general content concept; content kind and target profile are distinct
+dimensions; Spark is both a World kind and the `spark_vertical` delivery
+profile. The lock moves to v1.1 (Amendment 1; the v1.0 rule-16 text is
+preserved). GameIR stays the single semantic authority — additive optional
+`world` declaration, legacy documents remain valid (kind defaults `game`).
+Migration/compatibility tests land with the ACR's implementation Work
+Orders PLX-ARCH-002/003 (defined in ACR-001 §6).
+
+Pending gates (see the ledger): PLX-UX-001 on the Figma correction (blocked
+by the Starter-plan MCP limit — not claimed done), PLX-UX-002 on the WebFlix
+license/source audit, PLX-REL-001 on the Windows/per-commit release
+pipeline.

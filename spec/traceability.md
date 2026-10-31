@@ -18,3 +18,4 @@
 | Security/performance | quality gates | PL-041, PL-042 |
 | Browser/deployment | operational gates | PL-043, PL-044 |
 | Final audit | governance | PL-045 |
+| World kind / target profile (ACR-001) | spec/acr/ACR-001 + game-contracts/game-ir | PLX-ARCH-002/003 (pending dispatch) |
