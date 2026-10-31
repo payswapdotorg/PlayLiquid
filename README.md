@@ -10,7 +10,8 @@ The repository is the source of truth; implementation must not depend on prior c
 
 - [Product Experience Specification](docs/product/PRODUCT-EXPERIENCE-SPEC.md) — canonical product and UX requirements.
 - [Figma Implementation Contract](docs/product/FIGMA-IMPLEMENTATION-CONTRACT.md) — authoritative Figma frames and exact screen rules.
-- [Final Product Implementation Handoff](docs/handoff/FINAL-PRODUCT-IMPLEMENTATION-HANDOFF.md) — complete TL/worker implementation brief.
+- [Final Product Implementation Handoff](docs/handoff/FINAL-PRODUCT-IMPLEMENTATION-HANDOFF.md) — product implementation brief.
+- [Final Tech Lead Handoff](docs/handoff/FINAL-IMPLEMENTATION-HANDOFF.md) — complete, self-contained execution plan and definition of done.
 - [Product Experience Work Orders](spec/product-experience/WORK-ORDERS.md) — phases, ownership and acceptance.
 - [Cross-Platform Distribution Contract](docs/release/CROSS-PLATFORM-DISTRIBUTION.md) — installable Linux/Windows build requirements.
 - [Figma Design File](https://www.figma.com/design/LWlycZ5B3vCrUZ0a4pnu5u) — visual source.
@@ -65,7 +66,7 @@ A Windows installer is **not yet published** in the current release. The release
 
 ### Inspect builds from any commit
 
-The release engineering requirement is that every successful main commit uploads Linux and Windows installable inspection artifacts to its GitHub Actions run, and a `workflow_dispatch` workflow can rebuild an exact historical SHA after ordinary workflow artifacts expire. See [Cross-Platform Distribution Contract](docs/release/CROSS-PLATFORM-DISTRIBUTION.md). This policy is planned; verify the workflow has landed before promising availability.
+The repository now defines `.github/workflows/playliquid-inspection-builds.yml` to build Linux and Windows x64 installable artifacts on each `main` push and on exact-SHA/tag manual dispatch. Each run uploads checksums and a build manifest. This workflow is newly added on the handoff branch and is not yet proven until GitHub Actions completes successful native builds. See [Cross-Platform Distribution Contract](docs/release/CROSS-PLATFORM-DISTRIBUTION.md).
 
 ## Repository source of truth and fresh-agent recovery order
 
