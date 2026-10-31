@@ -8,6 +8,31 @@ A fresh agent must read `AI_CONTINUATION.md` and the canonical files listed in `
 
 Actual Git history, source, tests, migrations, runtime behavior, browser/deployment evidence and exact SHAs outrank reports, summaries, screenshots and chat.
 
+## Product direction authority
+
+The current product UX and information architecture are defined by:
+- `docs/product/PRODUCT-EXPERIENCE-SPEC.md`
+- `docs/product/FIGMA-IMPLEMENTATION-CONTRACT.md`
+- `docs/handoff/FINAL-PRODUCT-IMPLEMENTATION-HANDOFF.md`
+- `spec/product-experience/WORK-ORDERS.md`
+- `docs/release/CROSS-PLATFORM-DISTRIBUTION.md`
+
+These are repository-owned instructions, not optional chat context. The new workstream supersedes the old Game-Studio/Lab/Community-primary UX contract for future product UX decisions. It does not rewrite historical UX/program records or erase existing domain services.
+
+**Current UX rules:**
+- ZCode New Task is the starting experience; preserve its underlying task, model, provider, attachment, access and runtime features.
+- Preserve ZCode Settings and the entire Model Provider implementation. Never create a second provider/settings authority.
+- Preserve Search, Automations, Plugin Marketplace, Group/Project navigation, Browser and Terminal.
+- New Task requires a visible Select project dropdown above the composer and Browser/Terminal toggles at the top-right of the task workspace header.
+- Projects are the development workspace. Do not make a standalone Game Studio dashboard the primary development journey.
+- A World is the umbrella model and can be a game, Spark experience, interactive experience, simulation/training world, digital twin or future extensible profile. Spark remains a delivery/runtime target profile under architecture lock #16.
+- Everything reusable is a package. A World Project is Git-native. Native PlayLiquid project work must not require GitHub; connected Git providers are optional remotes.
+- Use the approved Figma frames as the visual specification. Do not invent a competing interpretation.
+- WebFlix is the interaction/visual reference; copy its code only after ownership/license authorization. Otherwise use it as a clean-room behavioral guide.
+- Linux and Windows installable inspection builds must be available with checksums and exact source commit provenance. Current published workflow only proves Linux; see the release contract.
+
+Before coding any UI Work Order, check that the relevant Figma frames are complete and pinned. See `docs/product/FIGMA-IMPLEMENTATION-CONTRACT.md`.
+
 ## Relationship to ZCode
 
 This is a ZCode fork.
@@ -36,17 +61,23 @@ Do not create a second ZCode model-routing, agent-session, remote-host, or gener
 
 Read:
 1. `AI_CONTINUATION.md`
-2. `spec/PROJECT-STATE.md`
-3. `spec/architecture.md`
-4. `spec/architecture-lock.md`
-5. `spec/requirements.md`
-6. `spec/dependency-graph.md`
-7. `spec/module-dependency-matrix.md`
-8. `spec/work-items.md`
-9. `spec/worker-contract.md`
-10. exact Work Order
-11. target module contract/spec and tests
-12. live GitHub base SHA and PR state
+2. `README.md`
+3. `spec/PROJECT-STATE.md`
+4. `spec/architecture.md`
+5. `spec/architecture-lock.md`
+6. `spec/requirements.md`
+7. `docs/product/PRODUCT-EXPERIENCE-SPEC.md`
+8. `docs/product/FIGMA-IMPLEMENTATION-CONTRACT.md`
+9. `docs/handoff/FINAL-PRODUCT-IMPLEMENTATION-HANDOFF.md`
+10. `spec/product-experience/WORK-ORDERS.md`
+11. `docs/release/CROSS-PLATFORM-DISTRIBUTION.md`
+12. `spec/dependency-graph.md`
+13. `spec/module-dependency-matrix.md`
+14. `spec/work-items.md`
+15. `spec/worker-contract.md`
+16. exact Work Order
+17. target module contract/spec and tests
+18. live GitHub base SHA and PR state
 
 For source changes, also run the inherited architecture-governance flow:
 `pnpm architecture:check --changed` → `pnpm architecture:context <module-id>`.
@@ -57,7 +88,7 @@ For source changes, also run the inherited architecture-governance flow:
 - One owner for every mutable state.
 - One canonical command/event path for each behavior.
 - GameIR is the semantic kernel.
-- Package Graph is the dependency/composition authority.
+- Package Graph is the composition/dependency authority.
 - Capability Broker is the runtime permission authority for avatar/agent actions.
 - GameOS platform services own reusable game-wide services.
 - Deterministic simulation is the test/evaluation foundation where feasible.
@@ -68,10 +99,10 @@ For source changes, also run the inherited architecture-governance flow:
 - Arena is an external capability provider.
 - Engine SDKs and DCC tools are adapters, not domain authorities.
 - MCP is a transport/integration mechanism, not the semantic kernel.
-- Spark is a target profile, not a content type.
+- Spark is a target profile, not a separate content type.
 - Large binary artifacts use content-addressed storage, not ordinary Git history.
 - Provenance/licensing is a release/build gate.
-- Console support is truthful and SDK-gated.
+- Console capability is SDK/toolchain gated and must be proven.
 - User/community contribution never silently becomes a prerequisite for autonomous operation.
 - Lab evidence never rewrites historical observations.
 - Simulated/counterfactual results are never represented as historical fact.
