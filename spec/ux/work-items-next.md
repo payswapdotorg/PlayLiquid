@@ -76,10 +76,20 @@ Proof: real branch/PR lifecycle; live session/chat; durable replay record/index/
 ## PLX-ARCH-001 — World kind/profile and Spark semantic reconciliation
 
 Owner: TL (architecture owner). Dependencies: none.
-Status: **ACR-001 ACCEPTED and MERGED** — PR #15 (branch `tl/PLX-ARCH-001-world-kind-acr`, base `a6c30053`), squash `a0fbd8d310968c76d6fa558766abc4843aff74fd`, governance CI run 41198277257 (success). Phase A documents only; Phase B WOs PLX-ARCH-002/003 ready for TL dispatch.
+Status: **ACR-001 ACCEPTED and MERGED** — PR #15 (branch `tl/PLX-ARCH-001-world-kind-acr`, base `a6c30053`), squash `a0fbd8d310968c76d6fa558766abc4843aff74fd`, governance CI run 41198277257 (success). Phase A documents only. Phase B: **PLX-ARCH-002 MERGED** (PR #16, squash `326da97f59bc592a4662b9c714be16d7e4f2d69e`); PLX-ARCH-003 ready for dispatch.
 Write surface: Architecture Change Request, architecture/requirements/graph/matrix/compatibility plan; no worker may change semantic kernel before approval. (Satisfied: no code changes in Phase A.)
 Requirements: World kinds include Spark/game/experience/digital_twin/other; target profiles separate. Existing GameIR/Package Graph remain single authority. Reconcile old Spark-only-target lock. (Satisfied by ACR-001; lock v1.1 Amendment 1.)
 Proof: accepted ACR (done); migration/compatibility tests (deferred to PLX-ARCH-002/003 — the ACR's implementation Work Orders, defined in ACR-001 §6); no duplicate World type (single-definition-site check lands with PLX-ARCH-002; lock rules 1/40 govern).
+
+## PLX-ARCH-002 — World kind / target profile registries + GameIR world declaration (MERGED)
+
+Owner: TL-executed (ACR-001 §6 first Phase B Work Order). Dependencies: ACR-001 (accepted).
+Branch: `arch/PLX-ARCH-002-world-kind-registries` · PR #16 · base `7600fa2` · squash `326da97f59bc592a4662b9c714be16d7e4f2d69e`.
+Write surface (frozen): `packages/game-contracts` + `packages/game-ir` + colocated tests only — held exactly.
+What landed: `WorldKind` / `TargetProfile` registries + `WorldDeclaration` guard + `DEFAULT_WORLD_KIND` (`game`) + `resolveWorldKind` in `game-contracts/src/world.ts`; optional document-level `world` declaration on `GameIRDocument` (additive; `irVersion` stays "1"); granular validation `GAMEIR/E017/E019/E020` (absence = legacy default, no diagnostic).
+Gates (local station, recorded in PR #16): game-contracts test 50/0 + typecheck + oxlint 0/0 (20 files); game-ir test 68/0 + typecheck + oxlint 0/0 (22 files); root `program:check` PASS (45 WOs); `architecture:check` 5/5 baseline / 0 new. Governance CI run 41198813037 (success).
+Tests: 16 new — legacy-valid, kind/profile independence matrix (5 kinds × 8 profiles), unknown-reject, non-fail-fast collection, additive-only regression, single-authority registry pin.
+Remaining for the ACR's Phase B: **PLX-ARCH-003** (runtime/build dispatch by worldKind + targetProfile across runtime-spark / spark / engine-playcanvas / build-contracts) — ready for dispatch.
 
 ## PLX-REL-001 — Cross-platform installable delivery
 
@@ -92,7 +102,7 @@ Proof: install/launch/upgrade/uninstall on actual OS runners; README direct link
 ## Dispatch sequence
 
 1. TL performs baseline audit, Figma correction and file-level ownership mapping. — audit + mapping DONE 2026-10-31; **Figma correction HELD** (operator gate; see the audit record).
-2. PLX-ARCH-001 begins immediately; other work that depends on World kind waits for ACR. — **ACR-001 ACCEPTED**; Phase B WOs (PLX-ARCH-002/003) ready for dispatch by TL.
+2. PLX-ARCH-001 begins immediately; other work that depends on World kind waits for ACR. — **ACR-001 ACCEPTED**; PLX-ARCH-002 MERGED (PR #16); PLX-ARCH-003 ready for dispatch.
 3. Dispatch PLX-UX-001/002/003 only when write surfaces are pairwise disjoint. — surfaces now frozen above; PLX-UX-001 HELD on the Figma gate; PLX-UX-002 HELD on the WebFlix audit; PLX-UX-003 unblocked by ACR-001 but HELD on its authorities audit.
 4. PLX-REL-001 can run in parallel only after workflow ownership is disjoint from root integration and existing release work. — audit done; ready when TL sets ownership.
 5. TL merges only after source + tests + runtime + browser + packaged build evidence agree. Update this ledger with branch, PR, base/head/merge SHA, test results and evidence URLs.
