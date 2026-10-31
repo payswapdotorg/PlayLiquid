@@ -44,6 +44,31 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 import { distroName, tail } from "./run-helpers.mjs";
 import { runAppRun, shutdownApp } from "./run-lifecycle.mjs";
 
+/** Wait (bounded, generous) for the product shell after DOM settle. The
+ * packaged app's first-run preparation ("Finishing startup" — agent-runtime
+ * and search-tool staging) can outlast the DOM settle: the loading screen's
+ * DOM is stable, waitForRender returns early, and a fixed-moment probe races
+ * the preparation (observed 60–120 s on cold CI runners — PLX-REL-001
+ * dispatch 41216691320 lesson — and longer when the offline scenario's dead
+ * proxy makes staging fetches hang until their timeouts: run 41226144216's
+ * offline render verdict caught the loading screen). The checks then verify
+ * what the user actually gets, not where the loading screen happened to be. */
+async function waitForProductShell(page, log) {
+  let probe = await markerProbe(page);
+  if (shellMarkersPresent(probe)) return probe;
+  const deadline = Date.now() + DEFAULTS.shellReadyTimeoutMs;
+  while (!shellMarkersPresent(probe) && Date.now() < deadline) {
+    await sleep(DEFAULTS.shellReadyPollMs);
+    probe = await markerProbe(page);
+  }
+  if (shellMarkersPresent(probe)) {
+    log(`product shell present — first-run preparation finished within the ${DEFAULTS.shellReadyTimeoutMs / 1000}s window`);
+  } else {
+    log(`product shell markers not present after ${DEFAULTS.shellReadyTimeoutMs / 1000}s — probing what is rendered; the checks will record it honestly`);
+  }
+  return probe;
+}
+
 export async function main(argv) {
   const options = parseArgs(argv);
   const outDir = options.out
@@ -126,29 +151,9 @@ export async function main(argv) {
           `child env keys: ${Object.keys(childEnv(run.profileDirs, xvfb.display)).sort().join(", ")}`,
         ],
       );
-      // PLX-REL-001 (dispatch 41216691320 lesson): the packaged app's
-      // first-run preparation ("Finishing startup" — agent-runtime and
-      // search-tool staging) can outlast the DOM settle: the loading
-      // screen's DOM is stable, waitForRender returns early, and a
-      // fixed-moment probe races the preparation (observed 60–120 s on
-      // cold CI runners; the build job passed at ~55 s while the publish
-      // job's verification exceeded the window 3 minutes later). Wait for
-      // the product shell markers with a generous documented deadline
-      // before probing — the checks then verify what the user actually
-      // gets, not where the loading screen happened to be.
-      let probe = await markerProbe(run.page);
-      if (!shellMarkersPresent(probe)) {
-        const deadline = Date.now() + DEFAULTS.shellReadyTimeoutMs;
-        while (!shellMarkersPresent(probe) && Date.now() < deadline) {
-          await sleep(DEFAULTS.shellReadyPollMs);
-          probe = await markerProbe(run.page);
-        }
-        if (shellMarkersPresent(probe)) {
-          log(`product shell present — first-run preparation finished within the ${DEFAULTS.shellReadyTimeoutMs / 1000}s window`);
-        } else {
-          log(`product shell markers not present after ${DEFAULTS.shellReadyTimeoutMs / 1000}s — probing what is rendered; the checks will record it honestly`);
-        }
-      }
+      // PLX-REL-001: identity/shell checks run on the settled product shell,
+      // not the transient loading screen (see waitForProductShell).
+      const probe = await waitForProductShell(run.page, log);
       identityChecks(report, probe, options);
       shellChecks(report, probe);
       // UX-003: the frozen shell + first-run contracts, asserted on the
@@ -219,6 +224,12 @@ export async function main(argv) {
         report.check("error-handling-offline-stability", "app stays alive with a dead proxy", "fail", "app never started");
         fs.copyFileSync(off.appLog, path.join(outDir, "logs", "app-offline-stdout.log"));
       } else {
+        // PLX-REL-001 (run 41226144216 lesson): the same first-run prep race
+        // as the main run applies under the dead proxy — staging fetches hang
+        // until their timeouts, so the render verdict must wait for the
+        // product shell (generously, bounded) instead of racing the loading
+        // screen. offlineScenario probes fresh for its verdict.
+        await waitForProductShell(off.page, log);
         await offlineScenario({
           report,
           cdp: off.page,
