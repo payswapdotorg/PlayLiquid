@@ -130,3 +130,17 @@ A user can:
 7. Install PlayLiquid alongside ZCode without profile/package collisions.
 
 Only advertise platforms/artifact types with successful native package launch evidence.
+
+
+## 8. Newly added continuous inspection workflow
+
+The handoff branch adds `.github/workflows/playliquid-inspection-builds.yml`:
+- runs on every push to `main`;
+- supports manual `build_ref` for a historical commit SHA or immutable tag;
+- resolves and records the exact checked-out commit;
+- builds Linux x64 .deb + AppImage on `ubuntu-latest`;
+- builds Windows x64 NSIS .exe on `windows-latest`;
+- uploads artifacts named with platform and source short SHA;
+- creates SHA256SUMS and `build-manifest.json` with source commit, product version, OS/architecture, artifact digests, toolchain versions and Actions run URL.
+
+**Verification status:** workflow source has been added but has not yet run on GitHub Actions. Do not mark cross-platform inspection complete until both matrix jobs succeed on a real main commit, the Linux package smoke harness passes, and a Windows-native install/launch/uninstall smoke test is implemented and passes. The current workflow builds and uploads the Windows installer but does not yet prove Windows installation/launch. This is an explicit TL follow-up, not a hidden assumption.
