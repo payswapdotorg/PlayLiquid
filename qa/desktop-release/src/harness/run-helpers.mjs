@@ -3,6 +3,7 @@
  * unchanged; max-file-lines gate): distro name, bounded child-exit wait,
  * log tail.
  */
+import fs from "node:fs";
 
 export function distroName() {
   try {
