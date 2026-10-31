@@ -76,7 +76,7 @@ Proof: real branch/PR lifecycle; live session/chat; durable replay record/index/
 ## PLX-ARCH-001 — World kind/profile and Spark semantic reconciliation
 
 Owner: TL (architecture owner). Dependencies: none.
-Status: **ACR-001 ACCEPTED** — `spec/acr/ACR-001-world-kind-and-target-profile-separation.md`, branch `tl/PLX-ARCH-001-world-kind-acr`, base `a6c30053` (Phase A documents only; merge SHA recorded by the TL bookkeeping commit per the ledger rules).
+Status: **ACR-001 ACCEPTED and MERGED** — PR #15 (branch `tl/PLX-ARCH-001-world-kind-acr`, base `a6c30053`), squash `a0fbd8d310968c76d6fa558766abc4843aff74fd`, governance CI run 41198277257 (success). Phase A documents only; Phase B WOs PLX-ARCH-002/003 ready for TL dispatch.
 Write surface: Architecture Change Request, architecture/requirements/graph/matrix/compatibility plan; no worker may change semantic kernel before approval. (Satisfied: no code changes in Phase A.)
 Requirements: World kinds include Spark/game/experience/digital_twin/other; target profiles separate. Existing GameIR/Package Graph remain single authority. Reconcile old Spark-only-target lock. (Satisfied by ACR-001; lock v1.1 Amendment 1.)
 Proof: accepted ACR (done); migration/compatibility tests (deferred to PLX-ARCH-002/003 — the ACR's implementation Work Orders, defined in ACR-001 §6); no duplicate World type (single-definition-site check lands with PLX-ARCH-002; lock rules 1/40 govern).
