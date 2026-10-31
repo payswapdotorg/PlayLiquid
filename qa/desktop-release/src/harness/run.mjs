@@ -18,6 +18,7 @@ import {
   pidAlive,
   portIsFree,
   runId,
+  sleep,
   waitForMemory,
 } from "./memwatch.mjs";
 import { startXvfb } from "./xvfb.mjs";
@@ -251,7 +252,29 @@ export async function main(argv) {
           `child env keys: ${Object.keys(childEnv(run.profileDirs, xvfb.display)).sort().join(", ")}`,
         ],
       );
-      const probe = await markerProbe(run.page);
+      // PLX-REL-001 (dispatch 41216691320 lesson): the packaged app's
+      // first-run preparation ("Finishing startup" — agent-runtime and
+      // search-tool staging) can outlast the DOM settle: the loading
+      // screen's DOM is stable, waitForRender returns early, and a
+      // fixed-moment probe races the preparation (observed 60–120 s on
+      // cold CI runners; the build job passed at ~55 s while the publish
+      // job's verification exceeded the window 3 minutes later). Wait for
+      // the product shell markers with a generous documented deadline
+      // before probing — the checks then verify what the user actually
+      // gets, not where the loading screen happened to be.
+      let probe = await markerProbe(run.page);
+      if (!shellMarkersPresent(probe)) {
+        const deadline = Date.now() + DEFAULTS.shellReadyTimeoutMs;
+        while (!shellMarkersPresent(probe) && Date.now() < deadline) {
+          await sleep(DEFAULTS.shellReadyPollMs);
+          probe = await markerProbe(run.page);
+        }
+        if (shellMarkersPresent(probe)) {
+          log(`product shell present — first-run preparation finished within the ${DEFAULTS.shellReadyTimeoutMs / 1000}s window`);
+        } else {
+          log(`product shell markers not present after ${DEFAULTS.shellReadyTimeoutMs / 1000}s — probing what is rendered; the checks will record it honestly`);
+        }
+      }
       identityChecks(report, probe, options);
       shellChecks(report, probe);
       // UX-003: the frozen shell + first-run contracts, asserted on the

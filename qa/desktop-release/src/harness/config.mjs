@@ -86,6 +86,14 @@ export const DEFAULTS = Object.freeze({
   memRequiredMb: 600,
   memWaitMs: 120_000,
   memWaitMaxMs: 20 * 60_000,
+  /** PLX-REL-001: how long to wait for the product shell markers after the
+   * DOM settles — the packaged app's first-run preparation ("Finishing
+   * startup": agent-runtime + search-tool staging) legitimately takes
+   * 60–120 s on cold CI runners, and the loading screen's DOM is stable,
+   * so the render-settle heuristic alone returns early. Generous on
+   * purpose: this is a WAIT for real product behavior, not a benchmark. */
+  shellReadyTimeoutMs: 180_000,
+  shellReadyPollMs: 3_000,
 });
 
 /** Checks whose failure is EXPECTED on the pre-UX-001/002 baseline artifact
