@@ -174,3 +174,14 @@ Before coding:
 5. Use screenshot comparison from the actual built app to the exact frames.
 
 The Starter-plan Figma MCP rate limit prevented completion of the final top-right tool placement and the separate social/live page set in the latest design session. Do not treat those as approved/complete until the Figma source file has actually been updated and visually checked.
+
+
+## 7. Operator-confirmed New Task and World semantics
+
+The New Task correction is mandatory:
+- a visible, functional **Select project** dropdown above the composer;
+- **Browser** and **Terminal** toggle icons in the task workspace header at the **top-right**;
+- both toggles open/close the existing ZCode Browser and Terminal panels;
+- do not move these controls below the prompt or replace them with decorative chips.
+
+World is the umbrella semantic/project concept. A World may be a game, Spark, interactive/social experience, simulation/training environment, digital twin of a real-world place/asset/process/system, or future profile. One World may have multiple profiles/entry points (e.g. a full game and Spark). Spark remains a delivery/runtime target profile, not a separate root content model, per architecture lock #16.
