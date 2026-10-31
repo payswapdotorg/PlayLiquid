@@ -14,9 +14,9 @@ Ready-to-run packages are published on the
 
 | | status |
 | --- | --- |
-| Latest `main` commit | [`d217c95`](https://github.com/payswapdotorg/PlayLiquid/commits/main) (2026-10-31 — see [commits](https://github.com/payswapdotorg/PlayLiquid/commits/main) for the current head) |
+| Latest `main` commit | [`4ebcc66a`](https://github.com/payswapdotorg/PlayLiquid/commit/4ebcc66a6148af3c7de6689ee9664befd308953e) (2026-10-31) |
 | Latest stable release | [playliquid-gameos-v3.15.0](https://github.com/payswapdotorg/PlayLiquid/releases/tag/playliquid-gameos-v3.15.0) — **Linux-only assets** (predates Windows packaging) |
-| Per-commit previews | every push to `main` publishes an immutable cross-platform prerelease tagged `preview/<short-sha>` (Linux + Windows assets, `SHA256SUMS` + `BUILD-INFO.txt`) — [releases list](https://github.com/payswapdotorg/PlayLiquid/releases) |
+| Per-commit previews | every push to `main` publishes an immutable cross-platform prerelease tagged `preview/<short-sha>` (Linux + Windows assets, `SHA256SUMS` + `BUILD-INFO.txt`) — [latest main preview `preview/4ebcc66a61`](https://github.com/payswapdotorg/PlayLiquid/releases/tag/preview/4ebcc66a61) · [all previews](https://github.com/payswapdotorg/PlayLiquid/releases) |
 | PR-head previews | opt-in per PR via the `release-preview` label (Actions artifacts from the exact PR head SHA) |
 | Linux x64 | proven: `.deb` + AppImage built and install/launch/upgrade/uninstall smoke-tested on `ubuntu-latest` at every release run |
 | Windows x64 | pipeline defined by PLX-REL-001: NSIS installer `.exe` + portable `.zip` built on `windows-latest` with a headless install/launch/uninstall smoke battery — see the honest status in [the install/release contract](docs/product/INSTALL-AND-RELEASE-CONTRACT.md) before relying on it |
