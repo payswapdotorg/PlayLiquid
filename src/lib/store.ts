@@ -1,16 +1,31 @@
 "use client";
 
 /**
- * PlayLiquid client store — SPA view routing (hash-synced) + interaction
- * state (likes, follows, saved, watched) persisted to localStorage.
+ * PlayLiquid client store — SPA routing for the Interface Reconstruction v2
+ * shell: one web experience (sidebar + topbar + pages, including the kept
+ * home feed and game pages), a full-screen creator workspace (New Task,
+ * Automations, Plugins) and a settings window. Routing is hash-synced
+ * ("#view=channel&channel=Data%20Slayer&game=…&spark=…") and interaction
+ * state (likes, follows, saved) persists to localStorage.
  */
 import { create } from "zustand";
 import type { ViewName } from "@/lib/types";
+
+const DESK_VIEWS: ViewName[] = ["newtask", "automations", "plugins"];
+export const DEFAULT_CHANNEL = "Data Slayer";
+
+export function isDeskView(view: ViewName): boolean {
+  return DESK_VIEWS.includes(view);
+}
 
 interface ViewState {
   view: ViewName;
   gameId: string | null;
   sparkIndex: number;
+  channel: string;
+  settingsOpen: boolean;
+  /** transient prefill handed to the New Task composer (Create popover) */
+  taskPrefill: string;
 }
 
 interface InteractionState {
@@ -21,8 +36,17 @@ interface InteractionState {
   likedSparks: Record<string, boolean>;
 }
 
+interface NavigateOpts {
+  gameId?: string | null;
+  sparkIndex?: number;
+  channel?: string;
+  prefill?: string;
+}
+
 interface PlayLiquidState extends ViewState, InteractionState {
-  navigate: (view: ViewName, opts?: { gameId?: string | null; sparkIndex?: number }) => void;
+  navigate: (view: ViewName, opts?: NavigateOpts) => void;
+  openSettings: () => void;
+  clearTaskPrefill: () => void;
   toggleLikeGame: (id: string) => void;
   toggleDislikeGame: (id: string) => void;
   toggleFollow: (id: string) => void;
@@ -62,9 +86,16 @@ function persist(s: PlayLiquidState) {
   }
 }
 
-/** Parse "#view=play&game=xyz&spark=2" into state. */
+/** Parse "#view=play&game=xyz&spark=2&channel=Name" into state. */
 function viewFromHash(): ViewState {
-  const view: ViewState = { view: "home", gameId: null, sparkIndex: 0 };
+  const view: ViewState = {
+    view: "home",
+    gameId: null,
+    sparkIndex: 0,
+    channel: DEFAULT_CHANNEL,
+    settingsOpen: false,
+    taskPrefill: "",
+  };
   if (typeof window === "undefined") return view;
   const h = window.location.hash.replace(/^#/, "");
   if (!h) return view;
@@ -74,6 +105,8 @@ function viewFromHash(): ViewState {
   view.gameId = params.get("game");
   const sp = params.get("spark");
   if (sp) view.sparkIndex = Number(sp) || 0;
+  const ch = params.get("channel");
+  if (ch) view.channel = ch;
   return view;
 }
 
@@ -81,6 +114,9 @@ export const usePlayLiquid = create<PlayLiquidState>((set, get) => ({
   view: "home",
   gameId: null,
   sparkIndex: 0,
+  channel: DEFAULT_CHANNEL,
+  settingsOpen: false,
+  taskPrefill: "",
   likedGames: {},
   dislikedGames: {},
   followedCreators: {},
@@ -94,17 +130,29 @@ export const usePlayLiquid = create<PlayLiquidState>((set, get) => ({
   navigate: (view, opts) => {
     const gameId = opts?.gameId !== undefined ? opts.gameId : get().gameId;
     const sparkIndex = opts?.sparkIndex ?? get().sparkIndex;
-    set({ view, gameId, sparkIndex });
+    const channel = opts?.channel ?? get().channel;
+    const taskPrefill = opts?.prefill ?? (isDeskView(view) ? "" : get().taskPrefill);
+    set({ view, gameId, sparkIndex, channel, taskPrefill, settingsOpen: false });
     if (typeof window !== "undefined") {
       const params = new URLSearchParams({ view });
       if (gameId) params.set("game", gameId);
       if (sparkIndex) params.set("spark", String(sparkIndex));
+      if (view === "channel") params.set("channel", channel);
       const hash = `#${params.toString()}`;
       if (window.location.hash !== hash) {
         window.history.pushState(null, "", hash);
       }
+      // the Sparks feed keeps its own scroll position (snap stages)
       if (view !== "sparks") window.scrollTo({ top: 0 });
     }
+  },
+
+  openSettings: () => {
+    set({ settingsOpen: true });
+  },
+
+  clearTaskPrefill: () => {
+    set({ taskPrefill: "" });
   },
 
   toggleLikeGame: (id) => {
@@ -147,10 +195,12 @@ export const usePlayLiquid = create<PlayLiquidState>((set, get) => ({
 if (typeof window !== "undefined") {
   window.addEventListener("popstate", () => {
     const s = usePlayLiquid.getState();
-    s.navigate(viewFromHash().view, {
-      gameId: viewFromHash().gameId,
-      sparkIndex: viewFromHash().sparkIndex,
+    const parsed = viewFromHash();
+    s.navigate(parsed.view, {
+      gameId: parsed.gameId,
+      sparkIndex: parsed.sparkIndex,
+      channel: parsed.channel,
     });
-    usePlayLiquid.setState(viewFromHash());
+    usePlayLiquid.setState(parsed);
   });
 }

@@ -140,12 +140,24 @@ export interface TaskDTO {
   createdAt: string;
 }
 
+/**
+ * View names across the two PlayLiquid experiences:
+ * - web pages: home, sparks, play (the game page), details, channel, you,
+ *   yourgames, trending, live, leaderboards, explore
+ * - creator workspace (desktop): newtask, automations, plugins
+ */
 export type ViewName =
   | "home"
   | "play"
   | "sparks"
   | "details"
+  | "channel"
+  | "you"
+  | "yourgames"
+  | "trending"
+  | "live"
+  | "leaderboards"
+  | "explore"
   | "newtask"
-  | "studio"
-  | "builder"
-  | "creator";
+  | "automations"
+  | "plugins";
