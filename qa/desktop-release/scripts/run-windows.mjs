@@ -137,10 +137,19 @@ const psArgs = [
 ];
 if (args.sums) psArgs.push("-Sums", args.sums);
 
-console.log(`[run-windows] harness: powershell ${psArgs.join(" ")}`);
+// PowerShell selection (PLX-REL-001 fix): prefer pwsh.exe (PowerShell 7 —
+// shipped on GitHub windows-latest runners; reads BOM-less UTF-8 scripts as
+// UTF-8). Windows PowerShell 5.1 (powershell.exe) reads BOM-less files as
+// ANSI, which decodes the harness's em-dashes into smart quotes and derails
+// the parser (run 41210886456, "Missing closing ')'"). A UTF-8 BOM is also
+// stamped on run-windows.ps1 so the powershell.exe fallback (stations
+// without pwsh) parses it too.
+const harnessExe = existsSync("C:\\Program Files\\PowerShell\\7\\pwsh.exe") ? "pwsh.exe" : "powershell.exe";
+
+console.log(`[run-windows] harness: ${harnessExe} ${psArgs.join(" ")}`);
 console.log(`[run-windows] evidence dir: ${outDir}`);
 
-const child = spawn("powershell.exe", psArgs, {
+const child = spawn(harnessExe, psArgs, {
   stdio: "inherit",
   env: process.env,
 });

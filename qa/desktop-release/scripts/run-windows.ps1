@@ -1,4 +1,4 @@
-<#
+﻿<#
 PLX-REL-001 Windows packaged-app smoke harness.
 
   powershell -ExecutionPolicy Bypass -File run-windows.ps1 `
