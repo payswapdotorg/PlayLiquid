@@ -1,23 +1,176 @@
 # Install and Release Contract
 Users must download and inspect PlayLiquid at every meaningful revision without cloning/building source.
 
-## Preview builds
-On every merge to main (and PR heads where feasible), use native GitHub Actions OS runners to build:
-- Linux x64: .deb + AppImage.
-- Windows x64: installer .exe (NSIS or supported existing Electron Builder target) + portable ZIP where feasible.
+This document records the contract AND what currently exists to satisfy it
+(implemented by PLX-REL-001 — workflow `.github/workflows/release-desktop.yml`,
+harnesses under `qa/desktop-release/`). Where something is required but not yet
+proven, this document says so instead of claiming it.
 
-Upload artifacts to workflow run with direct links and publish immutable per-SHA/edge preview releases. README links latest successful preview. Include source SHA, version, timestamp, platform/architecture and SHA-256. Never overwrite artifacts for another SHA. Label previews non-stable and document retention. Build from exact tested commit.
+## Preview builds
+
+**Required:** on every merge to main (and PR heads where feasible), native
+GitHub Actions OS runners build from the EXACT commit SHA:
+- Linux x64: `.deb` + AppImage.
+- Windows x64: NSIS installer `.exe` + portable ZIP.
+
+**What exists now:**
+- `push` to `main` triggers a full cross-platform run: `linux-desktop`
+  (ubuntu-latest) and `windows-desktop` (windows-latest) both check out the
+  pinned commit SHA, build, run their packaged-app smoke batteries, upload
+  Actions artifacts (7-day retention), and — only if BOTH jobs succeed — the
+  `publish` job publishes an immutable per-SHA GitHub **prerelease** tagged
+  `preview/<short-sha>` carrying all four installers + `SHA256SUMS` +
+  `BUILD-INFO.txt`. The `publish-status` job always records what did and did
+  not publish, and why.
+- PR heads ("where feasible", documented choice): a pull request that receives
+  the `release-preview` label triggers the same two build jobs from the EXACT
+  PR head SHA (`github.event.pull_request.head.sha` — never the merge ref),
+  uploading Actions artifacts only (7-day retention). No release is published
+  from PR heads; remove and re-add the label to rebuild after new pushes.
+- Manual: `workflow_dispatch` with `publish_preview=true` publishes a
+  `preview/<short-sha>` prerelease from any ref; `publish_release=true` is the
+  stable path (below).
+
+**Immutability & retention:**
+- Preview releases are immutable per SHA: the tag is pinned to the built commit
+  (a tag existing at a DIFFERENT commit is refused — same collision policy as
+  stable tags), asset uploads never use `--clobber`, and a re-run of the same
+  SHA only uploads assets that are missing. Another SHA's artifacts are never
+  overwritten.
+- Retention: transient Actions artifacts expire after 7 days (30 days for
+  stable publish runs); the immutable per-SHA preview releases are retained
+  until explicitly pruned by the maintainers.
+- Every artifact identifies the commit SHA, version, build timestamp (UTC),
+  OS/architecture and SHA-256: `SHA256SUMS` (GNU format, merged across OS
+  families) plus `BUILD-INFO.txt` in the release, and the same metadata in the
+  release notes.
+- Previews are labeled prereleases and marked "unstable per-commit preview" in
+  the release notes.
 
 ## Stable tags
-Publish both OS families, checksums, release notes, source SHA, SBOM/provenance and install/troubleshooting instructions.
+
+**Required:** both OS families, checksums, release notes, source SHA,
+SBOM/provenance and install/troubleshooting instructions.
+
+**What exists now:** `workflow_dispatch` with `publish_release=true` builds
+both OS families from the pinned SHA and publishes the stable tag (default
+`playliquid-gameos-v<version>`), pinned to the built SHA with tag-collision
+refusal at a different commit (issue #9 policy), carrying AppImage + `.deb` +
+`.exe` + `.zip` + merged `SHA256SUMS` + `BUILD-INFO.txt`, honest notes
+(unsigned Windows disclosure, auto-update disabled), and post-publication
+re-verification (published assets re-downloaded and checksum-verified; the
+published `.deb` reinstalled and launched through the Ubuntu smoke harness).
+SBOM/provenance beyond checksums and build identification is still pending
+(no SBOM format chosen yet — recorded, not claimed). The existing published
+stable releases (v3.14.3, v3.15.0) predate Windows packaging and are
+Linux-only; the first cross-platform stable release must be dispatched after
+PLX-REL-001 merges.
 
 ## Smoke tests
-Linux: clean .deb install/upgrade/uninstall, AppImage launch, desktop entry/icon/executable identity, New Task, model settings, Browser/Terminal, project selector, user data retention.
-Windows: clean install, Start Menu shortcut, launch, identity, same critical journeys, upgrade/relaunch/uninstall and user data retention. Sign when certificate available; otherwise disclose unsigned/SmartScreen behavior.
-Test actual packaged GUI on supported OS images; compile/package success alone is not proof. Fail publication if smoke/integrity gates fail.
+
+**Linux (unchanged RW-003 battery, ubuntu-latest):** clean `.deb`
+install/upgrade/uninstall, AppImage launch, desktop entry/icon/executable
+identity, product shell rendering + navigation, first-run states, dual
+viewports, offline resilience, clean shutdown; the published `.deb` is
+re-verified by download + checksum + launch after publication.
+
+**Windows (PLX-REL-001 headless battery, windows-latest):** artifact
+checksums; portable ZIP payload structure + launch; silent NSIS install
+(`/S`, per-user) with install-dir/exe presence, packaged
+`.zcode-install-manifest`, Start Menu shortcut, HKCU uninstall registry
+identity; installed-app launch with process identity (exe path), window-title
+product identity, Electron userData creation; data retention across a
+reinstall-over-existing + relaunch; silent uninstall removing app/shortcut/
+registry while retaining user data. Honest scope: no synthetic GUI
+interactions are driven; the "upgrade" check is a same-version reinstall (a
+cross-version upgrade needs two builds — recorded as follow-up, not claimed);
+the app is launched with `--disable-gpu` from a neutral working directory.
+See `qa/desktop-release/README.md` (Windows section) for the full check table.
+
+**Windows job live record (PLX-REL-001 verification, 2026-10-31):** the first
+proof dispatch on the PLX-REL-001 branch
+([run 41209879846](https://github.com/payswapdotorg/PlayLiquid/actions/runs/41209879846))
+failed at the desktop build step, and the always-on `publish-status` job
+recorded exactly that: `linux-desktop` succeeded (AppImage + `.deb` + the full
+Ubuntu smoke battery; 7-day Actions artifacts), `windows-desktop` failed, and
+the publication gate published **nothing** — no partial "cross-platform"
+preview exists for that SHA. Root cause (verified at the pinned commit): the
+windows-latest runner ships Git with `core.autocrlf=true`, so LF-only blobs
+are checked out with CRLF; the hashed Gen UI vendor assets
+(`apps/zcode-cli/packages/visualize-plugin/skills/visualize/assets/vendor`)
+have no eol rule in `.gitattributes` and failed their sha256 gate at tsup
+config load ("Gen UI vendor hash mismatch: floating-ui-core-1.7.3.min.js").
+The same commit's Linux checkout matches every vendor hash, which is why only
+the Windows job failed. Fixed in-workflow, within the frozen PLX-REL-001
+surface, by forcing a byte-exact checkout
+(`git config --global core.autocrlf false` before `actions/checkout`) — the
+Windows working tree is now byte-identical to the Linux checkout of the same
+SHA. The corrected pipeline proof is dispatch
+[run 41210886456](https://github.com/payswapdotorg/PlayLiquid/actions/runs/41210886456);
+its outcome is recorded in PR #17.
+
+**Windows harness, second live record (PLX-REL-001, dispatch
+[41214918788](https://github.com/payswapdotorg/PlayLiquid/actions/runs/41214918788)):**
+run 41210886456's Windows smoke failure was root-caused to the harness
+driver spawning `powershell.exe` (Windows PowerShell 5.1), which reads
+BOM-less UTF-8 scripts as ANSI — every em-dash's `0x94` byte decodes to a
+smart quote that terminates PowerShell strings early and derails the
+parser. Fixed by preferring `pwsh.exe` (PowerShell 7, shipped on
+windows-latest) in `run-windows.mjs` and stamping a UTF-8 BOM on
+`run-windows.ps1`. With parsing fixed, dispatch 41214918788's Windows
+smoke ran the full battery: **17/19 pass** — checksums, portable payload +
+launch, silent install, install-dir exe + manifest, Start Menu + desktop
+shortcuts, installed launch (alive, exe path, window title), user-data dir,
+data retention across reinstall, same-version reinstall, relaunch. The two
+failures and the fatal were HARNESS expectation bugs, not installer
+defects: electron-builder's assisted NSIS (oneClick=false) registers the
+uninstall entry with DisplayName `"${productName} ${version}"`
+("PlayLiquid GameOS 3.15.0" — `NsisTarget.js` default) and names the
+uninstaller file `"Uninstall ${PRODUCT_FILENAME}.exe"`
+(`common.nsh`'s `UNINSTALL_FILENAME`), where the harness expected the
+plain product name and plain `Uninstall.exe`. The harness now prefix-matches
+the DisplayName and resolves the uninstaller from the registry
+`UninstallString` first (electron-builder default name, then the legacy
+plain name, as fallbacks). The installer itself needs no change.
+
+**Signing:** no code-signing certificate exists; Windows installers are
+unsigned and every release discloses SmartScreen/"unknown publisher"
+behavior. Sign when a certificate is available. **No verified auto-update is
+claimed anywhere.**
+
+**Publication gating:** publication requires BOTH OS build jobs (and their
+smoke batteries) to succeed; a run that cannot produce both families records
+the honest status (`publish-status` job) and publishes nothing.
 
 ## Identity and updates
-PlayLiquid-specific app ID, executable, package identifiers, desktop entry, Windows installer identity, icons and update identity. Inherited ZCode auto-update must not install ZCode over PlayLiquid. No verified auto-update claims until signing, feed ownership, rollback and compatibility are real.
 
-## Baseline to verify
-README currently documents Linux .deb and AppImage. This is not evidence of Windows packaging or per-main-commit installable previews. Inspect actual workflows and release assets before claiming support.
+PlayLiquid-specific app ID (`org.playliquid.gameos`), executable
+(`playliquid-gameos` on Linux; `PlayLiquid GameOS.exe` on Windows), package
+identifiers, desktop entry, Windows installer identity (registry
+DisplayName/Publisher), icons and update identity all come from
+`packages/desktop/scripts/desktop-product-identity.mjs` (single source of
+truth). The inherited ZCode auto-update feed stays DISABLED
+(`remoteUpdateFeedEnabled: false`): it only distributes ZCode builds and would
+replace PlayLiquid with ZCode. No auto-update is enabled or claimed until a
+PlayLiquid-owned feed with signing, feed ownership, rollback and compatibility
+exists.
+
+## Governance workflow trigger (verified 2026-10-31, PLX-REL-001)
+
+The Phase-0 audit recorded the governance workflow's `push:` trigger as
+`branches: ain]` ("appears malformed — verify/fix when PLX-REL-001 touches
+workflows"). Verified at base SHA `79c6acd`: the file reads
+`push: branches: [main]` (byte-identical local vs remote; blob
+`be6ad37e216e2479caf230f1fd13bf3ee8bb3d45`), the YAML is valid, and the
+trigger demonstrably works — the governance workflow has 100 successful
+`push` runs on `main` (latest on `79c6acd` itself, run 41198911672). The
+`ain]` reading was a decoding artifact, not a repository defect; no fix was
+needed and none was made.
+
+## Baseline history (superseded by the sections above)
+
+README originally documented Linux `.deb` and AppImage only. The Phase-0
+audit (2026-10-31) established that no Windows packaging, Windows smoke
+harness, or per-commit preview builds existed at that time; PLX-REL-001
+implements them per this contract. Actual workflow runs and release assets
+outrank this document — inspect them before claiming support.

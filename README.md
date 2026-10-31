@@ -4,17 +4,36 @@
 
 The repository started from **ZCode 3.14.3**. ZCode remains the underlying AI workspace, agent runtime, desktop/web/CLI foundation, and provider/model infrastructure. PlayLiquid adds the canonical GameOS semantic kernel and lifecycle on top of it.
 
-## Download PlayLiquid GameOS for Ubuntu
+## Download PlayLiquid GameOS
 
 You do **not** need to clone or build this repository to use the desktop app.
-Ready-to-run Linux x64 packages are published on the
-[GitHub Releases](https://github.com/payswapdotorg/PlayLiquid/releases/latest) page:
+Ready-to-run packages are published on the
+[GitHub Releases](https://github.com/payswapdotorg/PlayLiquid/releases) page.
+
+### Release status
+
+| | status |
+| --- | --- |
+| Latest `main` commit | [`79c6acd`](https://github.com/payswapdotorg/PlayLiquid/commits/main) (2026-10-31 — see [commits](https://github.com/payswapdotorg/PlayLiquid/commits/main) for the current head) |
+| Latest stable release | [playliquid-gameos-v3.15.0](https://github.com/payswapdotorg/PlayLiquid/releases/tag/playliquid-gameos-v3.15.0) — **Linux-only assets** (predates Windows packaging) |
+| Per-commit previews | every push to `main` publishes an immutable cross-platform prerelease tagged `preview/<short-sha>` (Linux + Windows assets, `SHA256SUMS` + `BUILD-INFO.txt`) — [releases list](https://github.com/payswapdotorg/PlayLiquid/releases) |
+| PR-head previews | opt-in per PR via the `release-preview` label (Actions artifacts from the exact PR head SHA) |
+| Linux x64 | proven: `.deb` + AppImage built and install/launch/upgrade/uninstall smoke-tested on `ubuntu-latest` at every release run |
+| Windows x64 | pipeline defined by PLX-REL-001: NSIS installer `.exe` + portable `.zip` built on `windows-latest` with a headless install/launch/uninstall smoke battery — see the honest status in [the install/release contract](docs/product/INSTALL-AND-RELEASE-CONTRACT.md) before relying on it |
+| Auto-update | **disabled by design** (the inherited ZCode feed would replace PlayLiquid with ZCode); download a new release to update |
+
+Stable-release assets (Linux family):
 
 | asset | what it is |
 | --- | --- |
 | `PlayLiquid-GameOS-<version>-linux-amd64.deb` | Debian/Ubuntu package (**recommended on Ubuntu 24.04**) |
 | `PlayLiquid-GameOS-<version>-linux-x86_64.AppImage` | single-file portable app, no installation |
 | `SHA256SUMS` | checksums for the above assets |
+
+Preview releases additionally carry the Windows family —
+`PlayLiquid GameOS-<version>-win-x64.exe` (NSIS installer) and
+`PlayLiquid GameOS-<version>-win-x64.zip` (portable) — plus `BUILD-INFO.txt`
+(commit SHA, version, timestamp, OS/arch per asset).
 
 Direct links always point at the **latest** release (stay version-agnostic):
 
@@ -65,6 +84,30 @@ one-time documented workaround
 (`sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0`) — or simply
 prefer the `.deb` above. We do **not** recommend changing system security
 settings as a default path; the `.deb` avoids it entirely.
+
+### Windows (x64) — installer and portable zip
+
+Windows artifacts are produced by the same per-commit pipeline (NSIS installer
+`.exe` + portable `.zip`, see the release status table above). They are
+**unsigned**: Windows SmartScreen will show an "unknown publisher" warning —
+choose *More info → Run anyway* — and antivirus heuristics may warn. Verify
+the checksum before running:
+
+```powershell
+# from a preview release (download all assets from the release page first)
+Get-FileHash -Algorithm SHA256 .\"PlayLiquid GameOS-<version>-win-x64.exe"
+# then compare against the release's SHA256SUMS / BUILD-INFO.txt
+
+# installer (assisted installer; per-user by default)
+.\"PlayLiquid GameOS-<version>-win-x64.exe"
+
+# or portable: extract and run, no installation
+Expand-Archive .\"PlayLiquid GameOS-<version>-win-x64.zip" -DestinationPath PlayLiquidGameOS
+.\PlayLiquidGameOS\"PlayLiquid GameOS.exe"
+```
+
+Uninstall from Windows Settings → Apps (the uninstaller keeps user data by
+default). Auto-update is disabled (see the status table).
 
 ### Troubleshooting
 

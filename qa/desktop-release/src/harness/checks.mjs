@@ -105,10 +105,16 @@ export function identityChecks(report, probe, options) {
   );
 }
 
-export function shellChecks(report, probe) {
-  const shellPresent =
+/** True when the probe shows the product shell (any of the three surfaces or the full nav triple). */
+export function shellMarkersPresent(probe) {
+  return Boolean(
     probe.studioHeading || probe.labHeading || probe.communityHeading ||
-    (probe.navStudio && probe.navLab && probe.navCommunity);
+    (probe.navStudio && probe.navLab && probe.navCommunity),
+  );
+}
+
+export function shellChecks(report, probe) {
+  const shellPresent = shellMarkersPresent(probe);
   report.check(
     "product-shell-renders",
     "the PlayLiquid product shell (Studio/Lab/Community) renders as the default surface",

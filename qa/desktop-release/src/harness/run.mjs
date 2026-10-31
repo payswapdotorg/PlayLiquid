@@ -18,18 +18,10 @@ import {
   pidAlive,
   portIsFree,
   runId,
-  waitForMemory,
+  sleep,
 } from "./memwatch.mjs";
 import { startXvfb } from "./xvfb.mjs";
-import {
-  childEnv,
-  launchApp,
-  makeCleanProfile,
-  waitForCdp,
-  waitForPageTarget,
-  waitForRender,
-} from "./launcher.mjs";
-import { attachConsoleCollector, connectBrowser, connectTarget, preparePageSession } from "./cdp.mjs";
+import { childEnv } from "./launcher.mjs";
 import { Report } from "./report.mjs";
 import { checksumCheck, packagingIdentityCheck } from "./checks-artifact.mjs";
 import {
@@ -39,6 +31,7 @@ import {
   navigationCheck,
   realOperationCheck,
   shellChecks,
+  shellMarkersPresent,
   viewportChecks,
 } from "./checks.mjs";
 import { emptyStateContractCheck, workbenchEscapeCheck } from "./checks-contract.mjs";
@@ -48,126 +41,8 @@ import { journeyChecks } from "./checks-journey.mjs";
 import { offlineScenario } from "./checks-offline.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-import { distroName, tail, waitForExit } from "./run-helpers.mjs";
-
-/** One packaged launch up to "render settled" (or its honest error). */
-async function runAppRun(context, label, cdpPort, extraArgs = []) {
-  const { options, tmpRoot, xvfb, log } = context;
-  await waitForMemory(DEFAULTS.memRequiredMb, log);
-  const profileDirs = makeCleanProfile(path.join(tmpRoot, `profile-${label}`));
-  const before = fs.readdirSync(profileDirs.xdgConfig);
-  const appLog = path.join(tmpRoot, `app-${label}.log`);
-  const { proc, mode, argv } = await launchApp({
-    artifact: options.artifact,
-    env: childEnv(profileDirs, xvfb.display),
-    cwd: profileDirs.home, // neutral cwd — packaged app must not see a repo (see launcher.mjs)
-    args: [`--remote-debugging-port=${cdpPort}`, ...extraArgs],
-    logFile: appLog,
-  });
-  log(`launch[${label}]: pid ${proc.pid} mode=${mode} cwd=${profileDirs.home} argv=${JSON.stringify(argv)}`);
-  const startedAt = Date.now();
-  try {
-    await waitForCdp(cdpPort, DEFAULTS.cdpReadyTimeoutMs, log);
-    const { target, targets } = await waitForPageTarget(cdpPort, DEFAULTS.cdpReadyTimeoutMs, log);
-    const page = await connectTarget(target);
-    const browser = await connectBrowser(cdpPort);
-    await preparePageSession(page);
-    const consoleEntries = attachConsoleCollector(page);
-    const render = await waitForRender(page, DEFAULTS.renderSettleTimeoutMs, log);
-    return { proc, appLog, mode, startedAt, page, browser, target, targets, consoleEntries, render, profileDirs, before, cdpPort };
-  } catch (error) {
-    return {
-      proc,
-      appLog,
-      mode,
-      startedAt,
-      profileDirs,
-      before,
-      cdpPort,
-      error: String(error?.message ?? error),
-      // Startup forensics (live-caught: the ubuntu-latest runner killed the
-      // extracted app SILENTLY — zero electron output after the AppImage
-      // extraction listing). The exit code / signal / liveness at failure
-      // time disambiguates sandbox kills, instant exits and port hangs.
-      procExitCode: proc.exitCode,
-      procSignalCode: proc.signalCode,
-      procStillRunning: proc.exitCode === null && proc.signalCode === null,
-    };
-  }
-}
-
-/** After an app exits, wait (bounded) until its CDP port is actually free — a
- * second Chromium cannot bind a port whose previous listener/children are not
- * fully released (observed: it then silently starts without remote
- * debugging, which looks like a hang to the harness). */
-async function waitForPortFree(port, timeoutMs, log) {
-  const deadline = Date.now() + timeoutMs;
-  while (Date.now() < deadline) {
-    if (await portIsFree(port)) {
-      log(`port ${port} is free again`);
-      return true;
-    }
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-  }
-  log(`WARNING: port ${port} still not free after ${timeoutMs / 1000}s`);
-  return false;
-}
-
-/** Close via CDP Browser.close (the "user closes the window" path), then
- * bounded SIGTERM (the POSIX "user asks the app to quit" signal). Honest:
- * pass requires a bounded exit without the SIGKILL last resort; the method
- * actually needed is always recorded. */
-async function shutdownApp(context, run, checkId = "clean-shutdown") {
-  const { report, log } = context;
-  let method = "cdp-browser-close";
-  try {
-    // Fire-and-forget: the app may exit before the CDP response arrives.
-    run.browser.send("Browser.close").catch(() => undefined);
-  } catch {
-    method = "cdp-browser-close-failed";
-  }
-  let code = await waitForExit(run.proc, DEFAULTS.shutdownTimeoutMs);
-  if (code === null) {
-    method = "sigterm";
-    try {
-      process.kill(-run.proc.pid, "SIGTERM");
-    } catch {
-      /* already gone */
-    }
-    code = await waitForExit(run.proc, 15_000);
-  }
-  let exited = !(await pidAlive(run.proc.pid));
-  if (!exited) {
-    method = "sigkill-last-resort";
-    try {
-      process.kill(-run.proc.pid, "SIGKILL");
-    } catch {
-      /* ignore */
-    }
-    exited = !(await pidAlive(run.proc.pid));
-  }
-  await run.page.close().catch(() => undefined);
-  await run.browser.close().catch(() => undefined);
-  const uptimeMs = Date.now() - run.startedAt;
-  const clean = exited && method !== "sigkill-last-resort";
-  report.check(
-    checkId,
-    checkId === "clean-shutdown"
-      ? "application terminates in a bounded, controlled way when asked to close (no hang, no forced kill)"
-      : "offline-scenario application instance also terminates in a bounded, controlled way",
-    clean ? "pass" : "fail",
-    exited
-      ? `exit code ${code} via ${method} after ${Math.round(uptimeMs / 1000)}s of uptime`
-      : `process did NOT exit even after ${method} (pid ${run.proc.pid})`,
-    [`exit code: ${code}`, `shutdown method: ${method}`, `uptime: ${Math.round(uptimeMs / 1000)}s`],
-  );
-  log(`shutdown[${labelFor(run)} pid ${run.proc.pid}]: method=${method} code=${code}`);
-  await waitForPortFree(run.cdpPort, DEFAULTS.portFreeTimeoutMs, log);
-}
-
-function labelFor(run) {
-  return run.profileDirs ? path.basename(path.dirname(run.profileDirs.home)) : "run";
-}
+import { distroName, tail } from "./run-helpers.mjs";
+import { runAppRun, shutdownApp } from "./run-lifecycle.mjs";
 
 export async function main(argv) {
   const options = parseArgs(argv);
@@ -251,7 +126,29 @@ export async function main(argv) {
           `child env keys: ${Object.keys(childEnv(run.profileDirs, xvfb.display)).sort().join(", ")}`,
         ],
       );
-      const probe = await markerProbe(run.page);
+      // PLX-REL-001 (dispatch 41216691320 lesson): the packaged app's
+      // first-run preparation ("Finishing startup" — agent-runtime and
+      // search-tool staging) can outlast the DOM settle: the loading
+      // screen's DOM is stable, waitForRender returns early, and a
+      // fixed-moment probe races the preparation (observed 60–120 s on
+      // cold CI runners; the build job passed at ~55 s while the publish
+      // job's verification exceeded the window 3 minutes later). Wait for
+      // the product shell markers with a generous documented deadline
+      // before probing — the checks then verify what the user actually
+      // gets, not where the loading screen happened to be.
+      let probe = await markerProbe(run.page);
+      if (!shellMarkersPresent(probe)) {
+        const deadline = Date.now() + DEFAULTS.shellReadyTimeoutMs;
+        while (!shellMarkersPresent(probe) && Date.now() < deadline) {
+          await sleep(DEFAULTS.shellReadyPollMs);
+          probe = await markerProbe(run.page);
+        }
+        if (shellMarkersPresent(probe)) {
+          log(`product shell present — first-run preparation finished within the ${DEFAULTS.shellReadyTimeoutMs / 1000}s window`);
+        } else {
+          log(`product shell markers not present after ${DEFAULTS.shellReadyTimeoutMs / 1000}s — probing what is rendered; the checks will record it honestly`);
+        }
+      }
       identityChecks(report, probe, options);
       shellChecks(report, probe);
       // UX-003: the frozen shell + first-run contracts, asserted on the
