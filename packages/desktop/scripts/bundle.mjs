@@ -70,6 +70,34 @@ const osBuilderFlagMap = {
   linux: "--linux",
 };
 
+// electron-builder 的平台 flag 是 variadic（`--win nsis zip`，见 electron-builder
+// CLI 的 `type: "array"` 选项）。显式 target 列表会覆盖 electron-builder.config.js
+// 里的默认 target（win 默认只有 nsis）；PLX-REL-001 用它在一个 electron-builder
+// 进程里同时产出 NSIS 安装包 + 便携 zip，避免跑两遍完整打包。
+const knownBuilderTargetNames = new Set([
+  "nsis",
+  "nsis-web",
+  "portable",
+  "zip",
+  "appx",
+  "msi",
+  "squirrel",
+  "dir",
+  "dmg",
+  "pkg",
+  "flatpak",
+  "snap",
+  "appimage",
+  "deb",
+  "rpm",
+  "pacman",
+  "tar.gz",
+  "tar.xz",
+  "tar.lz",
+  "freebsd",
+  "apk",
+]);
+
 const archBuilderFlagMap = {
   x64: "--x64",
   arm64: "--arm64",
@@ -254,6 +282,8 @@ function printHelp() {
 参数:
   --os, -o <mac|win|linux>     目标操作系统，默认 mac
   --arch, -a <x64|arm64>       目标 CPU 架构，默认 arm64
+  --targets, -t <a,b,...>      显式 electron-builder target 列表（覆盖配置默认值）；
+                                PLX-REL-001 Windows 产物用 --targets nsis,zip
   --skip-prepare               跳过 prepare:runtime-assets
   --skip-build                 跳过 pnpm build
   --dry-run                    只打印最终命令，不执行打包
@@ -262,6 +292,7 @@ function printHelp() {
 环境变量:
   ZCODE_TARGET_OS              与 --os 等价
   ZCODE_TARGET_ARCH            与 --arch 等价
+  ZCODE_BUILDER_TARGETS        与 --targets 等价（逗号分隔）
 `);
 }
 
@@ -281,10 +312,24 @@ function normalizeArch(rawArch) {
   return normalizedArch;
 }
 
+function parseBuilderTargets(rawTargets) {
+  const targets = [];
+  for (const token of String(rawTargets).split(",")) {
+    const name = token.trim().toLowerCase();
+    if (!name) continue;
+    if (!knownBuilderTargetNames.has(name)) {
+      throw new Error(`不支持的 electron-builder target: ${name}`);
+    }
+    if (!targets.includes(name)) targets.push(name);
+  }
+  return targets;
+}
+
 function parseArgs(argv) {
   const options = {
     os: process.env.ZCODE_TARGET_OS ?? null,
     arch: process.env.ZCODE_TARGET_ARCH ?? null,
+    targets: process.env.ZCODE_BUILDER_TARGETS ?? null,
     skipPrepare: process.env.ZCODE_SKIP_PREPARE === "1",
     skipBuild: process.env.ZCODE_SKIP_BUILD === "1",
     dryRun: false,
@@ -340,6 +385,17 @@ function parseArgs(argv) {
       continue;
     }
 
+    if (arg === "--targets" || arg === "-t") {
+      options.targets = argv[index + 1] ?? null;
+      index += 1;
+      continue;
+    }
+
+    if (arg.startsWith("--targets=")) {
+      options.targets = arg.slice("--targets=".length);
+      continue;
+    }
+
     if (arg.startsWith("-")) {
       throw new Error(`不支持的参数: ${arg}`);
     }
@@ -356,10 +412,12 @@ function parseArgs(argv) {
 
   const resolvedOs = normalizeOs(options.os ?? positionalOs ?? DEFAULT_TARGET_OS);
   const resolvedArch = normalizeArch(options.arch ?? positionalArch ?? DEFAULT_TARGET_ARCH);
+  const resolvedTargets = options.targets === null ? [] : parseBuilderTargets(options.targets);
 
   return {
     os: resolvedOs,
     arch: resolvedArch,
+    targets: resolvedTargets,
     skipPrepare: options.skipPrepare,
     skipBuild: options.skipBuild,
     dryRun: options.dryRun,
@@ -702,17 +760,22 @@ function verifyPackagedRuntimeDependencies(os, arch) {
 }
 
 async function main() {
-  const { os, arch, skipPrepare, skipBuild, dryRun } = parseArgs(process.argv.slice(2));
+  const { os, arch, targets, skipPrepare, skipBuild, dryRun } = parseArgs(process.argv.slice(2));
   const buildArgs = [
     "exec",
     "electron-builder",
     "--config",
     "electron-builder.config.js",
     osBuilderFlagMap[os],
+    // electron-builder 平台 flag 的 variadic target 必须紧跟平台 flag、且在架构
+    // flag 之前（`--win nsis zip --x64`）；yargs 数组项在遇到下一个 `--flag` 时停止。
+    ...targets,
     archBuilderFlagMap[arch],
   ];
 
-  console.log(`[bundle] target=${os}/${arch}`);
+  console.log(
+    `[bundle] target=${os}/${arch}${targets.length > 0 ? ` targets=${targets.join(",")}` : ""}`,
+  );
   console.log(`[bundle] skipPrepare=${skipPrepare} skipBuild=${skipBuild}`);
 
   const buildEnv = {
