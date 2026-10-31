@@ -40,6 +40,7 @@ import {
   navigationCheck,
   realOperationCheck,
   shellChecks,
+  shellMarkersPresent,
   viewportChecks,
 } from "./checks.mjs";
 import { emptyStateContractCheck, workbenchEscapeCheck } from "./checks-contract.mjs";
