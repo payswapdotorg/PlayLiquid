@@ -36,7 +36,7 @@ jobs:
             bundle_args: "--os linux --arch x64"
           - os: windows
             runner: windows-latest
-            bundle_args: "--os win --arch x64
+            bundle_args: "--os win --arch x64"
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 120
     steps:
@@ -133,6 +133,8 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           set -euo pipefail
+          VERSION=$(node -p "require('./package.json').version")
+          export VERSION
           cd release-out
           if [ "$TARGET_OS" = "windows" ]; then
             sha256sum *.exe > SHA256SUMS
@@ -146,7 +148,7 @@ jobs:
               if p.is_file() and p.name not in {'build-manifest.json','SHA256SUMS'}:
                   data=p.read_bytes()
                   files.append({'name':p.name,'size_bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()})
-          version=subprocess.check_output(['node','-p',"require('./package.json').version"],text=True).strip()
+            version=os.environ['VERSION']
           manifest={
             'product':'PlayLiquid GameOS','version':version,
             'source_commit':os.environ['SOURCE_SHA'],
