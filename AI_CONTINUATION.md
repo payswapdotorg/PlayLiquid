@@ -24,6 +24,10 @@ Base: ZCode 3.14.3
 14. exact Work Order
 15. live GitHub branch/PR/CI state
 
+## Mandatory product handoff
+
+Read `docs/handoff/FINAL-IMPLEMENTATION-HANDOFF.md` before planning or dispatching implementation. It contains the binding New Task layout, World semantics, complete product scope, work-order sequencing, architecture preservation rules and Linux/Windows inspection-build requirements. The repository is the complete source of truth; no chat history is required.
+
 ## Evidence precedence
 
 Actual source > tests > migrations/schema > runtime evidence > browser evidence > deployment/build evidence > exact Git SHAs > program state > docs summaries > agent reports > chat.
