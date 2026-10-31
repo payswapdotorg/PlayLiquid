@@ -131,3 +131,8 @@ Any unavailable external SDK, hardware or platform service must be recorded as a
 Do not redesign frozen architecture from inside an implementation Work Order.
 
 When an implementation discovers a genuine architectural defect, record an Architecture Change Request and stop the affected downstream implementation rather than adding a parallel authority or hidden compatibility path.
+
+
+## Current product contract (2026-10-31)
+
+Before implementing any product/UI work, read `PRODUCT-NORTH-STAR.md` and `docs/handoff/FINAL-TL-HANDOFF-2026-10-31.md`. These supersede older conflicting UX choices: New Task is the default; no standalone Game Studio dashboard; preserve all ZCode model/provider settings and existing task, browser, terminal, automation and plugin systems; World kinds include Spark, game, experience and digital twin (Spark kind and target profile are distinct). Raise an ACR to reconcile frozen architecture rules; do not create parallel semantic authorities. Linux AND Windows per-commit preview installers are required. See `docs/product/INSTALL-AND-RELEASE-CONTRACT.md`.
