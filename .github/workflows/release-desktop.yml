@@ -316,6 +316,21 @@ jobs:
           "retention_days=$retention" >> $env:GITHUB_OUTPUT
           Write-Host "building $ref (event=$event, publish_mode=$mode, artifact_retention_days=$retention)"
 
+      - name: Force byte-exact checkout (disable Windows autocrlf)
+        # windows-latest ships Git with core.autocrlf=true (system config):
+        # LF-only blobs are checked out with CRLF, which broke the Gen UI
+        # vendor sha256 gate at build time (live-caught on the PLX-REL-001
+        # proof dispatch, run 41209879846 — "Gen UI vendor hash mismatch:
+        # floating-ui-core-1.7.3.min.js" from gen-ui-runtime-assets.mjs).
+        # The repo's .gitattributes pins *.mjs/*.sh to LF, but the hashed
+        # vendor assets under apps/zcode-cli/.../assets/vendor are not
+        # covered by any eol rule, so the runner default translated them.
+        # A byte-exact checkout keeps every working-tree file identical to
+        # the same commit's Linux checkout (identical bytes → identical
+        # SHA256SUMS semantics across OS jobs).
+        shell: pwsh
+        run: git config --global core.autocrlf false
+
       - name: Check out pinned commit
         uses: actions/checkout@v4
         with:
