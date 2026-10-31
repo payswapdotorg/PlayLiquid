@@ -51,3 +51,8 @@ Arena remains an external human capability provider.
 - No client-authoritative competitive outcomes.
 - No historical evidence rewriting.
 - No fake engagement or anti-abuse evasion.
+
+
+## Product continuation (2026-10-31)
+
+The self-contained current product authority is `PRODUCT-NORTH-STAR.md`; the current TL mission is `docs/handoff/FINAL-TL-HANDOFF-2026-10-31.md`. Read these before relying on older workstream summaries. The current Figma-to-code mapping is `docs/product/FIGMA-IMPLEMENTATION-MAP.md`, feature authority/evidence matrix is `docs/product/FEATURE-MATRIX.md`, and cross-platform installer requirement is `docs/product/INSTALL-AND-RELEASE-CONTRACT.md`. The New Task design still needs a visible Select project dropdown above the composer and top-right Browser/Terminal toggles. World kinds include Spark, game, experience and digital twin; Spark may also have a delivery profile. Raise an ACR for architecture reconciliation. New Task is the default; preserve ZCode model/provider settings and inherited functionality. Linux .deb/AppImage AND Windows installer/portable preview builds are required for every meaningful main revision.
