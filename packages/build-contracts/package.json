@@ -16,6 +16,7 @@
     "harness": "node src/harness.ts"
   },
   "dependencies": {
+    "@playliquid/game-contracts": "workspace:*",
     "@playliquid/game-ir": "workspace:*",
     "@playliquid/package-system": "workspace:*"
   },

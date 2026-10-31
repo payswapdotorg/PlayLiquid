@@ -46,6 +46,10 @@ export {
   projectScreenToSparkFrame,
 } from "./viewport.ts";
 
+// World dispatch (ACR-001 / PLX-ARCH-003)
+export type { SparkWorldDispatch } from "./dispatch.ts";
+export { dispatchSparkWorld, sparkRuntimeAdmitsWorld } from "./dispatch.ts";
+
 // Content analysis (game-ir is the only content model)
 export type {
   SparkContentUnit,

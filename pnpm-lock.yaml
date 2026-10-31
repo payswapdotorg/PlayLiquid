@@ -692,6 +692,9 @@ importers:
 
   packages/build-contracts:
     dependencies:
+      '@playliquid/game-contracts':
+        specifier: workspace:*
+        version: link:../game-contracts
       '@playliquid/game-ir':
         specifier: workspace:*
         version: link:../game-ir
@@ -1008,6 +1011,9 @@ importers:
       '@playliquid/engine-adapter-contract':
         specifier: workspace:*
         version: link:../engine-adapter-contract
+      '@playliquid/game-contracts':
+        specifier: workspace:*
+        version: link:../game-contracts
       '@playliquid/platform-contracts':
         specifier: workspace:*
         version: link:../platform-contracts

@@ -51,7 +51,10 @@ import { computeDigest } from "@playliquid/package-system";
 import { asTenantId, checkTenantIsolation } from "@playliquid/platform-contracts";
 import type { TenantId } from "@playliquid/platform-contracts";
 import { planSparkBoot } from "./boot-plan.ts";
-import type { SparkBootPlan, SparkBootRejection, SparkCostModel } from "./boot-plan.ts";
+import type { SparkBootPlan, SparkCostModel } from "./boot-plan.ts";
+import { sparkWorldDoorRefusal } from "./dispatch.ts";
+import type { SparkRuntimePhase, SparkRuntimeView } from "./runtime-view.ts";
+import type { SparkRuntimeRefusal, SparkRuntimeRefusalCode } from "./runtime-refusal.ts";
 import { scheduleSparkStreams } from "./stream-schedule.ts";
 import type { SparkStreamSchedule } from "./stream-schedule.ts";
 import { buildSparkCacheManifest } from "./cache.ts";
@@ -83,28 +86,8 @@ export interface SparkRuntimeOptions<W extends JsonSafeValue> {
   readonly seed?: string;
 }
 
-/** Typed runtime refusal codes (kebab-case, E8). */
-export type SparkRuntimeRefusalCode =
-  | "invalid-tenant"
-  | "cross-tenant"
-  | "invalid-session"
-  | "boot-refused"
-  | "not-booted"
-  | "already-booted"
-  | "boot-record-immutable"
-  | "stream-exhausted"
-  | "source-refused"
-  | "cache-refused"
-  | "kernel-refused";
-
-/** A typed runtime refusal. */
-export interface SparkRuntimeRefusal<C = SparkRuntimeRefusalCode> {
-  readonly ok: false;
-  readonly code: C;
-  readonly message: string;
-  /** Aggregated planning rejections, when code is `boot-refused`. */
-  readonly rejections?: readonly SparkBootRejection[];
-}
+/** Typed runtime refusal vocabulary (E8) — defined in runtime-refusal.ts, re-exported unchanged. */
+export type { SparkRuntimeRefusal, SparkRuntimeRefusalCode };
 
 /** Construction result. */
 export type SparkRuntimeCreation<W extends JsonSafeValue> =
@@ -112,24 +95,7 @@ export type SparkRuntimeCreation<W extends JsonSafeValue> =
   | SparkRuntimeRefusal;
 
 /** The lifecycle phase of the shell (kernel phases stay authoritative). */
-export type SparkRuntimePhase = "created" | "booted" | "live";
-
-/** The tenant-scoped read model of the shell. */
-export interface SparkRuntimeView {
-  /** Discriminator: a view (never a refusal). */
-  readonly ok: true;
-  readonly sessionId: string;
-  readonly phase: SparkRuntimePhase;
-  readonly planDigest: string;
-  readonly scheduleDigest: string;
-  readonly cacheManifestDigest: string;
-  readonly criticalBytes: number;
-  readonly plannedFirstPaintMs: number;
-  readonly plannedFirstInteractionMs: number;
-  readonly deferredUnitCount: number;
-  readonly streamedBatchCount: number;
-  readonly bootRecordDigest: string | null;
-}
+export type { SparkRuntimePhase, SparkRuntimeView } from "./runtime-view.ts";
 
 /** One streamed unit's outcome inside a batch execution (streaming.ts). */
 export type { SparkStreamedUnitReport } from "./streaming.ts";
@@ -350,6 +316,10 @@ export function createSparkRuntime<W extends JsonSafeValue>(options: SparkRuntim
   if (typeof options?.sessionId !== "string" || options.sessionId.length === 0) {
     return { ok: false, code: "invalid-session", message: "sessionId must be a non-empty string" };
   }
+  // ACR-001 (PLX-ARCH-003): the (worldKind, targetProfile)-aware door —
+  // the typed admission rule lives in dispatch.ts (the routing authority).
+  const worldRefusal = sparkWorldDoorRefusal(options.document);
+  if (worldRefusal !== null) return worldRefusal;
   const plan = planSparkBoot(options.document, options.profile, options.costModel);
   if (!plan.ok) {
     return { ok: false, code: "boot-refused", message: "spark boot planning refused the inputs (E8)", rejections: plan.rejections };

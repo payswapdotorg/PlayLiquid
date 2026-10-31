@@ -16,10 +16,20 @@
  *   is opaque to contracts (pinned by digest).
  *
  * Pure module: structural validators and one digest computation only.
+ *
+ * ACR-001 (2026-10-31, lock v1.1): the target-profile input gains an
+ * optional TYPED `deliveryProfile` — the delivery axis (TargetProfile
+ * registry: `spark_vertical | web | desktop | ...`) that is DISTINCT from
+ * the build-target axis (`BuildTargetId`). The registry is owned by
+ * `@playliquid/game-contracts` (single definition site, E1); this module
+ * only consumes it. Absent = legacy pre-ACR inputs (build binding driven
+ * by the build-target list alone, exactly as before) — additive only.
  */
 
 import { computeDigest, isContentDigest } from "@playliquid/package-system";
 import type { ContentDigest } from "@playliquid/package-system";
+import { isTargetProfile } from "@playliquid/game-contracts";
+import type { TargetProfile } from "@playliquid/game-contracts";
 import type { BuildTargetId, ProfileInputId, ToolchainProfileId, VendorId } from "./primitives.ts";
 import { isNonEmptyIdText } from "./primitives.ts";
 import type { EngineBindingRef, ToolOperationId } from "./adapter-seam.ts";
@@ -72,6 +82,14 @@ export interface TargetProfileInputRef {
   readonly target: BuildTargetId;
   /** Vendor gate declared by the profile (drives console evidence rules). */
   readonly vendorGate: VendorGateRequirement;
+  /**
+   * ACR-001 delivery axis: the typed TargetProfile this build delivers
+   * (`spark_vertical`, `web`, ...). OPTIONAL and INDEPENDENT of `target`
+   * (the build-target axis): absent = legacy pre-ACR inputs whose build
+   * binding is driven by the build-target list alone (unchanged behavior
+   * and unchanged digests). Vocabulary owned by game-contracts (E1).
+   */
+  readonly deliveryProfile?: TargetProfile;
 }
 
 /** A typed toolchain/environment profile descriptor; the profile CONTENT is opaque. */
@@ -152,7 +170,8 @@ export function validateBuildInputs(inputs: BuildInputs): BuildInputsValidation 
     !isNonEmptyIdText(profile?.profileId) ||
     !isContentDigest(profile?.profileDigest) ||
     !isNonEmptyIdText(profile?.target) ||
-    !isVendorGateRequirement(profile?.vendorGate)
+    !isVendorGateRequirement(profile?.vendorGate) ||
+    (profile?.deliveryProfile !== undefined && !isTargetProfile(profile.deliveryProfile))
   ) {
     reasons.push({
       code: "invalid-target-profile",
@@ -202,6 +221,12 @@ export function computeBuildInputsDigest(inputs: BuildInputs): ContentDigest {
       profileDigest: inputs.targetProfile.profileDigest,
       target: inputs.targetProfile.target,
       vendorGate: inputs.targetProfile.vendorGate.kind,
+      // ACR-001: the delivery profile joins the digest ONLY when declared —
+      // legacy inputs (absent) keep byte-identical digests (canonical JSON
+      // refuses undefined values; the key must be absent, never undefined).
+      ...(inputs.targetProfile.deliveryProfile !== undefined
+        ? { deliveryProfile: inputs.targetProfile.deliveryProfile }
+        : {}),
     },
     engineBinding: {
       engineId: inputs.engineBinding.engineId,

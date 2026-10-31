@@ -221,3 +221,95 @@ test("structurally invalid composed inputs are refused (E8)", () => {
     assert.ok(refusal.reasons?.some((reason) => reason.code === "invalid-toolchain"));
   }
 });
+
+// ---------------------------------------------------------------------------
+// ACR-001 (PLX-ARCH-003): the (worldKind, targetProfile)-aware composition.
+// ---------------------------------------------------------------------------
+
+test("ACR-001: a declared spark_vertical delivery composes with the typed delivery on the wire input", () => {
+  const composed = composeSparkBuildDocument(TENANT, baseComposition({
+    document: { ...fixtureSparkBuildDocument(), world: { kind: "experience", targetProfile: "spark_vertical" } },
+  }));
+  assert.equal(composed.ok, true, JSON.stringify(composed));
+  if (!composed.ok) return;
+  assert.equal(composed.inputs.targetProfile.deliveryProfile, "spark_vertical");
+  assert.equal(composed.spark.worldKind, "experience");
+  assert.deepEqual(composed.world, {
+    worldKind: "experience",
+    deliveryProfile: "spark_vertical",
+    routing: "declared-spark-vertical",
+  });
+});
+
+test("ACR-001: EVERY world kind composes when the delivery is spark_vertical (the kind never gates)", () => {
+  for (const kind of ["spark", "game", "experience", "digital_twin", "other"] as const) {
+    const composed = composeSparkBuildDocument(TENANT, baseComposition({
+      document: { ...fixtureSparkBuildDocument(), world: { kind, targetProfile: "spark_vertical" } },
+    }));
+    assert.equal(composed.ok, true, `${kind}: ${composed.ok ? "" : composed.message}`);
+  }
+});
+
+test("ACR-001: a declared non-spark delivery refuses world-delivery-not-spark", () => {
+  for (const delivery of ["web", "desktop", "mobile", "xr", "dedicated_server", "simulation"] as const) {
+    const refusal = composeSparkBuildDocument(TENANT, baseComposition({
+      document: { ...fixtureSparkBuildDocument(), world: { kind: "game", targetProfile: delivery } },
+    }));
+    assert.equal(refusal.ok, false, `${delivery} must refuse`);
+    if (!refusal.ok) {
+      assert.equal(refusal.code, "world-delivery-not-spark");
+      assert.match(refusal.message, new RegExp(`targetProfile "${delivery}"`));
+    }
+  }
+});
+
+test("ACR-001: a legacy composition keeps the exact pre-ACR shapes (additive-only)", () => {
+  const legacy = composeSparkBuildDocument(TENANT, baseComposition());
+  assert.equal(legacy.ok, true);
+  if (!legacy.ok) return;
+  // No new keys anywhere: the payload, the wire input and the digest input
+  // are byte-identical to the pre-ACR composition.
+  assert.equal("worldKind" in legacy.spark, false);
+  assert.equal("deliveryProfile" in legacy.inputs.targetProfile, false);
+  assert.deepEqual(legacy.world, {
+    worldKind: "game",
+    deliveryProfile: null,
+    routing: "legacy-undeclared",
+  });
+});
+
+test("ACR-001: the declaration moves the document digest, never the content digest (E9)", () => {
+  const legacy = composeSparkBuildDocument(TENANT, baseComposition());
+  const declared = composeSparkBuildDocument(TENANT, baseComposition({
+    document: { ...fixtureSparkBuildDocument(), world: { kind: "game", targetProfile: "spark_vertical" } },
+  }));
+  assert.equal(legacy.ok, true);
+  assert.equal(declared.ok, true);
+  if (!legacy.ok || !declared.ok) return;
+  // Same game-ir CONTENT (nodes/identity/entry unchanged — the world
+  // declaration is not content), so the content digest is stable...
+  assert.equal(declared.spark.gameIrDigest, legacy.spark.gameIrDigest);
+  // ...but the document digest pins the declared delivery + kind.
+  assert.notEqual(declared.documentDigest, legacy.documentDigest);
+  // Determinism: the same declaration composes to the same digest.
+  const again = composeSparkBuildDocument(TENANT, baseComposition({
+    document: { ...fixtureSparkBuildDocument(), world: { kind: "game", targetProfile: "spark_vertical" } },
+  }));
+  assert.equal(again.ok, true);
+  if (again.ok) assert.equal(again.documentDigest, declared.documentDigest);
+});
+
+test("ACR-001: a kind-only declaration composes as legacy delivery (dimensions are independent)", () => {
+  const composed = composeSparkBuildDocument(TENANT, baseComposition({
+    document: { ...fixtureSparkBuildDocument(), world: { kind: "digital_twin" } },
+  }));
+  assert.equal(composed.ok, true, JSON.stringify(composed));
+  if (!composed.ok) return;
+  assert.equal(composed.spark.worldKind, "digital_twin");
+  assert.equal("deliveryProfile" in composed.inputs.targetProfile, false);
+  assert.deepEqual(composed.world, {
+    worldKind: "digital_twin",
+    deliveryProfile: null,
+    routing: "legacy-undeclared",
+  });
+});
