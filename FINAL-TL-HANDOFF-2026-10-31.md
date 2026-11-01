@@ -133,26 +133,37 @@ connection (needs a real API key to pass; failure messages are honest).
 
 ## 6. Outstanding actions
 
-### 6.1 PR #14 merge — **blocked in this sandbox, ready elsewhere**
+### 6.1 Push/merge — **COMPLETED 2026-11-01 (updated post-delivery)**
 
-`payswapdotorg/PlayLiquid` PR #14 (`handoff/product-contract-installers-2026-10-31`)
-was opened from an earlier session with commits through `2bd3654`. Two
-further commits exist locally and are **not pushed** (`86e277c`,
-`c0d3a47`). This sandbox now has **no GitHub credentials, no remote, no
-`gh` CLI** (see reality check above), so pushing and merging must happen
-from a machine with the PAT. Exact procedure:
+The operator supplied a PAT after the handoff doc was written. What the
+delivery found and did:
 
-```bash
-# from a checkout with credentials
-git remote add origin https://github.com/payswapdotorg/PlayLiquid.git
-git push origin main                                              # or the handoff branch
-# then merge PR #14 in the GitHub UI (or: gh pr merge 14 --repo payswapdotorg/PlayLiquid --merge)
-```
+1. **PR #14 was already merged** (squash `a6c3005`, docs-only: product
+   contract + the desktop-track handoff docs). Nothing to merge.
+2. **Remote `main` is the desktop-fork monorepo** (ZCode 3.14.3 lineage,
+   pnpm workspace, deb/AppImage releases) — a different codebase from this
+   web adaptation, with 200+ commits of progress: ACR-001 world-kind
+   separation (PR #15), WorldKind/TargetProfile registries + dispatch
+   (PRs #16/#18), cross-platform per-commit previews (PR #17), offline
+   shell-wait fix (PR #19), audits (PR #21), World Projects workbench
+   (PR #23). The web adaptation serves as its visual reference (see the
+   `reference pictures` commits at the repo root).
+3. **This web adaptation is preserved on the remote branch
+   `handoff/web-adaptation-2026-11-01`** (this branch, head `a5a404c`+).
+   Before publishing, the branch's **entire history was scrubbed of
+   `.env`** — pre-rebuild commits (`cfb630b`, `66b5848`, `5c1d786` line)
+   carried real credential values (GitHub/Neon/Vercel/OpenRouter/E2B/
+   Apify/Composio/Upstash) and the repo is public. A sanitized `.env`
+   (DATABASE_URL only) was re-added on top. The pre-scrub history remains
+   only inside the original sandbox (local `refs/original/*`).
+4. **Reference pictures of the four design corrections were committed to
+   remote `main`** (`f620426`, following the prior `b81f726` pictures
+   precedent): newtask playtest panel, model settings, game builder,
+   automations back pill, desk rail collapsed, mobile playtest.
 
-If the local `main` (4 commits ahead of the PR branch) should land as the
-PR content: push `main` to the PR branch —
-`git push origin main:handoff/product-contract-installers-2026-10-31` —
-then merge.
+Lessons honored from the remote's own records: PR #20 was self-closed for
+  duplicating canonical docs — so no new handoff docs were pushed to main;
+  the pictures + this branch pointer are the only footprint.
 
 ### 6.2 Deferred by design (documented, not silently dropped)
 
@@ -163,8 +174,8 @@ then merge.
 | Real webview Browser / real PTY Terminal | panels are honest previews (labels say so); wiring a live webview/PTY is desktop-track work |
 | OAuth coding-plan entitlements (ZCode) | desktop-track |
 | Figma frames | no Figma access in this environment; the reconstruction is source-of-truth (`reconstruction.css` + components) |
-| Linux/Windows packaging, per-commit preview builds | needs CI + packaging toolchain (no CI credentials here); app is a web deployment, `next build` works |
-| Spark Architecture Change Request | schema work with data migration; deliberately not rushed at handoff — current Spark model is stable and fully wired |
+| Linux/Windows packaging, per-commit preview builds | **Done on the desktop track** (PR #17: cross-platform per-commit previews, Linux + Windows); for this web adaptation, `next build` works | 
+| Spark Architecture Change Request | **Done on the desktop track** (PR #15: ACR-001 world-kind/target-profile separation, Phase B in PRs #16/#18); this web adaptation's Spark model remains stable and fully wired |
 
 ### 6.3 Docs needing a credibility pass (next owner)
 
