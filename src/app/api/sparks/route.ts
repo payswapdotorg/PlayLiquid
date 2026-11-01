@@ -7,7 +7,18 @@ const PAGE_SIZE = 5;
 
 export async function GET(req: NextRequest) {
   const cursor = Number(req.nextUrl.searchParams.get("cursor") ?? "0") || 0;
+  const q = req.nextUrl.searchParams.get("q")?.trim();
   const sparks = await db.spark.findMany({
+    where: q
+      ? {
+          OR: [
+            { title: { contains: q } },
+            { caption: { contains: q } },
+            { creator: { name: { contains: q } } },
+            { game: { title: { contains: q } } },
+          ],
+        }
+      : undefined,
     include: { creator: true, game: true, _count: { select: { comments: true } } },
     orderBy: { likes: "desc" },
     skip: cursor,

@@ -9,7 +9,7 @@ export async function GET() {
   const me = await db.creator.findFirst({ where: { isMe: true } });
   if (!me) return NextResponse.json({ error: "Studio not found" }, { status: 404 });
 
-  const [myGames, recentComments, sparks, sessions] = await Promise.all([
+  const [myGames, recentComments, sparks, sessions, savedRows] = await Promise.all([
     db.game.findMany({
       where: { creatorId: me.id },
       include: { creator: true, sessions: true, _count: { select: { comments: true } } },
@@ -26,6 +26,10 @@ export async function GET() {
       orderBy: { likes: "desc" },
     }),
     db.playSession.findMany({ include: { game: { select: { creatorId: true } } } }),
+    db.libraryItem.findMany({
+      include: { game: { include: { creator: true, sessions: true, _count: { select: { comments: true } } } } },
+      orderBy: { createdAt: "desc" },
+    }),
   ]);
 
   const mySessionCount = sessions.filter((s) => myGames.some((g) => g.id === s.gameId)).length + 43210;
@@ -44,6 +48,7 @@ export async function GET() {
       sparks: sparks.length,
     },
     myGames: myGames.map((g) => toGameDTO(g)),
+    savedGames: savedRows.map((r) => toGameDTO(r.game)),
     recentComments: recentComments.map((c) => ({
       id: c.id,
       authorName: c.authorName,

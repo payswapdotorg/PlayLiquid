@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import ZAI from "z-ai-web-dev-sdk";
 import { db } from "@/lib/db";
 import { toGameDTO } from "@/lib/serialize";
+import { extractJsonObject } from "@/lib/extract-json";
 
 const ENGINES = ["breaker", "stardrift", "leap", "runner"] as const;
 
@@ -34,11 +35,9 @@ function slugify(title: string): string {
 }
 
 function extractJson(raw: string): unknown {
-  const cleaned = raw.replace(/```json|```/g, "").trim();
-  const start = cleaned.indexOf("{");
-  const end = cleaned.lastIndexOf("}");
-  if (start === -1 || end === -1) throw new Error("no JSON object in response");
-  return JSON.parse(cleaned.slice(start, end + 1));
+  const parsed = extractJsonObject(raw);
+  if (!parsed) throw new Error("no JSON object in response");
+  return parsed;
 }
 
 function clampChannel(v: unknown, fallback: number): number {
@@ -274,7 +273,7 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({
     task: { id: task.id, status: "completed" },
-    game: toGameDTO({ ...game, creator: me, sessions: [], _count: { comments: 0 } }),
+    game: toGameDTO({ ...game, creator: me, sessions: [] }),
     modelUsed,
     usedFallback,
   });

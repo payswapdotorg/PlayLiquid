@@ -91,11 +91,12 @@ export function GameEngine({
       const sp = 5.6 * speed;
       s.ballVX = Math.cos(ang) * sp;
       s.ballVY = Math.sin(ang) * sp;
-      s.bricks = [];
+      const bricks: { x: number; y: number; hp: number }[] = [];
       const cols = 10;
       const rows = 5;
       for (let r = 0; r < rows; r++)
-        for (let c = 0; c < cols; c++) s.bricks.push({ x: 60 + c * 68, y: 60 + r * 34, hp: 1 });
+        for (let c = 0; c < cols; c++) bricks.push({ x: 60 + c * 68, y: 60 + r * 34, hp: 1 });
+      s.bricks = bricks;
       s.paddleW = 120 / difficulty;
       s.wall = 1;
       s.destroyed = 0;
@@ -111,9 +112,10 @@ export function GameEngine({
       s.py = H * 0.5;
       s.vx = 0;
       s.vy = -640 * speed;
-      s.platforms = [];
+      const platforms: { x: number; y: number; w: number }[] = [];
       for (let i = 0; i < 8; i++)
-        s.platforms.push({ x: 40 + Math.random() * (W - 180), y: H - 30 - i * 52, w: 110 });
+        platforms.push({ x: 40 + Math.random() * (W - 180), y: H - 30 - i * 52, w: 110 });
+      s.platforms = platforms;
       s.camY = 0;
       s.height = 0;
       s.lavaY = H + 80;

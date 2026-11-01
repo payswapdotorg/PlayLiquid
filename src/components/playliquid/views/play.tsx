@@ -236,8 +236,13 @@ export function PlayView({ gameId }: { gameId: string | null }) {
         <button
           type="button"
           onClick={() => {
+            const next = !saved;
             toggleSave(g.id);
-            toast.success(saved ? "Removed from Library" : "Saved to Library");
+            toast.success(next ? "Saved to Library" : "Removed from Library");
+            // server-side Library persistence (optimistic)
+            void postJson(`/api/games/${g.id}/save`, { saved: next }).catch(() => {
+              toast.error("Could not update your Library");
+            });
           }}
           className={cn(
             "flex cursor-pointer items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors",

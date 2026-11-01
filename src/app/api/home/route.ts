@@ -37,10 +37,10 @@ export async function GET() {
     .map((g) => toGameDTO(g));
 
   const featured = trending.slice(0, 3);
-  const recommended = [...published].sort(
-    (a, b) => b.likes / (b.plays + 1) - a.likes / (a.plays + 1),
-  );
-  const live = published.filter((g) => g.isLive);
+  const recommended = [...published]
+    .sort((a, b) => b.likes / (b.plays + 1) - a.likes / (a.plays + 1))
+    .map((g) => toGameDTO(g));
+  const live = published.filter((g) => g.isLive).map((g) => toGameDTO(g));
   const categories = Array.from(new Set(published.map((g) => g.category))).sort();
 
   const dto: HomeDTO = {

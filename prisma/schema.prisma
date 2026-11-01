@@ -54,6 +54,7 @@ model Game {
   sparks          Spark[]
   updates         GameUpdate[]
   tasks           Task[]
+  savedBy         LibraryItem[]
 }
 
 model GameUpdate {
@@ -127,4 +128,32 @@ model Task {
   game       Game?    @relation(fields: [gameId], references: [id])
   resultJson String   @default("{}")
   createdAt  DateTime @default(now())
+}
+
+/** Saved-to-Library entries (server-side library persistence). */
+model LibraryItem {
+  id        String   @id @default(cuid())
+  gameId    String
+  game      Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([gameId])
+}
+
+/** Scheduled / recurring desk tasks (Automations). */
+model Automation {
+  id        String    @id @default(cuid())
+  name      String
+  prompt    String
+  schedule  String
+  enabled   Boolean   @default(true)
+  lastRunAt DateTime?
+  createdAt DateTime  @default(now())
+}
+
+/** Generic key-value preferences (settings, plugin states, notification opt-ins). */
+model Preference {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
 }

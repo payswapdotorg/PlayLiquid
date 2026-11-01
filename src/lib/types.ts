@@ -121,6 +121,7 @@ export interface SparksPageDTO {
 export interface StudioDTO {
   totals: { games: number; plays: number; likes: number; followers: number; sparks: number };
   myGames: GameDTO[];
+  savedGames: GameDTO[];
   recentComments: (CommentDTO & { gameTitle: string })[];
   playStats: { label: string; plays: number }[];
   sparkStats: { label: string; sparkTitle: string; likes: number; plays: number }[];
@@ -139,6 +140,49 @@ export interface TaskDTO {
   summary: string | null;
   createdAt: string;
 }
+
+/** Creator channel page payload (GET /api/creators/[id]). */
+export interface ChannelDTO {
+  creator: CreatorDTO;
+  games: GameDTO[];
+  sparks: SparkDTO[];
+  stats: {
+    videos: number;
+    sparks: number;
+    followers: number;
+    totalPlays: number;
+    totalLikes: number;
+    joinedAt: string;
+  };
+  recentComments: (CommentDTO & { gameTitle: string })[];
+}
+
+/** Global leaderboards payload (GET /api/leaderboards). */
+export interface LeaderboardsDTO {
+  topPlayers: { player: string; avatar: string; totalScore: number; runs: number; bestGame: string }[];
+  topGames: GameDTO[];
+}
+
+/** Desk automation (scheduled task). */
+export interface AutomationDTO {
+  id: string;
+  name: string;
+  prompt: string;
+  schedule: string;
+  enabled: boolean;
+  lastRunAt: string | null;
+  createdAt: string;
+}
+
+/** Generic preference map (settings, plugin states, notification opt-ins). */
+export type SettingsValues = Record<string, string>;
+
+/** Per-plugin install/enable state, persisted server-side. */
+export interface PluginState {
+  installed: boolean;
+  enabled: boolean;
+}
+export type PluginStates = Record<string, PluginState>;
 
 /**
  * View names across the two PlayLiquid experiences:
@@ -160,4 +204,5 @@ export type ViewName =
   | "explore"
   | "newtask"
   | "automations"
-  | "plugins";
+  | "plugins"
+  | "build";

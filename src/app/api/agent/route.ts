@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import ZAI from "z-ai-web-dev-sdk";
 import { db } from "@/lib/db";
+import { extractJsonObject } from "@/lib/extract-json";
 
 /**
  * Game Builder agent — conversational theme/live-param tuning for a game.
@@ -17,18 +18,6 @@ interface ThemePatch {
   speed?: number;
   difficulty?: number;
   label?: string;
-}
-
-function extractJson(raw: string): Record<string, unknown> | null {
-  const cleaned = raw.replace(/```json|```/g, "").trim();
-  const start = cleaned.indexOf("{");
-  const end = cleaned.lastIndexOf("}");
-  if (start === -1 || end === -1) return null;
-  try {
-    return JSON.parse(cleaned.slice(start, end + 1)) as Record<string, unknown>;
-  } catch {
-    return null;
-  }
 }
 
 function clamp255(v: unknown): number | null {
@@ -88,7 +77,7 @@ If the user asks something conversational (no change needed), reply with plain t
     });
     reply = completion.choices[0]?.message?.content ?? "";
 
-    const parsed = extractJson(reply);
+    const parsed = extractJsonObject(reply);
     if (parsed && typeof parsed.reply === "string") {
       reply = parsed.reply;
       if (parsed.patch && typeof parsed.patch === "object") {

@@ -21,6 +21,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { usePlayLiquid } from "@/lib/store";
+import { postJson } from "@/hooks/use-api";
+import type { GameDTO } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useDeskTasks } from "./desk-tasks";
 
@@ -71,6 +73,7 @@ export function NewTaskView() {
   // prefill handed over by the web Create menu (store)
   const taskPrefill = usePlayLiquid((s) => s.taskPrefill);
   const clearTaskPrefill = usePlayLiquid((s) => s.clearTaskPrefill);
+  const navigate = usePlayLiquid((s) => s.navigate);
 
   // composer
   const promptRef = useRef<HTMLTextAreaElement | null>(null);
@@ -103,6 +106,10 @@ export function NewTaskView() {
   // task list
   const addTask = useDeskTasks((s) => s.addTask);
 
+  // real submission — POST /api/tasks lets the Game Architect design a full
+  // game spec (5–30 s), so the composer shows a running state meanwhile
+  const [submitting, setSubmitting] = useState(false);
+
   // close the context popover on outside click
   useEffect(() => {
     if (!contextOpen) return;
@@ -115,16 +122,45 @@ export function NewTaskView() {
     return () => document.removeEventListener("click", onDocClick);
   }, [contextOpen]);
 
-  function submitTask() {
+  async function submitTask() {
     const text = prompt.trim();
     if (!text) {
       toast("Describe what you want PlayLiquid to do first");
       promptRef.current?.focus();
       return;
     }
-    addTask(text.length > 34 ? `${text.slice(0, 34)}…` : text);
-    toast(`Task started${project === "none" ? " · outside a project" : ` · ${project}`}`);
-    setPrompt("");
+    if (submitting) return;
+    setSubmitting(true);
+    try {
+      const res = await postJson<{
+        task: { id: string; status: string };
+        game: GameDTO;
+        modelUsed: string;
+        usedFallback: boolean;
+      }>("/api/tasks", { prompt: text, model, mode: execution });
+      addTask({
+        id: res.task.id,
+        title: res.game.title,
+        time: "now",
+        gameId: res.game.id,
+        status: res.game.status,
+      });
+      setPrompt("");
+      toast.success(
+        `"${res.game.title}" is ready — a ${res.game.category.toLowerCase()} on the ${res.game.engine} engine`,
+        {
+          action: {
+            label: "Open builder",
+            onClick: () => navigate("build", { gameId: res.game.id }),
+          },
+        },
+      );
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "The task could not be started");
+      promptRef.current?.focus();
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   function onProjectChange(value: string) {
@@ -150,6 +186,16 @@ export function NewTaskView() {
 
   return (
     <section className="newtask-view" data-panel={panel ?? undefined} id="newTaskView" aria-label="New task">
+      <button
+        type="button"
+        className="newtask-back"
+        id="backToApp"
+        title="Back to PlayLiquid"
+        onClick={() => navigate("home")}
+      >
+        ‹　<span className="back-label">Back to PlayLiquid</span>
+      </button>
+
       <div className="newtask-top-tools">
         <button
           type="button"
@@ -223,7 +269,7 @@ export function NewTaskView() {
             onKeyDown={(e) => {
               if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
                 e.preventDefault();
-                submitTask();
+                void submitTask();
               }
             }}
             placeholder="Ask PlayLiquid anything, @ for files, folders, or whiteboards, / for commands or agents, $ for skills, # for related conversations"
@@ -286,8 +332,11 @@ export function NewTaskView() {
                 className="send-task"
                 id="sendTask"
                 aria-label="Start task"
-                title="Start task"
-                onClick={submitTask}
+                title={submitting ? "Designing your game…" : "Start task"}
+                aria-busy={submitting}
+                disabled={submitting}
+                style={submitting ? { opacity: 0.55, cursor: "default", transform: "none" } : undefined}
+                onClick={() => void submitTask()}
               >
                 <ArrowUp className="size-[14px]" strokeWidth={2.4} />
               </button>
@@ -295,24 +344,35 @@ export function NewTaskView() {
           </div>
         </div>
 
-        {bannerVisible && (
-          <div className="newtask-banner" id="idleBanner">
+        {submitting ? (
+          <div className="newtask-banner" role="status" aria-live="polite">
             <span className="banner-icon" aria-hidden>
-              ⚑
+              ◷
             </span>
             <span>
-              New for subscribers: Create an idle-time task. We&apos;ll complete assigned work
-              during periods of surplus computing power.
+              Game Architect is designing your game — usually under 30 s…
             </span>
-            <button
-              type="button"
-              id="dismissIdle"
-              aria-label="Dismiss banner"
-              onClick={() => setBannerVisible(false)}
-            >
-              ×
-            </button>
           </div>
+        ) : (
+          bannerVisible && (
+            <div className="newtask-banner" id="idleBanner">
+              <span className="banner-icon" aria-hidden>
+                ⚑
+              </span>
+              <span>
+                New for subscribers: Create an idle-time task. We&apos;ll complete assigned work
+                during periods of surplus computing power.
+              </span>
+              <button
+                type="button"
+                id="dismissIdle"
+                aria-label="Dismiss banner"
+                onClick={() => setBannerVisible(false)}
+              >
+                ×
+              </button>
+            </div>
+          )
         )}
 
         <div className="task-template-grid">

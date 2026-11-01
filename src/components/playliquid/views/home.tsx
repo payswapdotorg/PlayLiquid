@@ -137,9 +137,9 @@ export function HomeView() {
 
           {/* interleaved opening: rows 1-2 → sparks → row → sparks */}
           <GameGrid games={opening} />
-          {category === "All" && <SparksShelf sparks={firstSparks} />}
+          {category === "All" && <SparksShelf sparks={firstSparks} offset={0} />}
           <GameGrid games={mid} className="mt-2" />
-          {category === "All" && <SparksShelf sparks={secondSparks} />}
+          {category === "All" && <SparksShelf sparks={secondSparks} offset={sparksMid} />}
 
           {/* trending */}
           <GameRail

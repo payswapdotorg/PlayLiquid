@@ -1,16 +1,26 @@
 "use client";
 
 /**
- * Channel page — ported from the Interface Reconstruction v2 design:
- * banner, identity (initials avatar, per-channel handle/description),
- * Join/Subscribe actions, and the seven tab panels.
+ * Channel page — a real creator channel from GET /api/creators/[idOrName]:
+ * banner + identity, Join/Subscribe/notification actions, and the seven tab
+ * panels (Home, Videos, Shorts, Live, Playlists, Community, About).
  */
 import { useState } from "react";
 import { toast } from "sonner";
+import { postJson, useApi } from "@/hooks/use-api";
 import { usePlayLiquid } from "@/lib/store";
+import { formatCount, formatPlays, timeAgo } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import type { ChannelDTO, GameDTO, SparkDTO } from "@/lib/types";
 
-type ChannelTab = "channelHome" | "channelVideos" | "channelShorts" | "channelLive" | "channelPlaylists" | "channelCommunity" | "channelAbout";
+type ChannelTab =
+  | "channelHome"
+  | "channelVideos"
+  | "channelShorts"
+  | "channelLive"
+  | "channelPlaylists"
+  | "channelCommunity"
+  | "channelAbout";
 
 const TABS: { id: ChannelTab; label: string }[] = [
   { id: "channelHome", label: "Home" },
@@ -22,79 +32,166 @@ const TABS: { id: ChannelTab; label: string }[] = [
   { id: "channelAbout", label: "About" },
 ];
 
-const SHORTS: { thumb: string; title: string; meta: string }[] = [
-  { thumb: "", title: "The tiny router with a big range", meta: "46K views · 2 days ago" },
-  { thumb: "s2", title: "Mesh networking on the move", meta: "38K views · 1 week ago" },
-  { thumb: "s3", title: "Can this work without Wi-Fi?", meta: "27K views · 2 weeks ago" },
-  { thumb: "s4", title: "Antenna range test", meta: "21K views · 3 weeks ago" },
-  { thumb: "s5", title: "Open source hardware find", meta: "19K views · 1 month ago" },
-];
+type SortMode = "Latest" | "Popular" | "Oldest";
 
-const UPLOADS: { thumb: string; duration: string; title: string; meta: string }[] = [
-  { thumb: "", duration: "54:20", title: "This Hotspot Pays for Itself", meta: "96K views · 1 day ago" },
-  { thumb: "t2", duration: "12:01", title: "The Open-Source Internet Is Bigger Than I Thought", meta: "63K views · 3 weeks ago" },
-  { thumb: "t3", duration: "59:02", title: "The Open Source Internet Is Here", meta: "2.6M views · 1 month ago" },
-  { thumb: "t4", duration: "27:02", title: "The Anywhere Network is Here", meta: "499K views · 2 months ago" },
-  { thumb: "t5", duration: "21:59", title: "How to Become Your Own ISP", meta: "1.3M views · 2 months ago" },
-  { thumb: "t6", duration: "25:13", title: "This Wi-Fi Feels Illegal", meta: "176K views · 3 months ago" },
-];
+const SORTS: SortMode[] = ["Latest", "Popular", "Oldest"];
 
-const PLAYLISTS: { art: string; title: string; count: string }[] = [
-  { art: "⌁", title: "Build your own network", count: "12 videos" },
-  { art: "◉", title: "Open-source hardware", count: "8 videos" },
-  { art: "⌘", title: "Internet without ISPs", count: "6 videos" },
-  { art: "⚡", title: "Field tests", count: "9 videos" },
-];
+function sortGames(games: GameDTO[], mode: SortMode): GameDTO[] {
+  const copy = [...games];
+  if (mode === "Popular") return copy.sort((a, b) => b.plays - a.plays);
+  if (mode === "Oldest") return copy.sort((a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime());
+  return copy.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+}
 
 export function ChannelView() {
   const channel = usePlayLiquid((s) => s.channel);
-  const [tab, setTab] = useState<ChannelTab>("channelHome");
-  const [subscribed, setSubscribed] = useState(false);
-  const [sort, setSort] = useState("Latest");
+  const { data, loading, error, reload } = useApi<ChannelDTO>(
+    `/api/creators/${encodeURIComponent(channel)}`,
+  );
 
-  // per the design's openChannel(): reset to the Home tab and "Subscribe"
-  // (blessed render-time reset when the channel changes)
-  const [prevChannel, setPrevChannel] = useState(channel);
-  if (prevChannel !== channel) {
-    setPrevChannel(channel);
+  const [tab, setTab] = useState<ChannelTab>("channelHome");
+  const [sort, setSort] = useState<SortMode>("Latest");
+  const [notify, setNotify] = useState(false);
+
+  // when the resolved creator changes, reset the local panel state
+  // (blessed render-time reset — no setState inside effects)
+  const creatorId = data?.creator.id ?? null;
+  const [prevCreatorId, setPrevCreatorId] = useState(creatorId);
+  if (prevCreatorId !== creatorId) {
+    setPrevCreatorId(creatorId);
     setTab("channelHome");
-    setSubscribed(false);
+    setSort("Latest");
+    setNotify(false);
   }
 
-  const isDataSlayer = channel === "Data Slayer";
-  const initials =
-    channel
-      .split(/\s+/)
-      .map((p) => p[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase();
-  const handle = isDataSlayer
-    ? "@dataslayermedia · 544K subscribers · 256 videos"
-    : "PlayLiquid creator channel";
-  const description = isDataSlayer
-    ? "Building an open source internet. Technology, networks and tools for a more open internet."
-    : `Creator channel for ${channel} on PlayLiquid.`;
+  const creator = data?.creator;
+  const isCurrent =
+    !!creator &&
+    (creator.id === channel ||
+      creator.name === channel ||
+      creator.handle === channel ||
+      creator.handle === `@${channel}`);
 
   return (
     <div className="channel-page">
+      {loading && !isCurrent && (
+        <div className="page-empty" aria-busy="true">
+          Loading channel…
+        </div>
+      )}
+
+      {error && (
+        <div className="page-empty" role="alert">
+          Studio not found
+          <br />
+          <small>{error}</small>
+          <br />
+          <button
+            type="button"
+            className="small-action"
+            style={{ marginTop: 12 }}
+            onClick={() => void reload()}
+          >
+            Try again
+          </button>
+        </div>
+      )}
+
+      {data && isCurrent && creator && (
+        <ChannelBody
+          data={data}
+          tab={tab}
+          setTab={setTab}
+          sort={sort}
+          setSort={setSort}
+          notify={notify}
+          setNotify={setNotify}
+        />
+      )}
+    </div>
+  );
+}
+
+function ChannelBody({
+  data,
+  tab,
+  setTab,
+  sort,
+  setSort,
+  notify,
+  setNotify,
+}: {
+  data: ChannelDTO;
+  tab: ChannelTab;
+  setTab: (t: ChannelTab) => void;
+  sort: SortMode;
+  setSort: (s: SortMode) => void;
+  notify: boolean;
+  setNotify: (n: boolean) => void;
+}) {
+  const navigate = usePlayLiquid((s) => s.navigate);
+  const toggleFollow = usePlayLiquid((s) => s.toggleFollow);
+  const followedCreators = usePlayLiquid((s) => s.followedCreators);
+  const { creator, games, sparks, stats, recentComments } = data;
+
+  const following = !!followedCreators[creator.id];
+  const initials = creator.name
+    .split(/\s+/)
+    .map((p) => p[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+  const featured = [...games].sort((a, b) => b.plays - a.plays)[0];
+  const liveGames = games.filter((g) => g.isLive);
+  const sortedGames = sortGames(games, sort);
+
+  function toggleSubscribe() {
+    const next = !following;
+    toggleFollow(creator.id);
+    void postJson(`/api/creators/${creator.id}/follow`, { following: next }).catch(
+      () => undefined,
+    );
+  }
+
+  function toggleNotify() {
+    const next = !notify;
+    setNotify(next);
+    void postJson("/api/settings", {
+      values: { [`notify:${creator.id}`]: String(next) },
+    }).catch(() => undefined);
+    toast(next ? "Channel notifications enabled" : "Channel notifications off");
+  }
+
+  return (
+    <>
       <div className="channel-banner">
         <span className="channel-banner-label" id="channelBannerLabel">
-          {channel.toUpperCase()} · PLAYLIQUID CREATOR CHANNEL
+          {creator.name.toUpperCase()} · PLAYLIQUID CREATOR CHANNEL
         </span>
       </div>
 
       <div className="channel-identity">
         <div className="channel-avatar" id="channelAvatar" aria-hidden>
-          {initials}
+          {creator.avatarUrl ? (
+            <img
+              src={creator.avatarUrl}
+              alt=""
+              style={{ width: "100%", height: "100%", borderRadius: "inherit", objectFit: "cover" }}
+            />
+          ) : (
+            initials
+          )}
         </div>
         <div className="channel-meta">
           <h1 id="channelName">
-            {channel} <span style={{ color: "#45c9e7", fontSize: 15 }}>✓</span>
+            {creator.name}{" "}
+            {creator.verified && <span style={{ color: "#45c9e7", fontSize: 15 }}>✓</span>}
           </h1>
-          <p id="channelHandle">{handle}</p>
+          <p id="channelHandle">
+            {creator.handle} · {formatCount(stats.followers)} subscribers · {stats.videos} games
+          </p>
           <p className="channel-aboutline" id="channelDescription">
-            {description}
+            {creator.bio}
           </p>
         </div>
         <div className="channel-actions">
@@ -108,17 +205,18 @@ export function ChannelView() {
           <button
             type="button"
             className="subscribe-btn"
-            aria-pressed={subscribed}
-            onClick={() => setSubscribed((s) => !s)}
+            aria-pressed={following}
+            onClick={toggleSubscribe}
           >
-            {subscribed ? "Subscribed" : "Subscribe"}
+            {following ? "Subscribed" : "Subscribe"}
           </button>
           <button
             type="button"
             className="round-action"
             title="Channel notifications"
             aria-label="Channel notifications"
-            onClick={() => toast("Channel notifications enabled")}
+            aria-pressed={notify}
+            onClick={toggleNotify}
           >
             ♧
           </button>
@@ -142,70 +240,90 @@ export function ChannelView() {
 
       {tab === "channelHome" && (
         <div className="channel-tab-panel active" id="channelHome">
-          <div className="channel-featured">
-            <div className="channel-feature-thumb">
-              <span className="channel-feature-play" aria-hidden>
-                ▶
-              </span>
+          {featured ? (
+            <div className="channel-featured">
+              <div className="channel-feature-thumb">
+                <img
+                  src={featured.thumbnailUrl}
+                  alt=""
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
+                />
+                <span className="channel-feature-play" aria-hidden>
+                  ▶
+                </span>
+              </div>
+              <div className="channel-feature-copy">
+                <div className="kicker">Featured game</div>
+                <h2>{featured.title}</h2>
+                <small>
+                  {creator.name} · {formatPlays(featured.plays)} · {timeAgo(featured.updatedAt)}
+                </small>
+                <p>{featured.description}</p>
+                <button
+                  type="button"
+                  className="small-action"
+                  onClick={() => navigate("play", { gameId: featured.id })}
+                >
+                  Play now
+                </button>
+              </div>
             </div>
-            <div className="channel-feature-copy">
-              <div className="kicker">Featured video</div>
-              <h2>The Open-Source Internet Is Bigger Than I Thought</h2>
-              <small>Data Slayer · 12:01 · 63K views</small>
-              <p>
-                Exploring the people and projects building networks outside the traditional
-                internet infrastructure.
-              </p>
-              <button
-                type="button"
-                className="small-action"
-                onClick={() => toast("Opening featured video")}
-              >
-                Watch featured video
-              </button>
-            </div>
-          </div>
+          ) : (
+            <div className="empty-note">This studio hasn&apos;t published any games yet.</div>
+          )}
 
-          <section className="channel-section">
-            <div className="channel-section-head">
-              <h2>Shorts</h2>
-              <button type="button" className="channel-tab-link" onClick={() => setTab("channelShorts")}>
-                View all
-              </button>
-            </div>
-            <div className="channel-shorts-row">
-              {SHORTS.map((s) => (
-                <div key={s.title}>
-                  <div className={cn("channel-short-thumb", s.thumb)} aria-hidden />
-                  <div className="channel-short-info">
-                    {s.title}
-                    <small>{s.meta}</small>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
+          {sparks.length > 0 && (
+            <section className="channel-section">
+              <div className="channel-section-head">
+                <h2>Shorts</h2>
+                <button
+                  type="button"
+                  className="channel-tab-link"
+                  onClick={() => setTab("channelShorts")}
+                >
+                  View all
+                </button>
+              </div>
+              <div className="channel-shorts-row">
+                {sparks.slice(0, 4).map((s) => (
+                  <ChannelShort key={s.id} spark={s} />
+                ))}
+              </div>
+            </section>
+          )}
 
-          <section className="channel-section">
-            <div className="channel-section-head">
-              <h2>Uploads</h2>
-              <button type="button" className="channel-tab-link" onClick={() => setTab("channelVideos")}>
-                View all
-              </button>
-            </div>
-            <div className="channel-video-grid">
-              {UPLOADS.slice(0, 4).map((v) => (
-                <ChannelVideo key={v.title} video={v} />
-              ))}
-            </div>
-          </section>
+          {games.length > 0 && (
+            <section className="channel-section">
+              <div className="channel-section-head">
+                <h2>Uploads</h2>
+                <button
+                  type="button"
+                  className="channel-tab-link"
+                  onClick={() => setTab("channelVideos")}
+                >
+                  View all
+                </button>
+              </div>
+              <div className="channel-video-grid">
+                {sortedGames.slice(0, 4).map((g) => (
+                  <ChannelVideo key={g.id} game={g} />
+                ))}
+              </div>
+            </section>
+          )}
         </div>
       )}
 
       {tab === "channelVideos" && (
         <div className="channel-tab-panel active" id="channelVideos">
           <div className="filters" role="tablist" aria-label="Sort uploads">
-            {["Latest", "Popular", "Oldest"].map((f) => (
+            {SORTS.map((f) => (
               <button
                 key={f}
                 type="button"
@@ -216,99 +334,115 @@ export function ChannelView() {
               </button>
             ))}
           </div>
-          <div className="channel-video-grid">
-            {UPLOADS.map((v) => (
-              <ChannelVideo key={v.title} video={v} />
-            ))}
-          </div>
+          {games.length === 0 ? (
+            <div className="empty-note">No uploads yet.</div>
+          ) : (
+            <div className="channel-video-grid">
+              {sortedGames.map((g) => (
+                <ChannelVideo key={g.id} game={g} />
+              ))}
+            </div>
+          )}
         </div>
       )}
 
       {tab === "channelShorts" && (
         <div className="channel-tab-panel active" id="channelShorts">
-          <div className="channel-shorts-row">
-            {SHORTS.map((s) => (
-              <div key={s.title}>
-                <div className={cn("channel-short-thumb", s.thumb)} aria-hidden />
-                <div className="channel-short-info">
-                  {s.title}
-                  <small>{s.meta}</small>
-                </div>
-              </div>
-            ))}
-          </div>
+          {sparks.length === 0 ? (
+            <div className="empty-note">No Shorts yet.</div>
+          ) : (
+            <div className="channel-shorts-row">
+              {sparks.map((s) => (
+                <ChannelShort key={s.id} spark={s} />
+              ))}
+            </div>
+          )}
         </div>
       )}
 
       {tab === "channelLive" && (
         <div className="channel-tab-panel active" id="channelLive">
-          <div className="page-empty">
-            No live streams are currently active.
-            <br />
-            <small>Past live streams will appear here.</small>
-          </div>
+          {liveGames.length === 0 ? (
+            <div className="page-empty">
+              No live streams are currently active.
+              <br />
+              <small>Past live streams will appear here.</small>
+            </div>
+          ) : (
+            <div className="channel-video-grid">
+              {liveGames.map((g) => (
+                <ChannelVideo key={g.id} game={g} />
+              ))}
+            </div>
+          )}
         </div>
       )}
 
       {tab === "channelPlaylists" && (
         <div className="channel-tab-panel active" id="channelPlaylists">
-          <div className="channel-playlists">
-            {PLAYLISTS.map((p) => (
-              <div className="playlist-card" key={p.title}>
-                <div className="playlist-art" aria-hidden>
-                  {p.art}
-                </div>
-                <b>{p.title}</b>
-                <small>{p.count}</small>
-              </div>
-            ))}
-          </div>
+          {games.length === 0 ? (
+            <div className="empty-note">No playlists yet.</div>
+          ) : (
+            <div className="channel-playlists">
+              {groupedByCategory(games).map(([category, list]) => (
+                <button
+                  type="button"
+                  className="playlist-card"
+                  key={category}
+                  onClick={() => navigate("play", { gameId: list[0].id })}
+                  style={{ textAlign: "left", border: "1px solid #263342", cursor: "pointer" }}
+                >
+                  <div className="playlist-art" aria-hidden>
+                    <img
+                      src={list[0].thumbnailUrl}
+                      alt=""
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        borderRadius: "inherit",
+                      }}
+                    />
+                    <span style={{ position: "relative", fontSize: 22, color: "#eaf7ff" }}>▶</span>
+                  </div>
+                  <b>{category}</b>
+                  <small>
+                    {list.length} {list.length === 1 ? "game" : "games"}
+                  </small>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
       {tab === "channelCommunity" && (
         <div className="channel-tab-panel active" id="channelCommunity">
-          <div className="channel-post">
-            <span
-              className="channel-avatar"
-              style={{ width: 42, height: 42, fontSize: 13, borderWidth: 1 }}
-              aria-hidden
-            >
-              {initials}
-            </span>
-            <div>
-              <b>{channel}</b>
-              <small> · 4 days ago</small>
-              <p>
-                What should we test next: a longer-range mesh node or a fully off-grid hotspot
-                build?
-              </p>
-              <button
-                type="button"
-                className="small-action"
-                onClick={() => toast("Poll selected")}
-              >
-                Vote on the poll
-              </button>
-            </div>
-          </div>
-          <div className="channel-post">
-            <span
-              className="channel-avatar"
-              style={{ width: 42, height: 42, fontSize: 13, borderWidth: 1 }}
-              aria-hidden
-            >
-              {initials}
-            </span>
-            <div>
-              <b>{channel}</b>
-              <small> · 2 weeks ago</small>
-              <p>
-                New video is up. This one takes us out into the field to test a network that works
-                without traditional infrastructure.
-              </p>
-            </div>
-          </div>
+          {recentComments.length === 0 ? (
+            <div className="empty-note">No community activity yet.</div>
+          ) : (
+            recentComments.map((c) => (
+              <div className="channel-post" key={c.id}>
+                <img
+                  src={c.authorAvatar}
+                  alt=""
+                  width={42}
+                  height={42}
+                  style={{ borderRadius: "50%", objectFit: "cover", flex: "none" }}
+                />
+                <div>
+                  <b>{c.authorName}</b>
+                  <small>
+                    {" "}
+                    · on {c.gameTitle} · {timeAgo(c.createdAt)}
+                  </small>
+                  <p>{c.body}</p>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       )}
 
@@ -316,27 +450,99 @@ export function ChannelView() {
         <div className="channel-tab-panel active" id="channelAbout">
           <div className="channel-about">
             <h3>About</h3>
+            <p>{creator.bio}</p>
             <p>
-              Building an open source internet. {channel} explores technologies that enable an
-              internet independent of traditional ISPs, including open networking protocols, radio
-              hardware, mesh networks and long-range wireless experiments.
+              {stats.videos} games · {stats.sparks} sparks · {formatCount(stats.totalPlays)} plays
+              · Joined{" "}
+              {new Date(stats.joinedAt).toLocaleDateString(undefined, {
+                month: "long",
+                year: "numeric",
+              })}
             </p>
-            <p>544K subscribers · 256 videos · Joined February 14, 2016</p>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
 
-function ChannelVideo({ video }: { video: { thumb: string; duration: string; title: string; meta: string } }) {
+function groupedByCategory(games: GameDTO[]): [string, GameDTO[]][] {
+  const map = new Map<string, GameDTO[]>();
+  for (const g of games) {
+    const list = map.get(g.category) ?? [];
+    list.push(g);
+    map.set(g.category, list);
+  }
+  return [...map.entries()];
+}
+
+const CARD_RESET = {
+  border: 0,
+  background: "transparent",
+  padding: 0,
+  font: "inherit",
+  color: "inherit",
+  cursor: "pointer",
+} as const;
+
+function ChannelVideo({ game }: { game: GameDTO }) {
+  const navigate = usePlayLiquid((s) => s.navigate);
   return (
-    <div className="channel-video">
-      <div className={cn("channel-thumb", video.thumb)}>
-        <span className="duration">{video.duration}</span>
+    <button
+      type="button"
+      className="channel-video"
+      style={{ ...CARD_RESET, textAlign: "left" }}
+      onClick={() => navigate("play", { gameId: game.id })}
+      aria-label={`Play ${game.title}`}
+    >
+      <div className="channel-thumb">
+        <img
+          src={game.thumbnailUrl}
+          alt=""
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+        />
+        <span className="duration">{game.durationMin} min</span>
       </div>
-      <h3>{video.title}</h3>
-      <p>{video.meta}</p>
-    </div>
+      <h3>{game.title}</h3>
+      <p>
+        {formatPlays(game.plays)} · {timeAgo(game.updatedAt)}
+      </p>
+    </button>
+  );
+}
+
+function ChannelShort({ spark }: { spark: SparkDTO }) {
+  const navigate = usePlayLiquid((s) => s.navigate);
+  return (
+    <button
+      type="button"
+      onClick={() =>
+        spark.game ? navigate("play", { gameId: spark.game.id }) : navigate("sparks")
+      }
+      aria-label={`Open ${spark.title}`}
+      style={CARD_RESET}
+    >
+      <div className="channel-short-thumb">
+        <video
+          src={spark.videoUrl}
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+          onMouseEnter={(e) => e.currentTarget.play().catch(() => undefined)}
+          onMouseLeave={(e) => {
+            e.currentTarget.pause();
+            e.currentTarget.currentTime = 0;
+          }}
+        />
+      </div>
+      <div className="channel-short-info">
+        {spark.title}
+        <small>
+          {formatCount(spark.likes)} likes · {spark.game ? spark.game.title : "PlayLiquid"}
+        </small>
+      </div>
+    </button>
   );
 }

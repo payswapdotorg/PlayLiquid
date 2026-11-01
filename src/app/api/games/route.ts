@@ -8,11 +8,24 @@ const PAGE_SIZE = 9;
 export async function GET(req: NextRequest) {
   const cursor = Number(req.nextUrl.searchParams.get("cursor") ?? "0") || 0;
   const category = req.nextUrl.searchParams.get("category");
+  const q = req.nextUrl.searchParams.get("q")?.trim();
 
   const games = await db.game.findMany({
     where: {
       status: "published",
       ...(category && category !== "All" ? { category } : {}),
+      ...(q
+        ? {
+            OR: [
+              { title: { contains: q } },
+              { description: { contains: q } },
+              { longDescription: { contains: q } },
+              { tags: { contains: q } },
+              { category: { contains: q } },
+              { creator: { name: { contains: q } } },
+            ],
+          }
+        : {}),
     },
     include: { creator: true, sessions: true, _count: { select: { comments: true } } },
     orderBy: [{ plays: "desc" }, { createdAt: "asc" }],

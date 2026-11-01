@@ -5,10 +5,13 @@ import { usePlayLiquid } from "@/lib/store";
 import { formatCount } from "@/lib/format";
 import type { SparkDTO } from "@/lib/types";
 
-/** One vertical 9:16 Sparks tile for the home shelf (hover previews too). */
-export function SparkTile({ spark }: { spark: SparkDTO }) {
+/**
+ * One vertical 9:16 Sparks tile for the home shelf (hover previews too).
+ * `index` is the tile's position in the full Sparks feed so the click
+ * deep-links to the exact stage.
+ */
+export function SparkTile({ spark, index }: { spark: SparkDTO; index: number }) {
   const navigate = usePlayLiquid((s) => s.navigate);
-  const sparkIndex = usePlayLiquid((s) => s.sparkIndex);
   const hover = useHoverPreview({
     previewUrl: spark.videoUrl,
     thumbnailUrl: spark.videoUrl,
@@ -20,7 +23,7 @@ export function SparkTile({ spark }: { spark: SparkDTO }) {
       type="button"
       onMouseEnter={hover.onMouseEnter}
       onMouseLeave={hover.onMouseLeave}
-      onClick={() => navigate("sparks", { sparkIndex: 0 })}
+      onClick={() => navigate("sparks", { sparkIndex: index })}
       aria-label={`Open Sparks: ${spark.title}`}
       className="group flex w-[168px] shrink-0 cursor-pointer flex-col gap-2 text-left sm:w-[192px] lg:w-[234px] xl:w-[264px]"
     >
@@ -56,8 +59,12 @@ export function SparkTile({ spark }: { spark: SparkDTO }) {
   );
 }
 
-/** The home-page Sparks shelf (horizontal rail of vertical tiles). */
-export function SparksShelf({ sparks }: { sparks: SparkDTO[] }) {
+/**
+ * The home-page Sparks shelf (horizontal rail of vertical tiles).
+ * `offset` is the position of `sparks[0]` in the full Sparks feed so each
+ * tile deep-links to the right stage.
+ */
+export function SparksShelf({ sparks, offset = 0 }: { sparks: SparkDTO[]; offset?: number }) {
   if (sparks.length === 0) return null;
   return (
     <section aria-label="Sparks shelf" className="mt-2">
@@ -68,8 +75,8 @@ export function SparksShelf({ sparks }: { sparks: SparkDTO[] }) {
         Sparks
       </h2>
       <div className="no-scrollbar mt-3 flex gap-4 overflow-x-auto px-4 pb-2 sm:px-6">
-        {sparks.map((s) => (
-          <SparkTile key={s.id} spark={s} />
+        {sparks.map((s, i) => (
+          <SparkTile key={s.id} spark={s} index={offset + i} />
         ))}
       </div>
     </section>

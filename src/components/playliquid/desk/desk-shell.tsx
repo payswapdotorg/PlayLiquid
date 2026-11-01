@@ -9,10 +9,13 @@
 import { useEffect } from "react";
 import { CirclePlus, Clock, LayoutGrid, Settings } from "lucide-react";
 import { usePlayLiquid } from "@/lib/store";
+import { useApi } from "@/hooks/use-api";
+import { timeAgo } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import type { ViewName } from "@/lib/types";
+import type { TaskDTO, ViewName } from "@/lib/types";
 import { useDeskTasks } from "./desk-tasks";
 import { NewTaskView } from "./newtask";
+import { GameBuilderView } from "./gamebuilder";
 import { AutomationsView } from "./automations";
 import { PluginsView } from "./plugins";
 
@@ -27,6 +30,23 @@ export function DeskShell() {
   const navigate = usePlayLiquid((s) => s.navigate);
   const openSettings = usePlayLiquid((s) => s.openSettings);
   const tasks = useDeskTasks((s) => s.tasks);
+  const hydrate = useDeskTasks((s) => s.hydrate);
+
+  // server task list → sidebar task store (external-store sync, post-render)
+  const { data: taskData } = useApi<{ tasks: TaskDTO[] }>("/api/tasks");
+  const serverTasks = taskData?.tasks ?? null;
+  useEffect(() => {
+    if (!serverTasks) return;
+    hydrate(
+      serverTasks.map((t) => ({
+        id: t.id,
+        title: (t.gameTitle ?? t.prompt).slice(0, 34),
+        time: timeAgo(t.createdAt),
+        gameId: t.gameId,
+        status: t.status,
+      })),
+    );
+  }, [serverTasks, hydrate]);
 
   // Ctrl/Cmd+N opens the New Task workspace (design shortcut)
   useEffect(() => {
@@ -88,11 +108,23 @@ export function DeskShell() {
           </div>
           <h5>Tasks</h5>
           <div id="taskEntries">
-            {tasks.map((t) => (
-              <div className="task-entry" key={t.id}>
-                {t.title} <span className="task-time">{t.time}</span>
-              </div>
-            ))}
+            {tasks.map((t) =>
+              t.gameId ? (
+                <button
+                  type="button"
+                  className="task-entry clickable"
+                  key={t.id}
+                  title={`${t.title} — open in Game Builder`}
+                  onClick={() => navigate("build", { gameId: t.gameId })}
+                >
+                  {t.title} <span className="task-time">{t.time}</span>
+                </button>
+              ) : (
+                <div className="task-entry" key={t.id}>
+                  {t.title} <span className="task-time">{t.time}</span>
+                </div>
+              ),
+            )}
           </div>
         </div>
 
@@ -116,6 +148,7 @@ export function DeskShell() {
 
       <main className="desk-content" id="deskMain">
         {view === "newtask" && <NewTaskView />}
+        {view === "build" && <GameBuilderView />}
         {view === "automations" && <AutomationsView />}
         {view === "plugins" && <PluginsView />}
       </main>

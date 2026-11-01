@@ -39,8 +39,8 @@ export function Topbar() {
   function submitSearch() {
     const q = query.trim();
     if (q) {
-      navigate("explore");
-      toast(`Showing discovery results for “${q}”`);
+      // hand the query to the Explore view via the store (hash keeps &q=)
+      navigate("explore", { search: q });
       setQuery("");
     } else {
       toast("Enter a game, studio or Spark to search");

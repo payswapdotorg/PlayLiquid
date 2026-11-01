@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useHoverPreview } from "./hover-preview";
+import { postJson } from "@/hooks/use-api";
 import { usePlayLiquid } from "@/lib/store";
 import { formatCount, formatPlays } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -21,10 +22,12 @@ type GameCardProps = {
   game: GameDTO;
   variant?: "grid" | "rail";
   className?: string;
+  /** Draft games open the Game Builder instead of the play page. */
+  openBuild?: boolean;
 };
 
 /** PlayLiquid game card: cover + metadata + status, with real hover preview. */
-export function GameCard({ game, variant = "grid", className }: GameCardProps) {
+export function GameCard({ game, variant = "grid", className, openBuild }: GameCardProps) {
   const navigate = usePlayLiquid((s) => s.navigate);
   const toggleSave = usePlayLiquid((s) => s.toggleSave);
   const saved = !!usePlayLiquid((s) => s.savedGames[game.id]);
@@ -34,8 +37,12 @@ export function GameCard({ game, variant = "grid", className }: GameCardProps) {
     title: game.title,
   });
 
-  function openGame(target: "play" | "details") {
+  function openGame(target: "play" | "details" | "build") {
     navigate(target, { gameId: game.id });
+  }
+
+  function openPrimary() {
+    openGame(openBuild ? "build" : "play");
   }
 
   async function share() {
@@ -60,8 +67,8 @@ export function GameCard({ game, variant = "grid", className }: GameCardProps) {
     >
       <button
         type="button"
-        onClick={() => openGame("play")}
-        aria-label={`Play ${game.title}`}
+        onClick={openPrimary}
+        aria-label={openBuild ? `Open ${game.title} in the Game Builder` : `Play ${game.title}`}
         className="relative block w-full cursor-pointer overflow-hidden rounded-xl bg-secondary text-left"
       >
         <div data-thumb-anchor className="relative aspect-video w-full">
@@ -124,7 +131,7 @@ export function GameCard({ game, variant = "grid", className }: GameCardProps) {
         <div className="min-w-0 flex-1">
           <button
             type="button"
-            onClick={() => openGame("play")}
+            onClick={openPrimary}
             className="block w-full cursor-pointer text-left"
           >
             <h3
@@ -165,8 +172,13 @@ export function GameCard({ game, variant = "grid", className }: GameCardProps) {
           <DropdownMenuContent align="end" className="w-52">
             <DropdownMenuItem
               onSelect={() => {
+                const next = !saved;
                 toggleSave(game.id);
-                toast.success(saved ? "Removed from Library" : "Saved to Library");
+                toast.success(next ? "Saved to Library" : "Removed from Library");
+                // server-side Library persistence (optimistic)
+                void postJson(`/api/games/${game.id}/save`, { saved: next }).catch(() => {
+                  toast.error("Could not update your Library");
+                });
               }}
             >
               <BookmarkPlus className="size-4" /> {saved ? "Remove from Library" : "Save to Library"}

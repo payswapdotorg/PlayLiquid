@@ -3,8 +3,8 @@
 /**
  * Web sidebar — ported from the Interface Reconstruction v2 design:
  * brand bar, primary nav, personal nav (You / Your games / New Task),
- * the five studio rows and the Explore nav. Glyph icons are Lucide
- * components; studio avatars keep the mockup's glyph badges.
+ * the real studio rows (GET /api/creators) and the Explore nav. Glyph icons
+ * are Lucide components; studio avatars are the creators' real images.
  */
 import {
   CirclePlus,
@@ -17,17 +17,10 @@ import {
   Trophy,
   UserRound,
 } from "lucide-react";
+import { useApi } from "@/hooks/use-api";
 import { usePlayLiquid } from "@/lib/store";
 import { cn } from "@/lib/utils";
-import type { ViewName } from "@/lib/types";
-
-const STUDIOS: { name: string; avatar: string; verified?: boolean }[] = [
-  { name: "PlayLiquid Labs", avatar: "✦", verified: true },
-  { name: "Cloud Nine Arcade", avatar: "☁" },
-  { name: "Volcano Interactive", avatar: "🌋", verified: true },
-  { name: "Pixel Pioneers", avatar: "♟", verified: true },
-  { name: "Starloop Games", avatar: "🌌" },
-];
+import type { CreatorDTO, ViewName } from "@/lib/types";
 
 const EXPLORE: { view: ViewName; label: string; icon: typeof Flame }[] = [
   { view: "trending", label: "Trending", icon: Flame },
@@ -66,6 +59,8 @@ function NavButton({
 export function Sidebar() {
   const view = usePlayLiquid((s) => s.view);
   const navigate = usePlayLiquid((s) => s.navigate);
+  const { data: studioData } = useApi<{ creators: CreatorDTO[] }>("/api/creators");
+  const studios = studioData?.creators ?? [];
 
   return (
     <aside className="web-sidebar" aria-label="PlayLiquid navigation">
@@ -100,15 +95,15 @@ export function Sidebar() {
       </nav>
 
       <div className="nav-caption">Studios</div>
-      {STUDIOS.map((s) => (
+      {studios.map((s) => (
         <button
-          key={s.name}
+          key={s.id}
           type="button"
           className="studio-row"
           onClick={() => navigate("channel", { channel: s.name })}
         >
-          <span className="studio-avatar" aria-hidden>
-            {s.avatar}
+          <span className={cn("studio-avatar", s.avatarUrl && "has-img")} aria-hidden>
+            {s.avatarUrl ? <img src={s.avatarUrl} alt="" /> : s.name.slice(0, 1)}
           </span>
           <span className="studio-name">{s.name}</span>
           {s.verified && (

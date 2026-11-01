@@ -7,23 +7,24 @@ export function useApi<T>(url: string | null) {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(!!url);
   const [error, setError] = useState<string | null>(null);
-  const loadingRef = useRef(false);
+  /** Monotonic request generation — a fetch superseded by a newer URL/reload is discarded. */
+  const genRef = useRef(0);
 
   const load = useCallback(async () => {
     if (!url) return;
-    if (loadingRef.current) return;
-    loadingRef.current = true;
+    const gen = ++genRef.current;
     setLoading(true);
     setError(null);
     try {
       const res = await fetch(url);
+      if (gen !== genRef.current) return; // a newer request superseded this one
       if (!res.ok) throw new Error(`Request failed (${res.status})`);
       setData((await res.json()) as T);
     } catch (e) {
+      if (gen !== genRef.current) return;
       setError(e instanceof Error ? e.message : "Something went wrong");
     } finally {
-      loadingRef.current = false;
-      setLoading(false);
+      if (gen === genRef.current) setLoading(false);
     }
   }, [url]);
 

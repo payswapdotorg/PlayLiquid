@@ -11,8 +11,8 @@
 import { create } from "zustand";
 import type { ViewName } from "@/lib/types";
 
-const DESK_VIEWS: ViewName[] = ["newtask", "automations", "plugins"];
-export const DEFAULT_CHANNEL = "Data Slayer";
+const DESK_VIEWS: ViewName[] = ["newtask", "automations", "plugins", "build"];
+export const DEFAULT_CHANNEL = "PlayLiquid Labs";
 
 export function isDeskView(view: ViewName): boolean {
   return DESK_VIEWS.includes(view);
@@ -26,6 +26,8 @@ interface ViewState {
   settingsOpen: boolean;
   /** transient prefill handed to the New Task composer (Create popover) */
   taskPrefill: string;
+  /** search query handed to the Explore view (topbar search) */
+  searchQuery: string;
 }
 
 interface InteractionState {
@@ -41,12 +43,14 @@ interface NavigateOpts {
   sparkIndex?: number;
   channel?: string;
   prefill?: string;
+  search?: string;
 }
 
 interface PlayLiquidState extends ViewState, InteractionState {
   navigate: (view: ViewName, opts?: NavigateOpts) => void;
   openSettings: () => void;
   clearTaskPrefill: () => void;
+  setSearchQuery: (q: string) => void;
   toggleLikeGame: (id: string) => void;
   toggleDislikeGame: (id: string) => void;
   toggleFollow: (id: string) => void;
@@ -86,7 +90,7 @@ function persist(s: PlayLiquidState) {
   }
 }
 
-/** Parse "#view=play&game=xyz&spark=2&channel=Name" into state. */
+/** Parse "#view=play&game=xyz&spark=2&channel=Name&q=…" into state. */
 function viewFromHash(): ViewState {
   const view: ViewState = {
     view: "home",
@@ -95,6 +99,7 @@ function viewFromHash(): ViewState {
     channel: DEFAULT_CHANNEL,
     settingsOpen: false,
     taskPrefill: "",
+    searchQuery: "",
   };
   if (typeof window === "undefined") return view;
   const h = window.location.hash.replace(/^#/, "");
@@ -107,6 +112,8 @@ function viewFromHash(): ViewState {
   if (sp) view.sparkIndex = Number(sp) || 0;
   const ch = params.get("channel");
   if (ch) view.channel = ch;
+  const q = params.get("q");
+  if (q !== null) view.searchQuery = q;
   return view;
 }
 
@@ -117,6 +124,7 @@ export const usePlayLiquid = create<PlayLiquidState>((set, get) => ({
   channel: DEFAULT_CHANNEL,
   settingsOpen: false,
   taskPrefill: "",
+  searchQuery: "",
   likedGames: {},
   dislikedGames: {},
   followedCreators: {},
@@ -132,12 +140,14 @@ export const usePlayLiquid = create<PlayLiquidState>((set, get) => ({
     const sparkIndex = opts?.sparkIndex ?? get().sparkIndex;
     const channel = opts?.channel ?? get().channel;
     const taskPrefill = opts?.prefill ?? (isDeskView(view) ? "" : get().taskPrefill);
-    set({ view, gameId, sparkIndex, channel, taskPrefill, settingsOpen: false });
+    const searchQuery = opts?.search !== undefined ? opts.search : view === "explore" ? get().searchQuery : "";
+    set({ view, gameId, sparkIndex, channel, taskPrefill, searchQuery, settingsOpen: false });
     if (typeof window !== "undefined") {
       const params = new URLSearchParams({ view });
       if (gameId) params.set("game", gameId);
       if (sparkIndex) params.set("spark", String(sparkIndex));
       if (view === "channel") params.set("channel", channel);
+      if (view === "explore" && searchQuery) params.set("q", searchQuery);
       const hash = `#${params.toString()}`;
       if (window.location.hash !== hash) {
         window.history.pushState(null, "", hash);
@@ -153,6 +163,10 @@ export const usePlayLiquid = create<PlayLiquidState>((set, get) => ({
 
   clearTaskPrefill: () => {
     set({ taskPrefill: "" });
+  },
+
+  setSearchQuery: (q) => {
+    set({ searchQuery: q });
   },
 
   toggleLikeGame: (id) => {
@@ -200,6 +214,7 @@ if (typeof window !== "undefined") {
       gameId: parsed.gameId,
       sparkIndex: parsed.sparkIndex,
       channel: parsed.channel,
+      search: parsed.searchQuery,
     });
     usePlayLiquid.setState(parsed);
   });

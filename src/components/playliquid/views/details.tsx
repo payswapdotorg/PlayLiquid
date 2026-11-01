@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { BookmarkPlus, Gamepad2, History, Share2, Star, Trophy, Users, Volume2, VolumeX } from "lucide-react";
+import { BookmarkPlus, Gamepad2, History, Send, Share2, Star, Trophy, Users, Volume2, VolumeX } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
 import { GameCard } from "../game-card";
 import { useApi, postJson } from "@/hooks/use-api";
 import { usePlayLiquid } from "@/lib/store";
@@ -31,6 +32,35 @@ export function DetailsView({ gameId }: { gameId: string | null }) {
   const following = !!usePlayLiquid((s) => (data ? s.followedCreators[data.game.creator.id] : false));
   const toggleFollow = usePlayLiquid((s) => s.toggleFollow);
   const [muted, setMuted] = useState(true);
+  const [commentText, setCommentText] = useState("");
+  const [commentPosting, setCommentPosting] = useState(false);
+  const [comments, setComments] = useState<CommentDTO[]>([]);
+  // comments arriving from the server — applied at render-time (no effect setState)
+  const [prevComments, setPrevComments] = useState<CommentDTO[] | null>(null);
+  if (data && data.comments !== prevComments) {
+    setPrevComments(data.comments);
+    setComments(data.comments);
+  }
+
+  async function postComment() {
+    if (!gameId || !commentText.trim()) {
+      toast("Write something first");
+      return;
+    }
+    setCommentPosting(true);
+    try {
+      const r = await postJson<{ comment: CommentDTO }>(`/api/games/${gameId}/comments`, {
+        body: commentText,
+      });
+      setComments((prev) => [r.comment, ...prev]);
+      setCommentText("");
+      toast.success("Comment posted");
+    } catch {
+      toast.error("Failed to post comment");
+    } finally {
+      setCommentPosting(false);
+    }
+  }
 
   if (loading) {
     return (
@@ -108,8 +138,13 @@ export function DetailsView({ gameId }: { gameId: string | null }) {
             variant="secondary"
             className="rounded-full"
             onClick={() => {
+              const next = !saved;
               toggleSave(g.id);
-              toast.success(saved ? "Removed from Library" : "Saved to Library");
+              toast.success(next ? "Saved to Library" : "Removed from Library");
+              // server-side Library persistence (optimistic)
+              void postJson(`/api/games/${g.id}/save`, { saved: next }).catch(() => {
+                toast.error("Could not update your Library");
+              });
             }}
           >
             <BookmarkPlus className={cn("size-4", saved && "text-pl-cyan")} /> {saved ? "Saved" : "Save"}
@@ -253,8 +288,41 @@ export function DetailsView({ gameId }: { gameId: string | null }) {
         </TabsContent>
 
         <TabsContent value="community" className="mt-4">
-          <ul className="space-y-4">
-            {data.comments.slice(0, 12).map((c: CommentDTO) => (
+          <div className="flex gap-3">
+            <Avatar className="size-9 shrink-0">
+              <AvatarImage src="/avatars/playliquid-labs.jpg" alt="" />
+              <AvatarFallback>Y</AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <Textarea
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                placeholder="Share tips, scores or feedback…"
+                className="min-h-[70px] border-border/70 bg-secondary/40"
+                aria-label="Write a comment"
+              />
+              <div className="mt-2 flex justify-end gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="rounded-full"
+                  onClick={() => setCommentText("")}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  size="sm"
+                  className="rounded-full pl-brand-gradient text-black hover:opacity-90"
+                  disabled={commentPosting}
+                  onClick={() => void postComment()}
+                >
+                  <Send className="size-3.5" /> Comment
+                </Button>
+              </div>
+            </div>
+          </div>
+          <ul className="mt-4 space-y-4">
+            {comments.slice(0, 12).map((c: CommentDTO) => (
               <li key={c.id} className="flex gap-3">
                 <Avatar className="size-9 shrink-0">
                   <AvatarImage src={c.authorAvatar} alt="" />

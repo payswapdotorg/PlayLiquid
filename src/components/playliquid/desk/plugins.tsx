@@ -3,12 +3,15 @@
 /**
  * Plugin Marketplace — ported from the Interface Reconstruction v2 design:
  * market tools, Public/Community/Personal tabs, live search and the
- * App plugins / Developer Tools sections with install toggles.
+ * App plugins / Developer Tools sections with install toggles. Install and
+ * enable states persist server-side via GET/PUT /api/plugins.
  */
 import { useState } from "react";
 import { ChevronDown, House, Plus, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
+import { useApi } from "@/hooks/use-api";
 import { cn } from "@/lib/utils";
+import type { PluginState, PluginStates } from "@/lib/types";
 
 type PluginKind = "switch" | "install";
 
@@ -41,7 +44,21 @@ const DEV_PLUGINS: PluginItem[] = [
   { name: "Android Emulator", glyph: "◉", glyphClass: "green", desc: "Launch and test Android applications...", kind: "switch", enabled: false },
 ];
 
+/** JSON request helper for the non-POST verbs (postJson only issues POST). */
+async function sendJson<T>(url: string, method: "PUT" | "PATCH" | "DELETE", body?: unknown): Promise<T> {
+  const res = await fetch(url, {
+    method,
+    headers: body !== undefined ? { "Content-Type": "application/json" } : undefined,
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  });
+  const json = (await res.json().catch(() => ({}))) as T & { error?: string };
+  if (!res.ok) throw new Error(json.error ?? `Request failed (${res.status})`);
+  return json;
+}
+
 export function PluginsView() {
+  const { data, reload } = useApi<{ states: PluginStates }>("/api/plugins");
+
   const [tab, setTab] = useState("Public");
   const [query, setQuery] = useState("");
   const [appCollapsed, setAppCollapsed] = useState(false);
@@ -53,9 +70,32 @@ export function PluginsView() {
     return initial;
   });
 
+  // merge the persisted server states over the catalog defaults — render-time
+  // sync keyed on the server payload reference, so a local toggle is never
+  // clobbered but Refresh (reload) genuinely re-syncs
+  const [mergedRef, setMergedRef] = useState<PluginStates | null>(null);
+  const serverStates = data?.states ?? null;
+  if (serverStates && mergedRef !== serverStates) {
+    setMergedRef(serverStates);
+    setStates((prev) => {
+      const next = { ...prev };
+      for (const p of [...APP_PLUGINS, ...DEV_PLUGINS]) {
+        const s: PluginState | undefined = serverStates[p.name];
+        if (!s) continue;
+        next[p.name] = p.kind === "switch" ? !!s.enabled : !!s.installed;
+      }
+      return next;
+    });
+  }
+
   function setPluginState(name: string, kind: PluginKind, next: boolean) {
     setStates((s) => ({ ...s, [name]: next }));
     if (kind === "install") toast(next ? "Plugin installed" : "Plugin removed");
+    const state: PluginState =
+      kind === "switch" ? { installed: true, enabled: next } : { installed: next, enabled: next };
+    void sendJson("/api/plugins", "PUT", { states: { [name]: state } }).catch(() =>
+      toast.error("Could not save plugin state"),
+    );
   }
 
   const q = query.trim().toLowerCase();
@@ -71,7 +111,10 @@ export function PluginsView() {
             className="desk-action"
             aria-label="Refresh marketplace"
             title="Refresh"
-            onClick={() => toast("Marketplace refreshed")}
+            onClick={() => {
+              void reload();
+              toast("Marketplace refreshed");
+            }}
           >
             <RefreshCw className="size-[15px]" strokeWidth={2} />
           </button>

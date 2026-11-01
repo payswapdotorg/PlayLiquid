@@ -7,8 +7,10 @@
  */
 import { useState } from "react";
 import { toast } from "sonner";
+import { useApi } from "@/hooks/use-api";
 import { usePlayLiquid } from "@/lib/store";
 import { cn } from "@/lib/utils";
+import type { SettingsValues } from "@/lib/types";
 
 const MENU: { group: string; items: { glyph: string; label: string }[] }[] = [
   {
@@ -45,16 +47,89 @@ const MENU: { group: string; items: { glyph: string; label: string }[] }[] = [
   },
 ];
 
+/** Settings control state — booleans unwrapped from the server's "true"/"false" strings. */
+interface Prefs {
+  language: string;
+  interfaceMode: string;
+  proactive: boolean;
+  inheritTerminal: boolean;
+  terminalFont: string;
+  terminalShell: string;
+  restoreWorkspace: boolean;
+}
+
+const DEFAULT_PREFS: Prefs = {
+  language: "System default",
+  interfaceMode: "Coding mode",
+  proactive: false,
+  inheritTerminal: true,
+  terminalFont: "",
+  terminalShell: "Auto",
+  restoreWorkspace: true,
+};
+
+/** Read a string preference; a missing key keeps the built-in default. */
+function strPref(values: SettingsValues, key: string, fallback: string) {
+  const raw: string | undefined = values[key];
+  return raw === undefined ? fallback : raw;
+}
+
+/** Read a boolean preference ("true"/"false"); a missing key keeps the built-in default. */
+function boolPref(values: SettingsValues, key: string, fallback: boolean) {
+  const raw: string | undefined = values[key];
+  return raw === undefined ? fallback : raw === "true";
+}
+
 export function SettingsShell() {
   const navigate = usePlayLiquid((s) => s.navigate);
+  const { data } = useApi<{ values: SettingsValues }>("/api/settings");
   const [active, setActive] = useState("General");
-  const [sw, setSw] = useState<Record<string, boolean>>({
-    proactive: false,
-    inheritTerminal: true,
-    restoreWorkspace: true,
-  });
+  const [prefs, setPrefs] = useState<Prefs>(DEFAULT_PREFS);
+  const [saving, setSaving] = useState(false);
 
-  const toggle = (key: string) => setSw((s) => ({ ...s, [key]: !s[key] }));
+  // server preferences arriving while mounted — applied at render-time (no effect setState);
+  // the settings window remounts on every open, so hydrate once per open
+  const [hydrated, setHydrated] = useState(false);
+  if (!hydrated && data) {
+    setHydrated(true);
+    const v = data.values;
+    setPrefs({
+      language: strPref(v, "language", DEFAULT_PREFS.language),
+      interfaceMode: strPref(v, "interface-mode", DEFAULT_PREFS.interfaceMode),
+      proactive: boolPref(v, "proactive-tasks", DEFAULT_PREFS.proactive),
+      inheritTerminal: boolPref(v, "inherit-terminal", DEFAULT_PREFS.inheritTerminal),
+      terminalFont: strPref(v, "terminal-font", ""),
+      terminalShell: strPref(v, "terminal-shell", DEFAULT_PREFS.terminalShell),
+      restoreWorkspace: boolPref(v, "restore-workspace", DEFAULT_PREFS.restoreWorkspace),
+    });
+  }
+
+  async function savePrefs() {
+    setSaving(true);
+    try {
+      const res = await fetch("/api/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          values: {
+            language: prefs.language,
+            "interface-mode": prefs.interfaceMode,
+            "proactive-tasks": String(prefs.proactive),
+            "inherit-terminal": String(prefs.inheritTerminal),
+            "terminal-font": prefs.terminalFont,
+            "terminal-shell": prefs.terminalShell,
+            "restore-workspace": String(prefs.restoreWorkspace),
+          } satisfies SettingsValues,
+        }),
+      });
+      if (!res.ok) throw new Error(`Request failed (${res.status})`);
+      toast.success("Settings saved");
+    } catch {
+      toast.error("Could not save settings");
+    } finally {
+      setSaving(false);
+    }
+  }
 
   return (
     <div className="settings-shell" id="settingsShell" aria-label="Settings">
@@ -114,7 +189,12 @@ export function SettingsShell() {
                 <b>Language</b>
                 <p>Choose the display language used by the application UI.</p>
               </div>
-              <select className="setting-control" aria-label="Language" defaultValue="System default">
+              <select
+                className="setting-control"
+                aria-label="Language"
+                value={prefs.language}
+                onChange={(e) => setPrefs((p) => ({ ...p, language: e.target.value }))}
+              >
                 <option>System default</option>
                 <option>English</option>
                 <option>French</option>
@@ -128,7 +208,12 @@ export function SettingsShell() {
                   and code changes.
                 </p>
               </div>
-              <select className="setting-control" aria-label="Interface mode" defaultValue="Coding mode">
+              <select
+                className="setting-control"
+                aria-label="Interface mode"
+                value={prefs.interfaceMode}
+                onChange={(e) => setPrefs((p) => ({ ...p, interfaceMode: e.target.value }))}
+              >
                 <option>Coding mode</option>
                 <option>Office mode</option>
               </select>
@@ -140,10 +225,10 @@ export function SettingsShell() {
               </div>
               <button
                 type="button"
-                className={cn("switch", sw.proactive && "on")}
+                className={cn("switch", prefs.proactive && "on")}
                 aria-label="Proactive task suggestions"
-                aria-pressed={sw.proactive}
-                onClick={() => toggle("proactive")}
+                aria-pressed={prefs.proactive}
+                onClick={() => setPrefs((p) => ({ ...p, proactive: !p.proactive }))}
               />
             </div>
           </div>
@@ -159,10 +244,10 @@ export function SettingsShell() {
               </div>
               <button
                 type="button"
-                className={cn("switch", sw.inheritTerminal && "on")}
+                className={cn("switch", prefs.inheritTerminal && "on")}
                 aria-label="Inherit system terminal profile"
-                aria-pressed={sw.inheritTerminal}
-                onClick={() => toggle("inheritTerminal")}
+                aria-pressed={prefs.inheritTerminal}
+                onClick={() => setPrefs((p) => ({ ...p, inheritTerminal: !p.inheritTerminal }))}
               />
             </div>
             <div className="setting-row">
@@ -174,6 +259,8 @@ export function SettingsShell() {
                   placeholder="Leave blank to inherit, e.g. MesloLGS NF, monospace"
                   style={{ marginTop: 12 }}
                   aria-label="Terminal font"
+                  value={prefs.terminalFont}
+                  onChange={(e) => setPrefs((p) => ({ ...p, terminalFont: e.target.value }))}
                 />
               </div>
             </div>
@@ -185,14 +272,24 @@ export function SettingsShell() {
                   Bash then cmd.exe.
                 </p>
               </div>
-              <select className="setting-control" aria-label="Integrated terminal shell" defaultValue="Auto">
+              <select
+                className="setting-control"
+                aria-label="Integrated terminal shell"
+                value={prefs.terminalShell}
+                onChange={(e) => setPrefs((p) => ({ ...p, terminalShell: e.target.value }))}
+              >
                 <option>Auto</option>
                 <option>PowerShell</option>
                 <option>Command Prompt</option>
                 <option>Git Bash</option>
               </select>
             </div>
-            <button type="button" className="save-btn" onClick={() => toast("Settings saved")}>
+            <button
+              type="button"
+              className="save-btn"
+              disabled={saving}
+              onClick={() => void savePrefs()}
+            >
               Save
             </button>
           </div>
@@ -205,10 +302,10 @@ export function SettingsShell() {
               </div>
               <button
                 type="button"
-                className={cn("switch", sw.restoreWorkspace && "on")}
+                className={cn("switch", prefs.restoreWorkspace && "on")}
                 aria-label="Restore previous workspace"
-                aria-pressed={sw.restoreWorkspace}
-                onClick={() => toggle("restoreWorkspace")}
+                aria-pressed={prefs.restoreWorkspace}
+                onClick={() => setPrefs((p) => ({ ...p, restoreWorkspace: !p.restoreWorkspace }))}
               />
             </div>
           </div>

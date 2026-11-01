@@ -1,0 +1,805 @@
+     1→"use client";
+     2→
+     3→/**
+     4→ * PlayLiquid live game engine — four real playable engines (breaker, stardrift,
+     5→ * leap, runner) themed by each game's themeJson so the playable build matches
+     6→ * its preview assets. Supports:
+     7→ * - keyboard (arrows / WASD / space), mouse and touch input
+     8→ * - HUD via DOM overlay (score, lives, game-over card)
+     9→ * - attract/demo mode (auto=true) for the Game Builder live canvas
+    10→ * - score/progress/game-over callbacks for sessions + leaderboards
+    11→ */
+    12→import { useCallback, useEffect, useRef, useState } from "react";
+    13→import { Heart, RotateCcw } from "lucide-react";
+    14→import { cn } from "@/lib/utils";
+    15→import type { GameTheme } from "@/lib/types";
+    16→
+    17→const W = 800;
+    18→const H = 450;
+    19→
+    20→export interface GameEngineHandle {
+    21→  restart: () => void;
+    22→}
+    23→
+    24→type EngineProps = {
+    25→  engine: string;
+    26→  theme: GameTheme;
+    27→  auto?: boolean;
+    28→  paused?: boolean;
+    29→  onScore?: (score: number) => void;
+    30→  onGameOver?: (score: number) => void;
+    31→  onProgress?: (progress: number) => void;
+    32→  restartKey?: number;
+    33→  className?: string;
+    34→};
+    35→
+    36→type RGB = number[];
+    37→const rgb = (c: RGB, a = 1) =>
+    38→  `rgba(${Math.round(c[0])},${Math.round(c[1])},${Math.round(c[2])},${a})`;
+    39→const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+    40→
+    41→function defaultTheme(): GameTheme {
+    42→  return {
+    43→    palette: {
+    44→      bg: [10, 6, 24],
+    45→      accent: [0, 229, 255],
+    46→      accent2: [138, 125, 255],
+    47→      ball: [240, 248, 255],
+    48→      platform: [122, 110, 150],
+    49→    },
+    50→    speed: 1,
+    51→    difficulty: 1,
+    52→    label: "Default",
+    53→  };
+    54→}
+    55→
+    56→export function GameEngine({
+    57→  engine,
+    58→  theme: themeProp,
+    59→  auto = false,
+    60→  paused = false,
+    61→  onScore,
+    62→  onGameOver,
+    63→  onProgress,
+    64→  restartKey = 0,
+    65→  className,
+    66→}: EngineProps) {
+    67→  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+    68→  const [hudScore, setHudScore] = useState(0);
+    69→  const [hudLives, setHudLives] = useState(3);
+    70→  const [gameOver, setGameOver] = useState(false);
+    71→  const [started, setStarted] = useState(auto);
+    72→
+    73→  const theme = themeProp?.palette ? themeProp : defaultTheme();
+    74→  const speed = Math.max(0.5, Math.min(1.8, themeProp?.speed ?? 1));
+    75→  const difficulty = Math.max(0.5, Math.min(1.8, themeProp?.difficulty ?? 1));
+    76→
+    77→  const stateRef = useRef<Record<string, unknown>>({});
+    78→  const keysRef = useRef<Record<string, boolean>>({});
+    79→  const pointerRef = useRef<{ x: number; y: number } | null>(null);
+    80→  const reportedOver = useRef(false);
+    81→  const rafRef = useRef(0);
+    82→  const scoreReport = useRef(0);
+    83→
+    84→  const makeState = useCallback(() => {
+    85→    const s: Record<string, unknown> = { score: 0, lives: 3, t: 0, maxScore: 0, dead: false };
+    86→    if (engine === "breaker") {
+    87→      s.paddleX = W / 2;
+    88→      s.ballX = W / 2;
+    89→      s.ballY = H * 0.6;
+    90→      const ang = -Math.PI / 3;
+    91→      const sp = 5.6 * speed;
+    92→      s.ballVX = Math.cos(ang) * sp;
+    93→      s.ballVY = Math.sin(ang) * sp;
+    94→      s.bricks = [];
+    95→      const cols = 10;
+    96→      const rows = 5;
+    97→      for (let r = 0; r < rows; r++)
+    98→        for (let c = 0; c < cols; c++) s.bricks.push({ x: 60 + c * 68, y: 60 + r * 34, hp: 1 });
+    99→      s.paddleW = 120 / difficulty;
+   100→      s.wall = 1;
+   101→      s.destroyed = 0;
+   102→      s.totalBricks = cols * rows;
+   103→    } else if (engine === "stardrift") {
+   104→      s.shipX = W / 2;
+   105→      s.asteroids = [];
+   106→      s.bullets = [];
+   107→      s.spawn = 0;
+   108→      s.shootT = 0;
+   109→    } else if (engine === "leap") {
+   110→      s.px = W / 2;
+   111→      s.py = H * 0.5;
+   112→      s.vx = 0;
+   113→      s.vy = -640 * speed;
+   114→      s.platforms = [];
+   115→      for (let i = 0; i < 8; i++)
+   116→        s.platforms.push({ x: 40 + Math.random() * (W - 180), y: H - 30 - i * 52, w: 110 });
+   117→      s.camY = 0;
+   118→      s.height = 0;
+   119→      s.lavaY = H + 80;
+   120→      s.lives = 1;
+   121→    } else {
+   122→      // runner
+   123→      s.lane = 1;
+   124→      s.laneX = W / 2;
+   125→      s.obstacles = [];
+   126→      s.spawn = 0;
+   127→      s.dist = 0;
+   128→      s.lives = 1;
+   129→    }
+   130→    return s;
+   131→  }, [engine, speed, difficulty]);
+   132→
+   133→  // reset when the restart key or engine changes (render-time state reset +
+   134→  // engine-state rebuild in a matching effect). makeState rides a ref so theme
+   135→  // slider changes never restart the run — only explicit resets do.
+   136→  const [prevReset, setPrevReset] = useState(`${restartKey}:${engine}`);
+   137→  if (prevReset !== `${restartKey}:${engine}`) {
+   138→    setPrevReset(`${restartKey}:${engine}`);
+   139→    setHudScore(0);
+   140→    setHudLives(engine === "runner" ? 1 : 3);
+   141→    setGameOver(false);
+   142→    setStarted(auto);
+   143→  }
+   144→  const makeStateRef = useRef(makeState);
+   145→  useEffect(() => {
+   146→    makeStateRef.current = makeState;
+   147→  }, [makeState]);
+   148→  useEffect(() => {
+   149→    stateRef.current = makeStateRef.current();
+   150→    reportedOver.current = false;
+   151→  }, [prevReset]);
+   152→
+   153→  const restart = useCallback(() => {
+   154→    stateRef.current = makeState();
+   155→    reportedOver.current = false;
+   156→    setHudScore(0);
+   157→    setHudLives(engine === "runner" ? 1 : 3);
+   158→    setGameOver(false);
+   159→    setStarted(true);
+   160→  }, [engine, makeState]);
+   161→
+   162→  // input
+   163→  useEffect(() => {
+   164→    const kd = (e: KeyboardEvent) => {
+   165→      keysRef.current[e.key] = true;
+   166→      if ([" ", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key)) e.preventDefault();
+   167→    };
+   168→    const ku = (e: KeyboardEvent) => {
+   169→      keysRef.current[e.key] = false;
+   170→    };
+   171→    window.addEventListener("keydown", kd);
+   172→    window.addEventListener("keyup", ku);
+   173→    return () => {
+   174→      window.removeEventListener("keydown", kd);
+   175→      window.removeEventListener("keyup", ku);
+   176→    };
+   177→  }, []);
+   178→
+   179→  const gameOverFor = useCallback(
+   180→    (score: number) => {
+   181→      if (reportedOver.current) return;
+   182→      reportedOver.current = true;
+   183→      setGameOver(true);
+   184→      onGameOver?.(Math.round(score));
+   185→    },
+   186→    [onGameOver],
+   187→  );
+   188→
+   189→  // throttled HUD updates — only when values actually change
+   190→  const hudRef = useRef({ score: -1, lives: -1 });
+   191→  const hud = useCallback(
+   192→    (score: number, lives: number) => {
+   193→      if (hudRef.current.score !== score || hudRef.current.lives !== lives) {
+   194→        hudRef.current = { score, lives };
+   195→        setHudScore(score);
+   196→        setHudLives(lives);
+   197→        onScore?.(score);
+   198→      }
+   199→    },
+   200→    [onScore],
+   201→  );
+   202→
+   203→  // main loop
+   204→  useEffect(() => {
+   205→    const canvas = canvasRef.current;
+   206→    if (!canvas) return;
+   207→    const ctx = canvas.getContext("2d");
+   208→    if (!ctx) return;
+   209→
+   210→    let last = performance.now();
+   211→    let lastProgress = -1;
+   212→
+   213→    const loop = (now: number) => {
+   214→      rafRef.current = requestAnimationFrame(loop);
+   215→      const dt = Math.min(0.05, (now - last) / 1000);
+   216→      last = now;
+   217→      const s = stateRef.current as Record<string, any>;
+   218→      if (!s || paused) {
+   219→        renderIdle(ctx);
+   220→        return;
+   221→      }
+   222→      s.t += dt;
+   223→
+   224→      // ---------------- update ----------------
+   225→      const keys = keysRef.current;
+   226→      const pointer = pointerRef.current;
+   227→      if (!started && !auto) {
+   228→        renderIdle(ctx);
+   229→        return;
+   230→      }
+   231→
+   232→      const progressOf = (sc: number) => {
+   233→        if (engine === "breaker") return Math.min(0.98, (s.destroyed ?? 0) / ((s.totalBricks ?? 50) * 3));
+   234→        if (engine === "stardrift") return Math.min(0.98, sc / 30000);
+   235→        if (engine === "leap") return Math.min(0.98, sc / 4200);
+   236→        return Math.min(0.98, sc / 25000);
+   237→      };
+   238→      const wrappedHud = (sc: number, lives: number) => {
+   239→        hud(sc, lives);
+   240→        const p = progressOf(sc);
+   241→        if (p !== lastProgress) {
+   242→          lastProgress = p;
+   243→          onProgress?.(p);
+   244→        }
+   245→      };
+   246→
+   247→      if (engine === "breaker") updateBreaker(s, dt, keys, pointer, auto, speed, difficulty, wrappedHud, (finalScore) => gameOverFor(finalScore));
+   248→      if (engine === "stardrift") updateStardrift(s, dt, keys, pointer, auto, speed, difficulty, wrappedHud, (finalScore) => gameOverFor(finalScore));
+   249→      if (engine === "leap") updateLeap(s, dt, keys, pointer, auto, speed, difficulty, wrappedHud, (finalScore) => gameOverFor(finalScore));
+   250→      if (engine === "runner") updateRunner(s, dt, keys, pointer, auto, speed, difficulty, wrappedHud, (finalScore) => gameOverFor(finalScore));
+   251→
+   252→      // ---------------- render ----------------
+   253→      renderFrame(ctx, s, engine, theme);
+   254→    };
+   255→    rafRef.current = requestAnimationFrame(loop);
+   256→    return () => cancelAnimationFrame(rafRef.current);
+   257→     
+   258→  }, [engine, theme, started, auto, paused, speed, difficulty]);
+   259→
+   260→  const onPointer = useCallback((e: React.PointerEvent<HTMLCanvasElement>) => {
+   261→    const rect = e.currentTarget.getBoundingClientRect();
+   262→    pointerRef.current = {
+   263→      x: ((e.clientX - rect.left) / rect.width) * W,
+   264→      y: ((e.clientY - rect.top) / rect.height) * H,
+   265→    };
+   266→  }, []);
+   267→
+   268→  const swipeStart = useRef<{ x: number; y: number } | null>(null);
+   269→  const onPointerDown = useCallback((e: React.PointerEvent<HTMLCanvasElement>) => {
+   270→    onPointer(e);
+   271→    swipeStart.current = { x: e.clientX, y: e.clientY };
+   272→    if (!started && !auto) setStarted(true);
+   273→  }, [onPointer, started, auto]);
+   274→  const onPointerUp = useCallback(
+   275→    (e: React.PointerEvent<HTMLCanvasElement>) => {
+   276→      const st = swipeStart.current;
+   277→      swipeStart.current = null;
+   278→      if (!st || engine !== "runner") return;
+   279→      const dx = e.clientX - st.x;
+   280→      const s = stateRef.current as Record<string, any>;
+   281→      if (Math.abs(dx) > 24) {
+   282→        s.lane = Math.max(0, Math.min(2, s.lane + (dx > 0 ? 1 : -1)));
+   283→      }
+   284→    },
+   285→    [engine],
+   286→  );
+   287→
+   288→  return (
+   289→    <div className={cn("relative aspect-video w-full select-none overflow-hidden rounded-xl bg-black", className)}>
+   290→      <canvas
+   291→        ref={canvasRef}
+   292→        width={W}
+   293→        height={H}
+   294→        className="pl-canvas absolute inset-0 h-full w-full"
+   295→        onPointerMove={onPointer}
+   296→        onPointerDown={onPointerDown}
+   297→        onPointerUp={onPointerUp}
+   298→        onPointerLeave={() => {
+   299→          pointerRef.current = null;
+   300→        }}
+   301→        aria-label={`${engine} game canvas`}
+   302→      />
+   303→      {/* HUD */}
+   304→      <div className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between p-3 font-mono text-sm font-bold tabular-nums text-white drop-shadow">
+   305→        <span className="rounded bg-black/40 px-2 py-0.5">{hudScore.toLocaleString()}</span>
+   306→        <span className="flex items-center gap-1 rounded bg-black/40 px-2 py-0.5">
+   307→          {Array.from({ length: Math.max(0, hudLives) }).map((_, i) => (
+   308→            <Heart key={i} className="size-3.5 fill-pl-rose text-pl-rose" aria-hidden />
+   309→          ))}
+   310→        </span>
+   311→      </div>
+   312→      {!auto && !started && !gameOver && (
+   313→        <button
+   314→          type="button"
+   315→          onClick={() => setStarted(true)}
+   316→          className="absolute inset-0 flex cursor-pointer flex-col items-center justify-center gap-3 bg-black/55 backdrop-blur-[2px]"
+   317→        >
+   318→          <span className="flex size-16 items-center justify-center rounded-full pl-1 pl-brand-gradient text-2xl text-black shadow-lg pl-glow">
+   319→            ▶
+   320→          </span>
+   321→          <span className="rounded-full bg-black/60 px-4 py-1.5 text-sm text-white">
+   322→            Click or press Space to play · ←→ move
+   323→          </span>
+   324→        </button>
+   325→      )}
+   326→      {gameOver && (
+   327→        <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black/70 backdrop-blur-sm pl-fade-up">
+   328→          <p className="font-mono text-xs uppercase tracking-[0.3em] text-white/60">Game over</p>
+   329→          <p className="font-mono text-4xl font-bold tabular-nums text-white">
+   330→            {hudScore.toLocaleString()}
+   331→          </p>
+   332→          <button
+   333→            type="button"
+   334→            onClick={restart}
+   335→            className="flex cursor-pointer items-center gap-2 rounded-full pl-brand-gradient px-5 py-2.5 text-sm font-semibold text-black transition hover:opacity-90"
+   336→          >
+   337→            <RotateCcw className="size-4" /> Play again
+   338→          </button>
+   339→          {auto && null}
+   340→        </div>
+   341→      )}
+   342→    </div>
+   343→  );
+   344→}
+   345→
+   346→/* ================= engine updates ================= */
+   347→
+   348→type HudCb = (score: number, lives: number) => void;
+   349→type OverCb = (score: number) => void;
+   350→
+   351→function updateBreaker(
+   352→  s: any, dt: number, keys: Record<string, boolean>, pointer: { x: number; y: number } | null,
+   353→  auto: boolean, speed: number, difficulty: number, hud: HudCb, over: OverCb,
+   354→) {
+   355→  const PW = s.paddleW;
+   356→  const PY = H - 34;
+   357→  // paddle control
+   358→  let target = s.paddleX;
+   359→  if (auto) {
+   360→    target = s.ballX + (s.ballVX > 0 ? 26 : -26);
+   361→  } else if (pointer) {
+   362→    target = pointer.x;
+   363→  } else if (keys["ArrowLeft"] || keys["a"]) target = s.paddleX - 640 * dt;
+   364→  else if (keys["ArrowRight"] || keys["d"]) target = s.paddleX + 640 * dt;
+   365→  s.paddleX = lerp(s.paddleX, Math.max(PW / 2, Math.min(W - PW / 2, target)), auto ? 0.12 : 0.35);
+   366→
+   367→  // ball
+   368→  s.ballX += s.ballVX * 60 * dt;
+   369→  s.ballY += s.ballVY * 60 * dt;
+   370→  if (s.ballX < 10) { s.ballX = 10; s.ballVX = Math.abs(s.ballVX); }
+   371→  if (s.ballX > W - 10) { s.ballX = W - 10; s.ballVX = -Math.abs(s.ballVX); }
+   372→  if (s.ballY < 10) { s.ballY = 10; s.ballVY = Math.abs(s.ballVY); }
+   373→
+   374→  // paddle bounce
+   375→  if (s.ballY > PY - 8 && s.ballY < PY + 8 && s.ballVY > 0 && Math.abs(s.ballX - s.paddleX) < PW / 2 + 6) {
+   376→    s.ballVY = -Math.abs(s.ballVY);
+   377→    const off = (s.ballX - s.paddleX) / (PW / 2);
+   378→    s.ballVX = off * 5.2 * speed;
+   379→  }
+   380→
+   381→  // bricks
+   382→  if (s.bricks.length > 0) {
+   383→    for (let i = s.bricks.length - 1; i >= 0; i--) {
+   384→      const b = s.bricks[i];
+   385→      if (s.ballX > b.x && s.ballX < b.x + 64 && s.ballY > b.y && s.ballY < b.y + 28) {
+   386→        s.bricks.splice(i, 1);
+   387→        s.destroyed = (s.destroyed ?? 0) + 1;
+   388→        s.score += 100;
+   389→        s.ballVY = -s.ballVY;
+   390→        break;
+   391→      }
+   392→    }
+   393→  }
+   394→  if (s.bricks.length === 0) {
+   395→    // next wall
+   396→    s.wall++;
+   397→    for (let r = 0; r < 5; r++)
+   398→      for (let c = 0; c < 10; c++) s.bricks.push({ x: 60 + c * 68, y: 60 + r * 34, hp: 1 });
+   399→    s.ballVX *= 1.08;
+   400→    s.ballVY = -Math.abs(s.ballVY) * 1.08;
+   401→    s.ballX = W / 2;
+   402→    s.ballY = H * 0.6;
+   403→  }
+   404→
+   405→  // miss
+   406→  if (s.ballY > H + 16) {
+   407→    s.lives--;
+   408→    if (s.lives <= 0) {
+   409→      hud(s.score, 0);
+   410→      over(s.score);
+   411→      s.dead = true;
+   412→    } else {
+   413→      s.ballX = W / 2;
+   414→      s.ballY = H * 0.6;
+   415→      s.ballVY = -Math.abs(s.ballVY);
+   416→      s.ballVX = (Math.random() > 0.5 ? 1 : -1) * 3.4 * speed;
+   417→    }
+   418→  }
+   419→  if (s.dead) { s.ballX = W / 2; s.ballY = H * 0.72; }
+   420→  hud(s.score, s.lives);
+   421→}
+   422→
+   423→function updateStardrift(
+   424→  s: any, dt: number, keys: Record<string, boolean>, pointer: { x: number; y: number } | null,
+   425→  auto: boolean, speed: number, difficulty: number, hud: HudCb, over: OverCb,
+   426→) {
+   427→  // ship control
+   428→  let target = s.shipX;
+   429→  if (auto) {
+   430→    // dodge nearest asteroid
+   431→    let danger = null as any;
+   432→    for (const a of s.asteroids) if (a.y > H * 0.35 && a.y < H && Math.abs(a.x - s.shipX) < 90 && (!danger || a.y > danger.y)) danger = a;
+   433→    if (danger) target = s.shipX + (danger.x > s.shipX ? -150 : 150);
+   434→    else target = W / 2 + Math.sin(s.t * 0.7) * 200;
+   435→  } else if (pointer) {
+   436→    target = pointer.x;
+   437→  } else if (keys["ArrowLeft"] || keys["a"]) target = s.shipX - 560 * dt;
+   438→  else if (keys["ArrowRight"] || keys["d"]) target = s.shipX + 560 * dt;
+   439→  s.shipX = lerp(s.shipX, Math.max(24, Math.min(W - 24, target)), auto ? 0.1 : 0.4);
+   440→
+   441→  // shooting
+   442→  s.shootT -= dt;
+   443→  if (s.shootT <= 0) {
+   444→    s.shootT = 0.24 / speed;
+   445→    s.bullets.push({ x: s.shipX, y: H - 66 });
+   446→  }
+   447→
+   448→  // spawn asteroids
+   449→  s.spawn -= dt;
+   450→  if (s.spawn <= 0) {
+   451→    s.spawn = Math.max(0.16, (0.7 - s.score / 60000) / difficulty) / speed;
+   452→    const r = 12 + Math.random() * 20;
+   453→    s.asteroids.push({ x: 20 + Math.random() * (W - 40), y: -r - 10, r, vy: (110 + Math.random() * 120 + s.score / 120) * speed * difficulty, rot: Math.random() * 6 });
+   454→  }
+   455→
+   456→  // bullets
+   457→  for (let i = s.bullets.length - 1; i >= 0; i--) {
+   458→    s.bullets[i].y -= 620 * dt;
+   459→    if (s.bullets[i].y < -14) s.bullets.splice(i, 1);
+   460→  }
+   461→
+   462→  // asteroids
+   463→  for (let i = s.asteroids.length - 1; i >= 0; i--) {
+   464→    const a = s.asteroids[i];
+   465→    a.y += a.vy * dt;
+   466→    a.rot += dt;
+   467→    if (a.y > H + 30) { s.asteroids.splice(i, 1); continue; }
+   468→    // bullet hit
+   469→    let hit = false;
+   470→    for (let j = s.bullets.length - 1; j >= 0; j--) {
+   471→      if (Math.hypot(s.bullets[j].x - a.x, s.bullets[j].y - a.y) < a.r + 4) {
+   472→        s.bullets.splice(j, 1);
+   473→        s.asteroids.splice(i, 1);
+   474→        s.score += 25;
+   475→        hit = true;
+   476→        break;
+   477→      }
+   478→    }
+   479→    if (hit) continue;
+   480→    // ship collision
+   481→    if (Math.hypot(s.shipX - a.x, H - 56 - a.y) < a.r + 14) {
+   482→      s.asteroids.splice(i, 1);
+   483→      s.lives--;
+   484→      if (s.lives <= 0) { hud(s.score, 0); over(s.score); s.dead = true; }
+   485→    }
+   486→  }
+   487→  hud(s.score, s.lives);
+   488→}
+   489→
+   490→function updateLeap(
+   491→  s: any, dt: number, keys: Record<string, boolean>, pointer: { x: number; y: number } | null,
+   492→  auto: boolean, speed: number, difficulty: number, hud: HudCb, over: OverCb,
+   493→) {
+   494→  const G = 1750 * speed;
+   495→  // horizontal control
+   496→  let target = s.px;
+   497→  if (auto) {
+   498→    // aim for nearest platform below
+   499→    let best = null as any;
+   500→    for (const p of s.platforms) if (p.y > s.py && p.y < s.py + 160 && (!best || p.y < best.y)) best = p;
+   501→    target = best ? best.x + best.w / 2 : s.px;
+   502→  } else if (pointer) {
+   503→    target = pointer.x;
+   504→  } else if (keys["ArrowLeft"] || keys["a"]) target = s.px - 460 * dt;
+   505→  else if (keys["ArrowRight"] || keys["d"]) target = s.px + 460 * dt;
+   506→  s.px = lerp(s.px, Math.max(12, Math.min(W - 12, target)), auto ? 0.14 : 0.5);
+   507→
+   508→  // vertical physics
+   509→  s.vy += G * dt;
+   510→  s.py += s.vy * dt;
+   511→
+   512→  // platform bounce (screen-space)
+   513→  if (s.vy > 0) {
+   514→    for (const p of s.platforms) {
+   515→      if (s.px > p.x - 8 && s.px < p.x + p.w + 8 && s.py + 14 >= p.y && s.py + 14 <= p.y + 16) {
+   516→        s.vy = -640 * speed;
+   517→        break;
+   518→      }
+   519→    }
+   520→  }
+   521→
+   522→  // camera up: keep player at 55% height
+   523→  const focus = H * 0.55;
+   524→  if (s.py < focus) {
+   525→    const dy = focus - s.py;
+   526→    s.py = focus;
+   527→    s.height += dy;
+   528→    for (const p of s.platforms) p.y += dy;
+   529→    s.score = Math.max(s.score, Math.round(s.height / 10));
+   530→  }
+   531→
+   532→  // recycle platforms
+   533→  for (let i = 0; i < s.platforms.length; i++) {
+   534→    const p = s.platforms[i];
+   535→    if (p.y > H + 30) {
+   536→      const highest = Math.min(...s.platforms.map((q: any) => q.y));
+   537→      p.y = highest - 50 - Math.random() * 26;
+   538→      p.x = 30 + Math.random() * (W - 170);
+   539→      p.w = Math.max(72, 116 - s.height / 60) / 1;
+   540→    }
+   541→  }
+   542→
+   543→  // lava rises as height grows
+   544→  s.lavaY = H + 60 - Math.min(H * 0.55, s.height * 0.05 * difficulty) - (s.t * 6 * speed * difficulty);
+   545→  if (s.py + 12 > s.lavaY) {
+   546→    hud(s.score, 0);
+   547→    over(s.score);
+   548→    s.dead = true;
+   549→  }
+   550→  hud(s.score, s.lives ?? 1);
+   551→}
+   552→
+   553→function updateRunner(
+   554→  s: any, dt: number, keys: Record<string, boolean>, _pointer: { x: number; y: number } | null,
+   555→  auto: boolean, speed: number, difficulty: number, hud: HudCb, over: OverCb,
+   556→) {
+   557→  const laneX = (l: number) => W / 2 + (l - 1) * 150;
+   558→  // lane control
+   559→  if (auto) {
+   560→    // pick safest lane
+   561→    const danger = [0, 1, 2].map((l) => s.obstacles.some((o: any) => o.lane === l && o.x < W * 0.55 && o.x > 100));
+   562→    if (danger[s.lane]) {
+   563→      const safe = danger.findIndex((d) => !d);
+   564→      if (safe !== -1) s.lane = safe;
+   565→    }
+   566→  } else {
+   567→    if (keys["ArrowLeft"] || keys["a"]) { if (!s.leftHeld) { s.lane = Math.max(0, s.lane - 1); s.leftHeld = true; } }
+   568→    else s.leftHeld = false;
+   569→    if (keys["ArrowRight"] || keys["d"]) { if (!s.rightHeld) { s.lane = Math.min(2, s.lane + 1); s.rightHeld = true; } }
+   570→    else s.rightHeld = false;
+   571→  }
+   572→  s.laneX = lerp(s.laneX, laneX(s.lane), 0.25);
+   573→
+   574→  // spawn
+   575→  s.spawn -= dt;
+   576→  const v = (430 + s.dist * 0.35) * speed * difficulty;
+   577→  if (s.spawn <= 0) {
+   578→    s.spawn = Math.max(0.32, 1.05 - s.dist / 9000);
+   579→    const lane = Math.floor(Math.random() * 3);
+   580→    if (!s.obstacles.some((o: any) => o.lane === lane && o.x > W - 160)) {
+   581→      s.obstacles.push({ x: W + 40, lane });
+   582→    }
+   583→  }
+   584→
+   585→  // obstacles
+   586→  for (let i = s.obstacles.length - 1; i >= 0; i--) {
+   587→    const o = s.obstacles[i];
+   588→    o.x -= v * dt;
+   589→    if (o.x < -60) { s.obstacles.splice(i, 1); s.score += 60; s.dist += 42; continue; }
+   590→    if (o.lane === s.lane && Math.abs(o.x - s.laneX) < 46) {
+   591→      hud(s.score, 0);
+   592→      over(s.score);
+   593→      s.dead = true;
+   594→    }
+   595→  }
+   596→  s.dist += v * dt * 0.1;
+   597→  s.score = Math.max(s.score, Math.round(s.dist));
+   598→  hud(s.score, 1);
+   599→}
+   600→
+   601→/* ================= rendering ================= */
+   602→
+   603→function renderIdle(ctx: CanvasRenderingContext2D) {
+   604→  ctx.fillStyle = "#05070d";
+   605→  ctx.fillRect(0, 0, W, H);
+   606→}
+   607→
+   608→function renderFrame(ctx: CanvasRenderingContext2D, s: any, engine: string, theme: GameTheme) {
+   609→  const P = theme.palette;
+   610→  ctx.save();
+   611→  ctx.fillStyle = rgb(P.bg);
+   612→  ctx.fillRect(0, 0, W, H);
+   613→
+   614→  ctx.shadowBlur = 14;
+   615→  ctx.shadowColor = rgb(P.accent, 0.8);
+   616→
+   617→  if (engine === "breaker") {
+   618→    // grid floor
+   619→    ctx.shadowBlur = 0;
+   620→    ctx.strokeStyle = rgb(P.accent, 0.1);
+   621→    for (let i = 0; i < 12; i++) {
+   622→      ctx.beginPath();
+   623→      ctx.moveTo(0, H * 0.8 + i * 16);
+   624→      ctx.lineTo(W, H * 0.8 + i * 16);
+   625→      ctx.stroke();
+   626→    }
+   627→    // bricks
+   628→    s.bricks.forEach((b: any, i: number) => {
+   629→      ctx.shadowBlur = 12;
+   630→      ctx.shadowColor = rgb(i % 2 ? P.accent2 : P.accent, 0.7);
+   631→      ctx.fillStyle = rgb(i % 2 ? P.accent2 : P.accent, 0.95);
+   632→      ctx.fillRect(b.x, b.y, 64, 28);
+   633→    });
+   634→    // paddle
+   635→    ctx.shadowColor = rgb(P.platform);
+   636→    ctx.fillStyle = rgb(P.platform);
+   637→    ctx.fillRect(s.paddleX - s.paddleW / 2, H - 34, s.paddleW, 12);
+   638→    // ball + trail
+   639→    ctx.shadowBlur = 18;
+   640→    ctx.shadowColor = rgb(P.ball);
+   641→    ctx.fillStyle = rgb(P.ball);
+   642→    ctx.beginPath();
+   643→    ctx.arc(s.ballX, s.ballY, 8, 0, Math.PI * 2);
+   644→    ctx.fill();
+   645→    ctx.fillStyle = rgb(P.ball, 0.18);
+   646→    ctx.beginPath();
+   647→    ctx.arc(s.ballX - s.ballVX * 2.2, s.ballY - s.ballVY * 2.2, 6, 0, Math.PI * 2);
+   648→    ctx.fill();
+   649→  }
+   650→
+   651→  if (engine === "stardrift") {
+   652→    // stars
+   653→    ctx.shadowBlur = 0;
+   654→    for (let i = 0; i < 70; i++) {
+   655→      const x = (i * 173) % W;
+   656→      const y = (i * 97 + s.t * (30 + (i % 5) * 26)) % H;
+   657→      ctx.fillStyle = `rgba(210,220,255,${0.2 + (i % 5) * 0.12})`;
+   658→      ctx.fillRect(x, y, 2, 2);
+   659→    }
+   660→    // nebula
+   661→    const g = ctx.createRadialGradient(W * 0.72, H * 0.3, 20, W * 0.72, H * 0.3, W * 0.36);
+   662→    g.addColorStop(0, rgb(P.accent2, 0.1));
+   663→    g.addColorStop(1, "rgba(0,0,0,0)");
+   664→    ctx.fillStyle = g;
+   665→    ctx.fillRect(0, 0, W, H);
+   666→    // bullets
+   667→    ctx.shadowBlur = 12;
+   668→    ctx.shadowColor = rgb(P.accent);
+   669→    ctx.fillStyle = rgb(P.ball);
+   670→    s.bullets.forEach((b: any) => ctx.fillRect(b.x - 2, b.y - 12, 4, 14));
+   671→    // asteroids
+   672→    ctx.shadowColor = rgb(P.platform);
+   673→    s.asteroids.forEach((a: any) => {
+   674→      ctx.save();
+   675→      ctx.translate(a.x, a.y);
+   676→      ctx.rotate(a.rot * 0.4);
+   677→      ctx.fillStyle = rgb(P.platform, 0.95);
+   678→      ctx.beginPath();
+   679→      for (let k = 0; k < 8; k++) {
+   680→        const ang = (k / 8) * Math.PI * 2;
+   681→        const rr = a.r * (0.72 + ((k * 29) % 10) / 26);
+   682→        ctx.lineTo(Math.cos(ang) * rr, Math.sin(ang) * rr);
+   683→      }
+   684→      ctx.closePath();
+   685→      ctx.fill();
+   686→      ctx.restore();
+   687→    });
+   688→    // ship
+   689→    ctx.shadowColor = rgb(P.accent);
+   690→    ctx.fillStyle = rgb(P.ball);
+   691→    ctx.beginPath();
+   692→    ctx.moveTo(s.shipX, H - 78);
+   693→    ctx.lineTo(s.shipX - 18, H - 50);
+   694→    ctx.lineTo(s.shipX + 18, H - 50);
+   695→    ctx.closePath();
+   696→    ctx.fill();
+   697→    // engine flame
+   698→    ctx.fillStyle = rgb(P.accent, 0.85);
+   699→    const fl = 10 + Math.sin(s.t * 40) * 5;
+   700→    ctx.beginPath();
+   701→    ctx.moveTo(s.shipX - 7, H - 50);
+   702→    ctx.lineTo(s.shipX, H - 50 + fl);
+   703→    ctx.lineTo(s.shipX + 7, H - 50);
+   704→    ctx.closePath();
+   705→    ctx.fill();
+   706→  }
+   707→
+   708→  if (engine === "leap") {
+   709→    // parallax bg
+   710→    ctx.shadowBlur = 0;
+   711→    const g = ctx.createLinearGradient(0, 0, 0, H);
+   712→    g.addColorStop(0, rgb(P.bg));
+   713→    g.addColorStop(1, rgb(P.accent, 0.16));
+   714→    ctx.fillStyle = g;
+   715→    ctx.fillRect(0, 0, W, H);
+   716→    // platforms
+   717→    ctx.shadowBlur = 10;
+   718→    ctx.shadowColor = rgb(P.platform, 0.8);
+   719→    ctx.fillStyle = rgb(P.platform);
+   720→    s.platforms.forEach((p: any) => {
+   721→      ctx.fillRect(p.x, p.y, p.w, 12);
+   722→      ctx.fillStyle = rgb(P.platform, 0.35);
+   723→      ctx.fillRect(p.x, p.y + 12, p.w, 4);
+   724→      ctx.fillStyle = rgb(P.platform);
+   725→    });
+   726→    // lava
+   727→    const lg = ctx.createLinearGradient(0, s.lavaY, 0, H);
+   728→    lg.addColorStop(0, rgb(P.accent, 0.95));
+   729→    lg.addColorStop(1, rgb(P.accent2 ?? P.accent, 1));
+   730→    ctx.shadowColor = rgb(P.accent);
+   731→    ctx.shadowBlur = 24;
+   732→    ctx.fillStyle = lg;
+   733→    ctx.fillRect(0, s.lavaY, W, H - s.lavaY + 10);
+   734→    ctx.fillStyle = "rgba(255,255,255,0.5)";
+   735→    ctx.fillRect(0, s.lavaY, W, 3);
+   736→    // player
+   737→    ctx.shadowBlur = 18;
+   738→    ctx.shadowColor = rgb(P.ball);
+   739→    ctx.fillStyle = rgb(P.ball);
+   740→    ctx.beginPath();
+   741→    ctx.arc(s.px, s.py, 13, 0, Math.PI * 2);
+   742→    ctx.fill();
+   743→    ctx.shadowBlur = 0;
+   744→    ctx.fillStyle = "#10141c";
+   745→    ctx.fillRect(s.px - 5, s.py - 4, 3, 5);
+   746→    ctx.fillRect(s.px + 2, s.py - 4, 3, 5);
+   747→  }
+   748→
+   749→  if (engine === "runner") {
+   750→    // bg city
+   751→    ctx.shadowBlur = 0;
+   752→    for (let i = 0; i < 16; i++) {
+   753→      const bw = 44 + ((i * 53) % 40);
+   754→      const bh = 60 + ((i * 97) % 130);
+   755→      ctx.fillStyle = rgb(P.platform, 0.16);
+   756→      ctx.fillRect((i * 52 - (s.dist * 0.24) % 52 + W) % (W + 52) - 26, H * 0.52 - bh, bw, bh);
+   757→    }
+   758→    // lanes
+   759→    const laneY = [H * 0.62, H * 0.74, H * 0.86];
+   760→    ctx.strokeStyle = rgb(P.accent, 0.2);
+   761→    ctx.lineWidth = 2;
+   762→    laneY.forEach((y) => {
+   763→      ctx.beginPath();
+   764→      ctx.moveTo(0, y);
+   765→      ctx.lineTo(W, y);
+   766→      ctx.stroke();
+   767→    });
+   768→    // ground stripes
+   769→    ctx.fillStyle = rgb(P.accent, 0.3);
+   770→    for (let i = 0; i < 10; i++) {
+   771→      const x = ((i * 96 - s.dist * 1.6) % (W + 96) + W + 96) % (W + 96) - 48;
+   772→      ctx.fillRect(x, H - 16, 52, 4);
+   773→    }
+   774→    // obstacles
+   775→    ctx.shadowBlur = 16;
+   776→    ctx.shadowColor = rgb(P.accent);
+   777→    s.obstacles.forEach((o: any) => {
+   778→      ctx.fillStyle = rgb(P.accent, 0.95);
+   779→      ctx.fillRect(o.x - 20, laneY[o.lane] - 44, 40, 44);
+   780→    });
+   781→    // player
+   782→    ctx.shadowColor = rgb(P.ball);
+   783→    ctx.fillStyle = rgb(P.ball);
+   784→    ctx.beginPath();
+   785→    ctx.arc(s.laneX, laneY[s.lane] - 22, 15, 0, Math.PI * 2);
+   786→    ctx.fill();
+   787→    ctx.shadowBlur = 0;
+   788→    ctx.fillStyle = "#0a0e16";
+   789→    ctx.fillRect(s.laneX - 6, laneY[s.lane] - 27, 3.5, 6);
+   790→    ctx.fillRect(s.laneX + 3, laneY[s.lane] - 27, 3.5, 6);
+   791→    // speed lines
+   792→    ctx.strokeStyle = rgb(P.accent2, 0.28);
+   793→    for (let i = 0; i < 6; i++) {
+   794→      const y = ((i * 83 + s.t * 400) % H + H) % H;
+   795→      const x = W - ((s.t * 900 + i * 160) % (W * 0.7));
+   796→      ctx.beginPath();
+   797→      ctx.moveTo(x, y);
+   798→      ctx.lineTo(x + 46, y);
+   799→      ctx.stroke();
+   800→    }
+   801→  }
+   802→
+   803→  ctx.restore();
+   804→}
+   805→
