@@ -116,12 +116,17 @@ export function ModelSettingsPanel() {
     }
   }
 
-  // provider draft (edits apply locally; Save persists via PUT)
+  // provider draft (edits apply locally; Save persists via PUT). draftEpoch
+  // bumps after a successful save so the draft re-syncs from the reloaded
+  // provider — e.g. the API-key row flips to its "saved on the server" state.
   const [draft, setDraft] = useState<ProviderDraft | null>(null);
   const [draftFor, setDraftFor] = useState<string | null>(null);
+  const [draftEpoch, setDraftEpoch] = useState(0);
+  const [syncedEpoch, setSyncedEpoch] = useState(0);
   const selected = providers?.find((p) => p.id === selectedId) ?? null;
-  if (selected && draftFor !== selected.id) {
+  if (selected && (draftFor !== selected.id || syncedEpoch !== draftEpoch)) {
     setDraftFor(selected.id);
+    setSyncedEpoch(draftEpoch);
     setDraft(toDraft(selected));
   }
 
@@ -171,6 +176,7 @@ export function ModelSettingsPanel() {
         models: draft.models,
       });
       await reload();
+      setDraftEpoch((e) => e + 1);
       toast.success("Model settings saved");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not save the provider");

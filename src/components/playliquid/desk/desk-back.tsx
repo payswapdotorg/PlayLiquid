@@ -20,7 +20,7 @@ export function DeskBackButton({ variant = "floating" }: { variant?: "floating" 
       type="button"
       className={cn("newtask-back", variant === "inline" && "newtask-back--inline")}
       title="Back to PlayLiquid"
-      onClick={() => navigate("home")}
+      onClick={() => navigate("home", { gameId: null, sparkIndex: 0 })}
     >
       ‹　<span className="back-label">Back to PlayLiquid</span>
     </button>
