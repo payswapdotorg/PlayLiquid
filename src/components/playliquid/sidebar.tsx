@@ -56,7 +56,7 @@ function NavButton({
   );
 }
 
-export function Sidebar() {
+export function Sidebar({ onToggleRail }: { onToggleRail: () => void }) {
   const view = usePlayLiquid((s) => s.view);
   const navigate = usePlayLiquid((s) => s.navigate);
   const { data: studioData } = useApi<{ creators: CreatorDTO[] }>("/api/creators");
@@ -67,8 +67,9 @@ export function Sidebar() {
       <button
         type="button"
         className="web-brandbar"
-        title="Go to PlayLiquid Home"
-        onClick={() => navigate("home")}
+        title="Toggle navigation panel"
+        aria-label="Toggle navigation panel"
+        onClick={onToggleRail}
       >
         <span className="drop-logo" aria-hidden />
         <span className="brand-word">PlayLiquid</span>

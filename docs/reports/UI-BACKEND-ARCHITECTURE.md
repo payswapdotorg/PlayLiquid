@@ -158,7 +158,7 @@ Was 4 static template cards + toasts. Now a full CRUD loop on a new `Automation`
 Install/enable toggles were local-only (reset on remount). Now: **`GET/PUT /api/plugins`** (new) persists per-plugin `{installed, enabled}` in the `Preference` store (key `plugin-states`), merged over the client catalog. Tabs remain presentational (Public/Community/Personal map to the same catalog — §7).
 
 ### 4.15 Settings (`settings.tsx`) — G7
-Every control (language, interface mode, proactive suggestions, terminal profile/font/shell, restore workspace) was unpersisted; "Save" was a toast. Now **`GET/PUT /api/settings`** (new) persists all values as `Preference` rows; the shell hydrates from the server on open and saves on click. Left menu sections beyond General remain navigation scaffolds (values hidden per active panel — §7).
+Every control (language, interface mode, proactive suggestions, terminal profile/font/shell, restore workspace) was unpersisted; "Save" was a toast. Now **`GET/PUT /api/settings`** (new) persists all values as `Preference` rows; the shell hydrates from the server on open and saves on click. **Model settings** is fully restored from zai-org/zcode (`model-settings.tsx` + `/api/models`): provider groups (presets + custom), provider form (name, masked API key, Base URL, API format — anthropic-messages / openai-chat-completions / openai-responses, enabled, real connectivity test, delete), and per-model editors with the ZCode model-config metadata (display name, model ID, context window, max output tokens, input types text/image/video/audio/pdf, capabilities incl. MFJS tool schema, and reasoning levels ordered low → high). Other left-menu sections remain navigation scaffolds (§7).
 
 ### 4.16 Topbar / Sidebar
 - Voice search: deferred (needs ASR integration — §7).
@@ -198,6 +198,7 @@ model Preference  { key @id, value, updatedAt }                        // settin
 | `/api/agent` | POST | Build Agent chat → theme patch (pre-existing, now wired) | Game Builder |
 | `/api/automations` (+`/[id]`) | GET/POST/PATCH/DELETE | **new** — automations CRUD | Automations |
 | `/api/settings` | GET/PUT | **new** — preference KV | Settings, keep-awake, notify opt-ins |
+| `/api/models` (+`/[id]/test`) | GET/POST/PUT/DELETE + POST | **new** — the ZCode model-provider settings contract: preset providers (Z.ai, BigModel) + custom providers (template catalog), each with a model list carrying full metadata (context window, input modalities, capabilities, reasoning levels low→high, max output tokens); `/test` performs a real authenticated connectivity check. API keys are stored server-side and never returned to the page. | Settings → Model settings |
 | `/api/plugins` | GET/PUT | **new** — plugin state persistence | Plugin Marketplace |
 
 ### 5.3 Creation pipeline (G1 end-to-end)
@@ -235,6 +236,7 @@ All wiring keeps the established patterns: `useApi` for GETs, `postJson` for wri
 | Feed hygiene actions (not-interested/report) | needs moderation queue + personalized ranking model |
 | Browser/Terminal panels embedding real content | sandboxed webview/PTY (e.g. E2B) — chrome is intentionally honest about being a preview |
 | Plugin tabs (Public/Community/Personal) sourcing distinct catalogs | marketplace registry service; state persistence shipped |
+| Model settings: OAuth coding-plan entitlements / quota cards | the ZCode desktop feature needs account infra; the provider/model configuration surface is fully restored, subscription status is not (single-tenant web adaptation) |
 | Dislike server-side | personalization signal only; becomes a server write when recommendation ranking exists |
 | Per-commit Linux/Windows installers | covered by the separate Install & Release Contract (docs/product/INSTALL-AND-RELEASE-CONTRACT.md) |
 
@@ -245,3 +247,14 @@ All wiring keeps the established patterns: `useApi` for GETs, `postJson` for wri
 - `bun run lint` — clean (zero warnings). `tsc --noEmit` — zero errors in `src/`.
 - **Browser-verified end-to-end:** Back button on New Task → home ✓ · task submit ("zen garden puzzle…") → running state → LLM draft "Zen Garden Puzzle" in task list ✓ · task click → Game Builder (canvas, 5 color pickers, sliders, scenes) ✓ · Build Agent chat applied a live palette patch (bg → deep ocean blue) with a clean reply ✓ · Publish → play page with live canvas ✓ · "Your games" shows drafts (badge) + published incl. the new game ✓ · Sparks: 5 paged stages with real clips, like (♡→♥), comments drawer (3 loaded, post prepended) ✓ · Channel: real identity/stats, 7 tabs, Oldest sort reverses correctly, bell opt-in persisted server-side ✓ · Leaderboards: podium + 12-player table from real score aggregates ✓ · Explore: topbar search "lava" → `#view=explore&q=lava` with games + sparks results ✓ · Settings: UI change → Save → `language:"French"` server-verified ✓ · Automations/Plugins CRUD persisted ✓.
 - **Hardening during verification:** shared `extractJsonObject` (balanced-brace scanner) now backs both LLM routes — the naive first-`{`…last-`}` slice broke when the model appended prose after the JSON; `POST` aliases on `/api/settings` + `/api/plugins` (POST-only client helper); atomic read-merge-write transaction on plugin state; `useApi` request-generation guard (URL-change race); desk task-store hydration moved to a post-render effect (React "cannot update during render" warning eliminated); full 13-view console sweep clean; mobile (390px) clean on home/newtask/sparks/builder.
+
+---
+
+## 9. Workspace upgrades (verified 2026-11-01, second change-set)
+
+Four UX/feature upgrades on top of the loop above:
+
+1. **Back-to-PlayLiquid on every desk page** — the pill (previously New Task only) now also lives on Automations, Plugin Marketplace and all four Game Builder states (inline in the builder header, floating elsewhere). Click → web home. Verified on all pages incl. mobile.
+2. **Logo toggles the left panel** — in both experiences the PlayLiquid brand bar now collapses/expands the sidebar to a 68px icon rail (persisted: `pl-desk-rail` / `pl-web-rail`). Mirrors the mobile rail styling. Home navigation stays on the sidebar Home item / back pill.
+3. **Live playtest panel in New Task** — a third top-right toggle (Playtest, alongside Browser and Terminal) opens a side panel with the shared `GameEngine`: game picker over all your builds (`GET /api/studio`, drafts included), Play / Auto / Restart controls, live status bar, and an Open-in-Game-Builder hand-off. Canvas verified rendering, auto demo and build switching.
+4. **Model settings restored from zai-org/zcode** — §4.15 + §5.2 `/api/models`. Browser-verified: preset seed (Z.ai, BigModel with GLM metadata), add-from-template (DeepSeek), masked API-key entry, enable toggle, per-model editor (ID, context window, reasoning levels), save → server rows, real connectivity test (honest HTTP 401 on a bad key, 200 on a valid endpoint), delete-custom / preset-delete-blocked, empty-ID save guard.

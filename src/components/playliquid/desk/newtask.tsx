@@ -21,10 +21,11 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { usePlayLiquid } from "@/lib/store";
-import { postJson } from "@/hooks/use-api";
-import type { GameDTO } from "@/lib/types";
+import { postJson, useApi } from "@/hooks/use-api";
+import type { GameDTO, GameDetailDTO, GameTheme, StudioDTO } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useDeskTasks } from "./desk-tasks";
+import { GameEngine } from "../mini-games/game-engine";
 
 const TEMPLATES: { icon: string; title: string; hint: string; template: string }[] = [
   {
@@ -99,7 +100,7 @@ export function NewTaskView() {
   }, [taskPrefill, clearTaskPrefill]);
 
   // chrome
-  const [panel, setPanel] = useState<"browserPanel" | "terminalPanel" | null>(null);
+  const [panel, setPanel] = useState<"browserPanel" | "terminalPanel" | "playtestPanel" | null>(null);
   const [contextOpen, setContextOpen] = useState(false);
   const [bannerVisible, setBannerVisible] = useState(true);
 
@@ -197,6 +198,18 @@ export function NewTaskView() {
       </button>
 
       <div className="newtask-top-tools">
+        <button
+          type="button"
+          className={cn("newtask-tool", panel === "playtestPanel" && "active")}
+          id="togglePlaytest"
+          aria-label="Toggle playtest panel"
+          aria-pressed={panel === "playtestPanel"}
+          title="Toggle live playtest"
+          onClick={() => setPanel((p) => (p === "playtestPanel" ? null : "playtestPanel"))}
+        >
+          <span aria-hidden>▶</span>
+          <span className="tool-name">Playtest</span>
+        </button>
         <button
           type="button"
           className={cn("newtask-tool", panel === "browserPanel" && "active")}
@@ -415,6 +428,7 @@ export function NewTaskView() {
 
       {panel === "browserPanel" && <BrowserPanel onClose={() => setPanel(null)} />}
       {panel === "terminalPanel" && <TerminalPanel onClose={() => setPanel(null)} />}
+      {panel === "playtestPanel" && <PlaytestPanel onClose={() => setPanel(null)} />}
     </section>
   );
 }
@@ -689,6 +703,167 @@ function TerminalPanel({ onClose }: { onClose: () => void }) {
         <button type="button" id="runCommand" onClick={runCommand}>
           Run
         </button>
+      </div>
+    </aside>
+  );
+}
+
+/**
+ * PlaytestPanel — the live playtest canvas, raised to the same level as the
+ * Browser and Terminal side panels: pick any of your builds (drafts included,
+ * from GET /api/studio) and play it right inside the New Task workspace via
+ * the shared GameEngine. Manual Play mode, Auto demo mode and Restart mirror
+ * the Game Builder's playtest controls.
+ */
+function PlaytestPanel({ onClose }: { onClose: () => void }) {
+  const navigate = usePlayLiquid((s) => s.navigate);
+  const { data: studioData, loading } = useApi<StudioDTO>("/api/studio");
+  const games = studioData?.myGames ?? [];
+
+  // selected build — defaults to the most recent one (list is recency-sorted)
+  const [gameId, setGameId] = useState<string | null>(null);
+  const [pickedFor, setPickedFor] = useState<GameDTO[] | null>(null);
+  if (games.length > 0 && pickedFor !== games) {
+    setPickedFor(games);
+    if (!games.some((g) => g.id === gameId)) setGameId(games[0].id);
+  }
+
+  const { data: detail } = useApi<{ game: GameDetailDTO }>(gameId ? `/api/games/${gameId}` : null);
+  const game = detail?.game ?? null;
+
+  const [mode, setMode] = useState<"play" | "auto">("play");
+  const [restartKey, setRestartKey] = useState(0);
+
+  // restart when switching builds so the canvas never shows the previous game
+  const [engineFor, setEngineFor] = useState<string | null>(null);
+  if (game && engineFor !== game.id) {
+    setEngineFor(game.id);
+    setRestartKey((k) => k + 1);
+  }
+
+  const theme: GameTheme = game?.theme ?? {
+    palette: { bg: [10, 6, 24], accent: [0, 229, 255], accent2: [138, 125, 255], ball: [240, 248, 255], platform: [122, 110, 150] },
+    speed: 1,
+    difficulty: 1,
+    label: "Default",
+  };
+
+  return (
+    <aside className="task-side-panel playtest-pane" id="playtestPanel" aria-label="Playtest panel">
+      <div className="side-pane-titlebar">
+        <span className="side-pane-app-icon" aria-hidden>
+          ▶
+        </span>
+        <span className="side-pane-title">Playtest</span>
+        <span className="side-pane-subtitle" id="playtestGameTitle">
+          {game ? game.title : "No build"}
+        </span>
+        <span className="side-pane-spacer" />
+        <button
+          type="button"
+          title="Open in Game Builder"
+          aria-label="Open in Game Builder"
+          disabled={!gameId}
+          onClick={() => gameId && navigate("build", { gameId })}
+        >
+          <ArrowUpRight className="size-[15px]" strokeWidth={2} />
+        </button>
+        <button
+          type="button"
+          data-close-panel="playtestPanel"
+          aria-label="Close playtest panel"
+          title="Close"
+          onClick={onClose}
+        >
+          <X className="size-[15px]" strokeWidth={2.2} />
+        </button>
+      </div>
+
+      <div className="playtest-toolbar">
+        <select
+          className="composer-select"
+          aria-label="Select a build to playtest"
+          value={gameId ?? ""}
+          onChange={(e) => setGameId(e.target.value || null)}
+        >
+          {games.length === 0 && <option value="">No builds yet</option>}
+          {games.map((g) => (
+            <option key={g.id} value={g.id}>
+              {g.title}
+              {g.status === "draft" ? " (draft)" : ""}
+            </option>
+          ))}
+        </select>
+        <span className="playtest-mode">
+          <button
+            type="button"
+            className={cn("gb-mode", mode === "play" && "active")}
+            aria-pressed={mode === "play"}
+            onClick={() => setMode("play")}
+          >
+            Play
+          </button>
+          <button
+            type="button"
+            className={cn("gb-mode", mode === "auto" && "active")}
+            aria-pressed={mode === "auto"}
+            onClick={() => setMode("auto")}
+          >
+            Auto
+          </button>
+          <button
+            type="button"
+            className="gb-mode"
+            aria-label="Restart playtest"
+            onClick={() => setRestartKey((k) => k + 1)}
+          >
+            <RotateCw className="size-[12px]" strokeWidth={2.2} />
+          </button>
+        </span>
+      </div>
+
+      <div className="playtest-viewport" id="playtestViewport">
+        {loading ? (
+          <div className="browser-empty">
+            <div className="browser-empty-icon" aria-hidden>
+              ◷
+            </div>
+            <h3>Loading builds…</h3>
+          </div>
+        ) : games.length === 0 ? (
+          <div className="browser-empty">
+            <div className="browser-empty-icon" aria-hidden>
+              ▶
+            </div>
+            <h3>No builds yet</h3>
+            <p>
+              Submit a task below — the Game Architect will design a playable draft you can test
+              right here.
+            </p>
+          </div>
+        ) : !game ? (
+          <div className="browser-empty">
+            <div className="browser-empty-icon" aria-hidden>
+              ◷
+            </div>
+            <h3>Loading build…</h3>
+          </div>
+        ) : (
+          <div className="playtest-canvas">
+            <GameEngine
+              engine={game.engine}
+              theme={theme}
+              restartKey={restartKey}
+              auto={mode === "auto"}
+            />
+          </div>
+        )}
+      </div>
+
+      <div className="browser-statusbar" id="playtestStatus">
+        {game
+          ? `Live playtest · ${game.engine} engine · v${game.version} · ${game.status}`
+          : "Pick one of your builds to play it here"}
       </div>
     </aside>
   );

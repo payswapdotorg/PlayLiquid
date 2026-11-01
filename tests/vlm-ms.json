@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "```json\n{\n  \"left_nav\": {\n    \"providers_list\": [\"Z.ai\", \"BigModel\", \"Add provider\"],\n    \"status\": \"Present\"\n  },\n  \"right_detail\": {\n    \"form_fields\": [\"Name\", \"API key\", \"Base URL\", \"API format\", \"Enabled\", \"Test connection\"],\n    \"status\": \"Present (Test connection button is likely below the visible area)\"\n  },\n  \"model_list\": {\n    \"context_window_badges\": \"Not visible in the current viewport\",\n    \"status\": \"N/A or below fold\"\n  },\n  \"layout_integrity\": {\n    \"breakage_or_overlap\": \"None detected\",\n    \"status\": \"Clean layout\"\n  }\n}\n```",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1793518778,
+  "id": "20261101153935c3cd0364650c4370",
+  "model": "glm-5v-turbo",
+  "object": "chat.completion",
+  "request_id": "20261101153935c3cd0364650c4370",
+  "usage": {
+    "completion_tokens": 153,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 971,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 1124
+  }
+}

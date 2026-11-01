@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "```json\n{\n  \"1) Top-right has three toggle buttons (Playtest, Browser, Terminal)?\": \"Yes, the top navigation bar contains 'Playtest', 'Browser', and 'Terminal' toggle buttons.\",\n  \"2) The side panel shows a playable game canvas?\": \"Yes, the right panel displays a 'Lighthouse Keeper' game canvas with a grid, score, and lives.\",\n  \"3) A toolbar with a game picker dropdown and Play/Auto/Restart controls?\": \"Yes, the Playtest header includes 'Play' and 'Auto' buttons alongside a restart icon.\",\n  \"4) Any layout breakage?\": \"No, the layout is clean with proper alignment of the sidebar, main content area, and right-side playtest panel.\"\n}\n```",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1793518785,
+  "id": "202611011539427535133712994ec3",
+  "model": "glm-5v-turbo",
+  "object": "chat.completion",
+  "request_id": "202611011539427535133712994ec3",
+  "usage": {
+    "completion_tokens": 162,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 965,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 1127
+  }
+}

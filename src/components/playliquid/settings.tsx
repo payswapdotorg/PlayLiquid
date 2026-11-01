@@ -11,6 +11,7 @@ import { useApi } from "@/hooks/use-api";
 import { usePlayLiquid } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import type { SettingsValues } from "@/lib/types";
+import { ModelSettingsPanel } from "./model-settings";
 
 const MENU: { group: string; items: { glyph: string; label: string }[] }[] = [
   {
@@ -179,10 +180,14 @@ export function SettingsShell() {
           </button>
         </div>
 
-        <div className="settings-inner">
+        <div className={cn("settings-inner", active === "Model settings" && "ms-wide")}>
           <h1 className="settings-title">{active}</h1>
           <span className="system-pill">System default</span>
 
+          {active === "Model settings" ? (
+            <ModelSettingsPanel />
+          ) : (
+          <>
           <div className="setting-card">
             <div className="setting-row">
               <div className="setting-text">
@@ -309,6 +314,8 @@ export function SettingsShell() {
               />
             </div>
           </div>
+          </>
+          )}
         </div>
       </main>
     </div>

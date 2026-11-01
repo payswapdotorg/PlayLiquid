@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { useApi } from "@/hooks/use-api";
 import { cn } from "@/lib/utils";
 import type { PluginState, PluginStates } from "@/lib/types";
+import { DeskBackButton } from "./desk-back";
 
 type PluginKind = "switch" | "install";
 
@@ -103,6 +104,7 @@ export function PluginsView() {
 
   return (
     <section className="market-content" id="pluginsView" aria-label="Plugin Marketplace">
+      <DeskBackButton />
       <div className="market-head">
         <h1>Plugin Marketplace</h1>
         <div className="market-tools">

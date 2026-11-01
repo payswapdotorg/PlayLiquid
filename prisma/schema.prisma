@@ -157,3 +157,24 @@ model Preference {
   value     String
   updatedAt DateTime @updatedAt
 }
+
+/**
+ * Model providers (Settings → Model settings), ported from ZCode's
+ * model-provider settings contract: preset providers (Z.ai, BigModel) plus
+ * user-created custom providers, each carrying its model list as JSON with
+ * the full ZCode model-config metadata (context window, modalities,
+ * capabilities, reasoning levels, max output tokens).
+ */
+model ModelProvider {
+  id         String   @id @default(cuid())
+  key        String   @unique
+  name       String
+  baseUrl    String   @default("")
+  apiFormat  String   @default("openai-chat-completions")
+  apiKey     String   @default("")
+  enabled    Boolean  @default(false)
+  preset     Boolean  @default(false)
+  modelsJson String   @default("[]")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}

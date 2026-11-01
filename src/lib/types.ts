@@ -177,6 +177,62 @@ export interface AutomationDTO {
 /** Generic preference map (settings, plugin states, notification opt-ins). */
 export type SettingsValues = Record<string, string>;
 
+/* ---- Model settings (ported from ZCode's model-provider contract) ---- */
+
+/** Provider API wire formats supported by the model settings panel. */
+export type ProviderApiFormat = "anthropic-messages" | "openai-chat-completions" | "openai-responses";
+
+/** A model's input content types (ZCode model-config inputFormat). */
+export interface ModelInputFormatDTO {
+  text: boolean;
+  image: boolean;
+  video: boolean;
+  audio: boolean;
+  pdf: boolean;
+}
+
+/** One entry in a provider's model list, with the full ZCode metadata. */
+export interface ModelEntryDTO {
+  id: string;
+  displayName: string;
+  enabled: boolean;
+  contextWindow: number;
+  maxOutputTokens: number;
+  inputFormat: ModelInputFormatDTO;
+  supportsToolCall: boolean;
+  supportsJsonSchemaOutput: boolean;
+  supportsNativeWebSearch: boolean;
+  supportsMidConversationSystem: boolean;
+  requiresMfjsToolSchema: boolean;
+  /** ordered reasoning levels, low → high (ZCode reasoningLevel.values) */
+  reasoningLevels: string[];
+}
+
+/** A model provider (preset or custom) as stored server-side. */
+export interface ModelProviderDTO {
+  id: string;
+  key: string;
+  name: string;
+  baseUrl: string;
+  apiFormat: ProviderApiFormat;
+  hasApiKey: boolean;
+  enabled: boolean;
+  preset: boolean;
+  models: ModelEntryDTO[];
+}
+
+/** GET /api/models payload. */
+export interface ModelProvidersDTO {
+  providers: ModelProviderDTO[];
+}
+
+/** Connectivity test result (POST /api/models/[id]/test). */
+export interface ModelTestResultDTO {
+  ok: boolean;
+  message: string;
+  status: number | null;
+}
+
 /** Per-plugin install/enable state, persisted server-side. */
 export interface PluginState {
   installed: boolean;

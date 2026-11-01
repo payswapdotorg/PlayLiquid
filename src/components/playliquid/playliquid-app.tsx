@@ -13,7 +13,7 @@
  * The home feed and the game pages (play / details) are the pre-reconstruction
  * implementations and render full-bleed inside the content column.
  */
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { isDeskView, usePlayLiquid } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { HoverPreviewLayer } from "./hover-preview";
@@ -72,12 +72,36 @@ function WebShell() {
   const gameId = usePlayLiquid((s) => s.gameId);
   const sparkIndex = usePlayLiquid((s) => s.sparkIndex);
 
+  // the logo toggles the left panel (same behavior as the creator workspace
+  // brand bar); persisted per experience
+  const [rail, setRail] = useState(false);
+  const [railHydrated, setRailHydrated] = useState(false);
+  if (!railHydrated) {
+    setRailHydrated(true);
+    try {
+      setRail(window.localStorage.getItem("pl-web-rail") === "1");
+    } catch {
+      /* storage unavailable — session-only toggle */
+    }
+  }
+  function toggleRail() {
+    setRail((r) => {
+      const next = !r;
+      try {
+        window.localStorage.setItem("pl-web-rail", next ? "1" : "0");
+      } catch {
+        /* ignore */
+      }
+      return next;
+    });
+  }
+
   // the kept pre-reconstruction pages manage their own padding and width
   const bare = view === "home" || view === "play" || view === "details";
 
   return (
-    <div className="web-shell" id="webShell">
-      <Sidebar />
+    <div className={cn("web-shell", rail && "collapsed")} id="webShell">
+      <Sidebar onToggleRail={toggleRail} />
       <main className="web-main">
         <Topbar />
         <div className={cn("web-content", bare && "web-content--bare")}>

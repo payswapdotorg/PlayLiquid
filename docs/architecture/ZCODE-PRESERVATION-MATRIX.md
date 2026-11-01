@@ -10,7 +10,7 @@ what was preserved in spirit, what was re-homed, and what is out of scope.
 | Task creation & lifecycle | Adapted | `views/new-task.tsx` → `POST /api/tasks` → agent-generated game records |
 | Agent selection & orchestration | Adapted | Agent roster (Game Architect / World Builder / Avatar Smith) in New Task; Build Agent in the builder |
 | Model selection | Adapted | Model picker (GLM-4.6 default) in New Task; model recorded on each Task row |
-| Model/provider settings page | **Out of scope here** | No provider registry exists in this web app; belongs to the desktop-fork track |
+| Model/provider settings page | **Restored (web adaptation)** | Settings → Model settings (`model-settings.tsx` + `/api/models`): ZCode's preset providers (Z.ai, BigModel), custom-provider catalog (Anthropic, OpenAI, OpenRouter, DeepSeek, Moonshot), API key / Base URL / API format, real connectivity test, and per-model ZCode model-config metadata (context window, input modalities, capabilities, reasoning levels low→high, max output tokens). OAuth coding-plan entitlements remain desktop-track. |
 | Workspace/project selection | Adapted | Workspace picker in New Task (PlayLiquid Labs · Main) |
 | Terminal / browser tools | Out of scope (web adaptation) | — |
 | Settings page preservation | **Not applicable** | Nothing was removed — this app never had a ZCode settings page to preserve |

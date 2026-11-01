@@ -14,6 +14,7 @@ import { usePlayLiquid } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import type { CommentDTO, GameDetailDTO, GameDTO, GameTheme, ScoreDTO, UpdateDTO } from "@/lib/types";
 import { GameEngine } from "../mini-games/game-engine";
+import { DeskBackButton } from "./desk-back";
 
 interface GameDetailPayload {
   game: GameDetailDTO;
@@ -231,6 +232,7 @@ export function GameBuilderView() {
   if (!gameId) {
     return (
       <section className="gb-shell" aria-label="Game Builder">
+        <DeskBackButton />
         <div
           className="desk-inner"
           style={{
@@ -260,6 +262,7 @@ export function GameBuilderView() {
   if (error && (!data || stale)) {
     return (
       <section className="gb-shell" aria-label="Game Builder">
+        <DeskBackButton />
         <div
           className="desk-inner"
           style={{
@@ -283,6 +286,7 @@ export function GameBuilderView() {
   if (!data || loading || stale) {
     return (
       <section className="gb-shell" aria-label="Game Builder">
+        <DeskBackButton />
         <div
           className="desk-inner"
           style={{
@@ -306,6 +310,7 @@ export function GameBuilderView() {
   return (
     <section className="gb-shell" id="gameBuilderView" aria-label="Game Builder">
       <header className="gb-head">
+        <DeskBackButton variant="inline" />
         <h1>{game.title}</h1>
         <span className={cn("gb-badge", meta.status === "published" && "published")}>
           {meta.status}

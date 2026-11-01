@@ -14,6 +14,7 @@ import { usePlayLiquid } from "@/lib/store";
 import { timeAgo } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { AutomationDTO, GameDTO } from "@/lib/types";
+import { DeskBackButton } from "./desk-back";
 
 const SCHEDULES = [
   "Weekdays at 09:00",
@@ -196,7 +197,8 @@ export function AutomationsView() {
   }
 
   return (
-    <section className="desk-inner" id="automationsView" aria-label="Automations">
+    <section className="desk-inner automations-view" id="automationsView" aria-label="Automations">
+      <DeskBackButton />
       <div className="desk-title-row">
         <h1>Automations</h1>
         <span className="secondary-title">Workflows</span>

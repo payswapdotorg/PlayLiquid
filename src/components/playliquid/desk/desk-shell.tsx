@@ -2,11 +2,11 @@
 
 /**
  * Desktop shell — the ZCode-derived creator workspace from the Interface
- * Reconstruction v2 design: brand bar back to the web experience, the
- * New Task / Automations / Plugin Marketplace nav, the task list and the
- * user row (settings).
+ * Reconstruction v2 design: brand bar (toggles the left panel, matching the
+ * web experience), the New Task / Automations / Plugin Marketplace nav, the
+ * task list and the user row (settings).
  */
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { CirclePlus, Clock, LayoutGrid, Settings } from "lucide-react";
 import { usePlayLiquid } from "@/lib/store";
 import { useApi } from "@/hooks/use-api";
@@ -24,6 +24,18 @@ const NAV: { view: ViewName; label: string; icon: typeof Clock; shortcut?: strin
   { view: "automations", label: "Automations", icon: Clock },
   { view: "plugins", label: "Plugin Marketplace", icon: LayoutGrid },
 ];
+
+const RAIL_KEY = "pl-desk-rail";
+
+/** Read the persisted rail (collapsed) state — defaults to expanded. */
+function readRail(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.localStorage.getItem(RAIL_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
 
 export function DeskShell() {
   const view = usePlayLiquid((s) => s.view);
@@ -60,18 +72,40 @@ export function DeskShell() {
     return () => window.removeEventListener("keydown", onKey);
   }, [navigate]);
 
+  // the brand bar toggles the left panel — same behavior as the web
+  // experience's logo; persisted per workspace
+  const [rail, setRail] = useState(false);
+  const [railHydrated, setRailHydrated] = useState(false);
+  if (!railHydrated) {
+    setRailHydrated(true);
+    setRail(readRail());
+  }
+  function toggleRail() {
+    setRail((r) => {
+      const next = !r;
+      try {
+        window.localStorage.setItem(RAIL_KEY, next ? "1" : "0");
+      } catch {
+        /* storage unavailable — session-only toggle */
+      }
+      return next;
+    });
+  }
+
   return (
-    <div className="desktop-shell" id="deskShell">
+    <div className={cn("desktop-shell", rail && "collapsed")} id="deskShell">
       <aside className="desk-sidebar">
         <div className="desk-sidebar-top">
           <button
             type="button"
             className="desk-brand"
-            title="Back to PlayLiquid"
-            onClick={() => navigate("home")}
+            title={rail ? "Expand panel" : "Collapse panel"}
+            aria-label={rail ? "Expand workspace panel" : "Collapse workspace panel"}
+            aria-expanded={!rail}
+            onClick={toggleRail}
           >
             <span className="drop-logo" aria-hidden />
-            <span>PlayLiquid</span>
+            <span className="desk-brand-word">PlayLiquid</span>
           </button>
         </div>
 
