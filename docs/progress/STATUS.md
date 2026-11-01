@@ -5,6 +5,31 @@ hover-preview architecture, the creation→publish→discovery loop, community
 interactions, search, theming, and mobile behavior are verified end-to-end.
 ESLint clean; dev server healthy on :3000; DB seeded.
 
+## Pass 4 (final, 2026-11-01) — four design corrections + hardening
+
+1. **Back pill on every desk page** — shared `desk/desk-back.tsx`
+   (floating + inline variants) on New Task, Automations, Plugins and the
+   Game Builder; back navigation now lands on a clean `#view=home`
+   (stale `game`/`spark` params cleared).
+2. **Desk logo = rail toggle** — matches the web logo's sidebar behavior;
+   persisted (`pl-desk-rail`), verified across reload.
+3. **Playtest as a third panel** — New Task's top-right is now an
+   exclusive Playtest / Browser / Terminal toggle; the Playtest panel
+   runs any build (drafts included) on the shared GameEngine with
+   Play/Auto/Restart. Verified live canvas, exclusive switching, 390 px.
+4. **ZCode model settings restored** (`model-settings.tsx` +
+   `/api/models` CRUD): presets, provider catalog, server-only API keys,
+   full per-model metadata, and a **real connectivity test** via the
+   previously-missing `POST /api/models/[id]/test` (verified live: HTTP
+   401 from api.z.ai with a dummy key; no-key and timeout paths honest).
+   Draft re-syncs after Save.
+   Commits: `86e277c`, `c0d3a47`. Evidence: `tests/final-*.png`.
+   **Environment note:** the sandbox was rebuilt after pass 2 — external
+   credentials, git remote and `gh` CLI are gone; see
+   `FINAL-TL-HANDOFF-2026-10-31.md` §6.1 for the PR #14 push/merge
+   procedure from a credentialed machine.
+
+
 ## Pass 2 (later on 2026-10-31) — credentials + re-verification
 
 1. **Credential handoff executed** (the instruction that still stood): all
